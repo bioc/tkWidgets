@@ -209,7 +209,7 @@ pExplorer <- function (pkgName = "", pkgPath = "",
     tkpack(butFrame, pady = 5)
     writePkgDirs()
 
-    if(grtFocus){
+    if(getFocus){
         tkgrab.set(base)
     }
     tkwait.window(base)
