@@ -228,7 +228,7 @@ sNames4rNames <- function(pdata, sampleNames){
         ok <- tkmessageBox(title = "Sample mis-match",
                      message = paste("Length of sample names and",
                          "row numbers of data frame do not match.",
-                         "\nContinue?"),
+                         "\nContinue anyway?"),
                      icon = "question",
                      type = "yesno")
         if(tclvalue(ok) == "no"){
