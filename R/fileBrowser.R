@@ -79,12 +79,9 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         if(length(selIndex) > 0){
             for(i in selIndex){
                 selObj <- as.character(tkget(listView, i))
-#                if(regexpr(paste(".*", Platform()$file.sep, sep = ""),
-#                           selObj) == -1){
                     fileSelected <<- c(fileSelected,
                                     paste(path, Platform()$file.sep,
                                           selObj, sep = ""))
-#                }
             }
             fileSelected <<- unique(fileSelected)
             writeToView(selectView, fileSelected)
@@ -172,27 +169,23 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     base <- tktoplevel()
     tktitle(base) <- paste("File Browser")
 
-    canvas <- tkcanvas(base, relief = "raised", width = CANWIDTH,
-                       height = CANHEIGHT)
-    tkpack(canvas, side = "top", fill = "both")
-
-    topFrame <- tkframe(canvas)
+    topFrame <- tkframe(base)
     instruct <- tklabel(topFrame, text = textToShow, font = LABELFONT1)
     dir <- tklabel(topFrame, text = "Directory: ", font = LABELFONT2)
     caption <- tklabel(topFrame, text = path, font = LABELFONT2)
     tkgrid(instruct, columnspan = 2)
     tkgrid(dir, caption)
-    tkcreate(canvas, "window", (CANWIDTH/2), (2 * OFFSET + LABELHEIGHT/2),
-	     anchor = "center", window = topFrame)
+    tkgrid(topFrame, columnspan = 2, padx = 10)
 
-    leftFrame <- tkframe(canvas)
+    leftFrame <- tkframe(base)
     dirLabel <- tklabel(leftFrame, text = "Files in directory",
                         font = "Helvetica 11")
     tkgrid(dirLabel, columnspan = 2)
-    viewFrame <- tkframe(leftFrame)
-    listView <- makeView(viewFrame, vWidth = BOXWIDTH,
+    dirLFrame <- tkframe(leftFrame)
+    listView <- makeView(dirLFrame, vWidth = BOXWIDTH,
                          vHeight = BOXHEIGHT)
-    tkgrid(viewFrame, columnspan = 2)
+    tkgrid(dirLFrame, columnspan = 2)
+
     upBut <- tkbutton(leftFrame, text = "Up", width = BUTWIDTH,
 		      command = up)
     selectBut <- tkbutton(leftFrame, text = "Select >>", width = BUTWIDTH,
@@ -205,17 +198,15 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkbind(listView, "<B1-ButtonRelease>", selInDir)
     writeDir(listView, pickFiles(dirsNFiles(path), testFun,
                                  prefix, suffix))
-    tkcreate(canvas, "window", OFFSET, (LABELHEIGHT + 2 * OFFSET + 15),
-	     anchor = "nw", window = leftFrame)
 
-    rightFrame <- tkframe(canvas)
+    rightFrame <- tkframe(base)
     selLabel <- tklabel(rightFrame, text = "Files selected",
                         font = "Helvetica 11")
     tkgrid(selLabel, columnspan = 2)
-    sViewFrame <- tkframe(rightFrame)
-    selectView <- makeView(sViewFrame, vWidth = BOXWIDTH,
+    selLFrame <- tkframe(rightFrame)
+    selectView <- makeView(selLFrame, vWidth = BOXWIDTH,
                            vHeight = BOXHEIGHT)
-    tkgrid(sViewFrame, columnspan = 2)
+    tkgrid(selLFrame, columnspan = 2)
     tkconfigure(selectView, selectmode = "extended", font = LABELFONT2)
     tkbind(selectView, "<B1-ButtonRelease>", selInSelection)
     remBut <- tkbutton(rightFrame, text = "<< Remove", width = BUTWIDTH,
@@ -225,17 +216,12 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid(remBut, clearBut)
     tkgrid.configure(remBut, sticky = "e")
     tkgrid.configure(clearBut, sticky = "w")
-    tkcreate(canvas, "window", (CANWIDTH/2 + OFFSET),
-             (LABELHEIGHT + 2 * OFFSET + 15),
-	     anchor = "nw", window = rightFrame)
 
-    botFrame <- tkframe(canvas)
-    endBut <- tkbutton(botFrame, text = "Finish", width = BUTWIDTH,
+    tkgrid(leftFrame, rightFrame)
+
+    endBut <- tkbutton(base, text = "Finish", width = BUTWIDTH,
 		       command = end)
-    tkpack(endBut)
-    tkcreate(canvas, "window", CANWIDTH/2,
-             (CANHEIGHT - OFFSET - LABELHEIGHT + 15),
-	     anchor = "center", window = botFrame)
+    tkgrid(endBut, columnspan = 2)
 
     tkwait.window(base)
 
