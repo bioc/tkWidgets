@@ -24,25 +24,19 @@ dataViewer <- function(data, caption = "", save = TRUE){
                              hScroll = TRUE, what = "canvas")
 
     dataFrame <- tkframe(innerFrame)
-    columnLength <- numberChar(data)
     for(i in 1:ncol(data)){
         tempFrame <- tkframe(dataFrame)
         if(!is.null(colnames(data))){
-            colWidth <- max(columnLength[i], nchar(colnames(data)[i]))
             tempName <- tkbutton(tempFrame, text = colnames(data)[i],
-                                 width = colWidth)
+                                 width = 0)
             tkpack(tempName, expand = TRUE, fill = "x")
-        }else{
-            colWidth <- columnLength[i]
         }
-        tempList <- tklistbox(tempFrame, width = colWidth,
+        tempList <- tklistbox(tempFrame, width = 0,
                               height = 0, background = "white")
         writeList(tempList, data[,i])
         tkpack(tempList, side = "left", expand = TRUE, fill = "y")
         tkpack(tempFrame, side = "left")
     }
-#    tkpack(dataFrame)
-#    tkwindow.create(innerFrame, "0.0", window = dataFrame)
 
     tkcreate(innerFrame, "window", 0, 0, anchor = "nw", window = dataFrame)
 

@@ -6,29 +6,40 @@
 
 \usepackage{/scratch/homes/jzhang/R/share/texmf/Sweave}
 \begin{document}
+\author{Jianhua Zhang}
 
 \title{Expected behavior of importWizard}
 \maketitle
 
-It takes three steps to import a file using
-\code{\link{importWizard}}. There are buttons that allow users to
-travel back and forth between the three steps.
+\copyright{2002 Bioconductor}
+
+\begin{verbatim}
+$Id: importWizard.Rnw,v 1.2 2003/04/03 13:41:24 jhnzhang Exp $
+\end{verbatim}
+
+It takes three steps to import a file using importWizard. There are
+buttons that allow users to travel back and forth between the three
+steps (states). When importWizard is invoked, an environment object is 
+created to keep data for each state. Data stored for each state
+include a list for the formal argument of read.table and
+an object of class colInfo with three slots for the
+name, data type, and retention of data columns read from a file.
  
 \section*{Step one: file browing}
 
-When \code{\link{importWizard}} is invoked, a widget that appears
-should have the following elements:
+When importWizard is invoked, a widget that appears will
+have the following elements: 
 
 \begin{itemize}
 \item An entry box for the name of the file to be imported.
 \item A "Borwse" button that allows users to browse directories for
   the a file to import.
-\item Two radio buttons define the type of the file to be
+\item Two radio buttons defining the type of the file to be
   imported. One button for delimited file and one for fixed width file.
 \item A list box with number for users to choose from for the line
   number from which import begins.
 \item A list box to show the file to be imported as lines read in
-  using \code{\link{readLines}}
+  using readLines
 \item  Four buttons ("Cancel", "< Back", "Next", "Finish") to allow
   users to travel back and forth.
 \end{itemize}
@@ -38,7 +49,17 @@ the entry box, one of the two radio buttons will be checked if the
 system is able to detect if the file is delimited or has fixed width,
 and the content of the file will be displayed as separate lines in the
 list box. Otherwise, the elements will be empty until users select a
-file using the "Browse" button.
+file using the "Browse" button, at which time the elements will be
+populated with data.
+
+When a file is displayed, the system will check to see if the file has
+a header, a delimiter separating data columns, and the data type for
+each data column (if any). The results will be used to initiate the
+values for the list that has the same set argument as the formal
+arguments for read.table. The initial values for the
+argument list for step one are set using values returned by
+guess.sep.A new line ("\t") is the default value for
+argument sep if the file does not have any other delimiter.
 
 Cliking the "Next >" button moves to step two.
 
@@ -49,20 +70,26 @@ The widget for step two has the following widget elements:
 \begin{itemize}
 \item A group of radio buttons for the exact type of delimiter used
   in the file to be imported. A delimiter that is not listed by the
-  radio buttons can be chosen by selecting "Other" radio button and
+  radio buttons can be entered by selecting "Other" radio button and
   then enter the the type of delimiter in the actived entry box beside
   "Other". 
 \item A list box for users to select the the type of quote used in the
   file. 
 \item A canvas showing the file in columns if the file is
   delimited. No function has be implemented to deal with fixed width
-  file at this time.
+  file yet at this moment.
 \item  Four buttons ("Cancel", "< Back", "Next", "Finish") to allow
   users to travel back and forth.
 \end{itemize}
 
-Clicking the "< Back" button moves back to step one and "Next >"
-button moves to step three.
+The initial values for the argument list for step two the same as the
+values when step one is exited. Any change by users will be written to
+the argument list for this step.
+
+Clicking the "< Back" button moves back to step one with the values of
+the argument list set to that of the last state of step one. Clinking "Next >"
+button moves to step three with the values of the argument list for
+step three set to the last state of step tow.
 
 \section*{Step three: file manipulation}
 
@@ -70,27 +97,26 @@ The widget for step three has the following widget elements:
 
 \begin{itemize}
 \item A "More Args..." button that allows users to select some of the
-  additional arguments to import a file using \code{\link{read.table}}
-  for advanced users.  
-\item A list box with the file to be imported shown in columns if
-  delimited. On top of each column there is a radio button to indicate
-  whether a column will droped when the file is imported, an entry box
+  additional arguments to import a file using read.table
+  for advanced users. The values of those arguments are defaulted to
+  that the default values for read.table.  
+\item A list box with the file to be imported shown in columns if. On
+  top of each column there is a radio button to indicate 
+  whether a column should be droped when the file is imported, an entry box
   for the name of the column when imported as a data frame, and
-  another entry box for the data type of the column. Default values
-  for these elements will be set but users are always able to change
-  them.  
+  another entry box for the data type of the column. 
 \item  Four buttons ("Cancel", "< Back", "Next", "Finish") to allow
   users to travel back and forth.
 \end{itemize}
 
 Clicking the "< Back" button moves back to step two. When the "Finish"
 button is clicked, a message box will pop up to allow users to decide
-whether to save the imported file a an R object in the .Global
+whether to save the imported file as an R object in the .Global
 environment by a specified name.
 
 \section*{Usage}
 
-\code{\link{importWizard}} is driven by the interface. Users only need
+importWizard is driven by the interface. Users only need
 to type "importWizard()" or "importWizard(filename)" to begin the
 importing process.
 
