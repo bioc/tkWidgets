@@ -57,6 +57,10 @@ guess.header <- function(twoLines, sep){
     firstLine <- as.numeric(firstLine)
     scndLine <- as.numeric(scndLine)
     options(warn = 1)
+
+    firstLine[!is.na(firstLine)] <- "num"
+    scndLine[!is.na(scndLine)] <- "num"
+
     if(!setequal(firstLine, scndLine)){
         return(TRUE)
     }else{
