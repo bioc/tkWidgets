@@ -31,8 +31,19 @@ importPhenoData <- function(sampleNames){
             args <- argsWidget(args,
                                inst = "Arguments for function read.table")
             args[["row.names"]] <- sampleNames
-            pdata <<- do.call("read.table", as.list(args))
-            newPhenodata <<- createPhenoData(pdata, sampleNames)
+            options(show.error.messages = FALSE)
+            tryMe<- try(do.call("read.table", as.list(args)))
+            options(show.error.messages = TRUE)
+            if(inherits(tryMe, "try-error")){
+                tkmessageBox(title = paste(what, "read.table error"),
+                     message = paste("read.table failed because of",
+                                    tryMe[1]),
+                     icon = "error",
+                     type = "ok")
+            }else{
+                pdata <<- tryMe
+                newPhenodata <<- createPhenoData(pdata, sampleNames)
+            }
         }
     }
     readObj <- function(){
@@ -192,7 +203,7 @@ createPhenoData <- function(pdata, sampleNames){
     dataText <- makeViewer(dataFrame, vWidth = 30, vHeight = 15,
                            hScroll = TRUE,
                            vScroll = TRUE, what = "text", side = "left",
-                           text = "")
+                           text = "editable cells to be implemented")
     tkpack(dataText, side = "top", expand = TRUE, fill = "both")
     tkpack(dataFrame, side = "top", expand = TRUE, fill = "both",
            padx = 5)
@@ -209,6 +220,9 @@ createPhenoData <- function(pdata, sampleNames){
     tkwait.window(base)
 
 }
+
+
+
 
 
 

@@ -9,12 +9,16 @@
   data frame object and use the data frame to construct a phenoData object
 }
 \usage{
-importPhenoData()
-createPhenoData(pdata)
+importPhenoData(sampleNames)
+createPhenoData(pdata, sampleNames)
 showIOError(what)
 }
 
 \arguments{
+  \item{sampleNames}{\code{sampleNames} a vector of character strings
+    for the names of samples. The length of \code{smapleNames} should be
+    the same as the number of rows of an existing file or data frame if
+    a phenoData object is to be created based on a file or data frame}
   \item{pdata}{\code{pdata} a data frame for the experimental data}
   \item{what}{\code{what} a character string to indicate whether a name
     for a file ("file"), data frame ("data frame"), or phenoData
