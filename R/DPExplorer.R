@@ -5,6 +5,9 @@
 # Copyrihgt, 2003, J. Zhang, all rights reserved
 #
 
+##FIXME: the selection of keys for returning needs to grab the environment
+## as well, right now we merely try to use the last environment selected
+## and that is not quite what we would like
 DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer",
                         getFocus = TRUE){
 
