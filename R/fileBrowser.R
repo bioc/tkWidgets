@@ -18,8 +18,8 @@ fileBrowser <- function (path = ""){
     }
 
     inList <- function(){
-        if(tkcurselection(listView) != ""){
-            selectedObj <<- tkget(listView, tkcurselection(listView))
+       if(tkcurselection(listView) != ""){
+            selectedObj <<- tkget(listView,(tkcurselection(listView)))
             if(regexpr(Platform()$file.sep, selectedObj) >= 1){
 	        path <<- paste(path, Platform()$file.sep,
                                gsub(Platform()$file.sep, "\\", selectedObj),
@@ -29,8 +29,16 @@ fileBrowser <- function (path = ""){
                 writeCap(path)
                 if(currentNode >= 2)
                     tkconfigure(upBut, state = "normal")
-            }else
-                fileSelected <<- selectedObj
+                fileSelected <<- ""
+            }
+        }
+    }
+
+    selFile <- function (){
+        if(tkcurselection(listView) != ""){
+            selectedObj <<- tkget(listView, tkcurselection(listView))
+            fileSelected <<- tkget(listView,
+                                       tkcurselection(listView))
         }
     }
 
@@ -87,7 +95,8 @@ fileBrowser <- function (path = ""){
     listView <- makeView(listFrame)
     tkpack(listFrame, fill = "x", expand = TRUE)
 
-    tkbind(listView, "<B1-ButtonRelease>", inList)
+    tkbind(listView, "<Double-Button-1>", inList)
+    tkbind(listView, "<B1-ButtonRelease>", selFile)
     writeDir(listView, list.files(path), path)
 
     butFrame <- tkframe(base)

@@ -4,8 +4,9 @@
 \title{An simple interface to view files and pick one as the return.}
 \description{
   This function provides the GUI for users to go up and down a path and
-  view the files. When a file shown is selected, the function will
-  return the full path for that file. 
+  view the files. When a file/directory shown is selected and the "End"
+  button pressed, the function will return the full path for that
+  file/directory.  
 }
 \usage{
 fileBrowser(path="")
@@ -18,9 +19,12 @@ fileBrowser(path="")
 \details{
   When a path is viewed, files will be displayed as they are and
   directories will be displayed with a system file separacter appended
-  (e.g. "/" for the Unix system). Click on a file name will make a
-  selection and the full path for the selected file will be
-  returned. The GUI is modal and has to be closed before doing any other
+  (e.g. "/" for the Unix system). Single click on a file/directory name
+  will make a selection and double clicks on a directory name will go
+  into that directory and the files displayed. When a file/directory is
+  selected and the "End" button pressed, the full path for the selected
+  file/directory will be returned. The GUI is modal and has to be closed
+  by pressing the "End" button before doing any other
   operations. 
 }
 \value{
@@ -29,7 +33,7 @@ fileBrowser(path="")
 }
 \references{tcltk, R News Vol. 1/3, 2001. A Primer on the R-Tcl/Tk Package.}
 \author{Jianhua (John) Zhang}
-\note{This funciton is part of the Bioconductor project at Dana-Farber
+\note{This function is part of the Bioconductor project at Dana-Farber
   Cancer Institute to provide Bioinformatics funcitons through R.}
 
 \seealso{\code{\link{makeView}},\code{\link{writeDir}}}
@@ -44,3 +48,7 @@ fileBrowser(path="")
 # fileBrowser(path = "yourPath")
 }
 \keyword{interface}
+
+
+
+
