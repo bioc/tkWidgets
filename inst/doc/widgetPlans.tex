@@ -8,120 +8,187 @@
 
 \section*{Some ideas}
 
-Here are some simple ideas for building widgets. While this document
-lives in the tkWidgets directory (for now) the plan is not to be
-limited by that functionality. Gtk and other things -- Java etc,
-seem like reasonable targets.
+This document constitutes a request for comments for the Bioconductor
+widget project.
+The goals of this project are to provide software infrastructure and a
+programming paradigm to help package developers implement widgets.
+We are not interested directly in graphical user interfaces (GUIs)
+since we understand that terminology to describe a fully featured
+programmatic user interface. Our concern is with providing small-scale
+navigable graphical interfaces for particular tasks. Examples of such
+tasks include browsing (e.g. for files) or data entry. Such
+tasks can be package specific in some cases while in others they can
+be more generally useful.
 
-Let's start with some definitions.
-
-A primitive widget (pwidget) is simply a set of linked interactive
-tools.
-Some examples:
-\begin{itemize}
-\item A text string, a type--in box and a button.
-\item A set of linked radio buttons
-\item A set of linked check boxes
-\item A list-box
-\item A button -- can have an arbitrary R function associated with it.
-\end{itemize}
-
-A widget is an ordered collection (list) of pwidgets.
-These get rendered in a single dialog box.
-The default values are given by the input list and on exit the state
-of the different pwidgets is recorded in the list, which is returned.
-A widget can have two hooks, these are not rendered. One is a
-pre--rendering hook (a function that takes no arguments) and if
-present is run before the widget is rendered.
-A post--rendering hook which is run when the widget is closed.
-The pre--rendering hook is run on entry and the post--hook is registered with 
-\verb+on.exit+. This ensures that it is run when the function is
-exited regardless of how. 
-It might be nice (but this will take some time) to allow it to
-determine how the exit was achieved (is it an end
-or a next or an error or ...).
-
-Widgets are rendered by the \verb+widgetRender+ function.
-It returns an object of the \verb+iWidget+ which is a list of
-lists. If the exit is normal (ie via the {\em end} button) then the
-users changes will be contained in the return value and an element
-{\tt end} whose value will be {\tt "END"}. 
-For all other forms of exit the input
-will be returned. The rendered widget by default will have a
-\verb+cancel+ button and an \verb+end+ button if there is no
-definition for an end button in the controlbuttons list. 
-
-In the not too distant future the pwidgets will be implemented as S4
-classes. This will give them more structure. In this preliminary
-implementation they will be lists. However, we have used
+It is our intention to implement all structure described here as S4
+classes. This will provide a great deal of structure and can provide a
+basis for extension by others with different needs. In the preliminary
+implementation they will be lists. However, we have used the notion of
 abstract data types and that should let us reuse much of the
 code when the methods and classes are implemented.
 
-Next we introduce the concept of {\em chained widgets},
-\verb+cWidgets+. Basically this is simply a list of widgets that will
-be rendered sequentially. The \verb+cWidgets+ will also have pre and
-post rendering hooks (these happen once for the entire
-process). except for the first and last widgets in the list of
-cWidgets who will have a \verb+next+ (first) or \verb+previous+
-(last). The last widget will also have an \verb+end+ button. A counter
-to indicate state is maintained and used for navigation.  
+While our initial implementation of some of these ideas is in
+\verb+tcl/tk+ our intention is for the methodology to be general and
+hence applicable to other systems such as Gtk and Java.
 
-The buttons will be defined by a list named control buttons that has a
-bottonText and buttonFun defining the label and behavior of the button
-respectively.  
+We begin with some definitions.
 
-We need to decide how to run the pre and post widget hooks when the
-different buttons are pushed (does \verb+next+ run the hook or does
-any exit from the widget?).
+A primitive widget or {\em pWidget} is simply a set of linked interactive
+tools.
+Some examples:
+\begin{itemize}
+\item A text string, a type-in box and a button.
+\item A set of linked radio buttons
+\item A set of linked check boxes
+\item A list-box
+\item A button that can have an arbitrary R function associated with
+  it. Text and a type-in box or list box may also be available.
+\end{itemize}
+
+A simple object system can be used to organize and describe each
+pWidget.
+Initially this will simply be a list where each element of the list
+describes one component of the pWidget.
+Thus, in the first pWidget suggested the list representation would be
+of length three. The first component would indicate that it was a text
+string and provide the text to be displayed. The second element would
+be a type-in box and would contain a component describing the default
+value. The third component would be button. It would have information
+regarding the text to appear in the button and the function to be
+evaluated if the button is pushed by the user.
+
+%%FIXME: can pWidgets be rendered on their own or only as components
+%%of other things?
+A pWidget can then be easily assembled and rendered. 
+All pWidgets have both a \verb+Cancel+ button and an \verb+End+
+button. When the user pushes the \verb+End+ button the current values
+for all components are saved in the appropriate slots and the pWidget
+list is returned. Thus, the programmer has access to the users choices
+and can use them to guide the evaluation of their program.
+
+pWidgets are not themselves a complex enough structure to adequately
+handle all tasks that we would like to address with this
+system. Therefore we will introduce a number of more complex
+components as well.
+The first of these is the {\em widget}.
+
+A {\em widget} is an ordered collection (list) of pWidgets.
+To construct a widget the programmer creates and then combines a
+number of pWidgets into a single list or structure. The order is
+important and will determine the order in which the pWidgets will be
+rendered.
+A widget is contained within a single dialog box.
+The default values are given by the input list and on exit the state
+of the different pWidgets is recorded in the list, which is returned.
+
+A widget can have two hooks which are not themselves rendered. 
+A hook is simply a set of expressions that are evaluated at a
+particular time they do not accept any arguments and hence must be
+self-contained. 
+Widgets can have a pre-rendering hook to handle specific set-up tasks
+and a post-rendering hook to handle any tasks (such as unlinking of
+temporary files) that need to be done after the widget is exited.
+Any hook that is present is guaranteed to run regardless of the type
+of exit.
+
+Widgets are rendered by the \verb+widgetRender+ function.
+It returns an object of the \verb+iWidget+ class which is basically a
+list of lists. If the exit is normal (ie via the {\em end} button)
+then the users changes will be contained in the return value and an
+element {\tt end} whose value will be {\tt "END"}. 
+For all other forms of exit the input
+will be returned. The rendered widget by default will have a
+\verb+Cancel+ button and an \verb+End+ button if there is no
+definition for an end button in the control buttons list. 
+
+Widgets themselves need to be extended to deal with more complex
+interactions. A familiar prototype that seems to be generally useful
+is the data entry wizard that appears when one wants to import data
+into a Microsoft Excel Worksheet. The wizard is basically a set of
+linked panes that guide the user through the steps of entering their
+data. In order to mimic that process and other related ones we
+introduce the further concept of chained widgets or {\em cWidget}s.
+
+Basically a cWidget is simply a list of widgets that will
+be rendered according to some specification. 
+In the case of the data entry wizard one would like to guide the user
+through a sequence of steps and that process should be enabled. In
+other similar situations there will be no specific way to order the
+users progression and a different sort of iteration will be needed. 
+cWidgets will provide sufficient functionality to accomodate all such
+uses.
+
+The \verb+cWidgets+ will also have pre and
+post rendering hooks (these are evaluated once for the entire
+process). 
+Some special rendering will occur depending on the type of cWidget
+that is being processed. If the widgets must be processed in order
+(e.g. a wizard) then only the active pane will be displayed. The
+active pane will contain (as appropriate) buttons for \verb+Next+ 
+and \verb+Previous+. All panes will contain a \verb+Cancel+ button and
+the last widget will also have an \verb+End+ button. A counter
+will be used to maintain state and for navigation. 
+There will probably be options to control the display of the
+\verb+Previous+ button to situations where it is appropriate. 
+
+In this context we will also need to exercise some caution in
+determining the appropriate behavior of any hooks that exist on the
+widgets themselves. If the user navigates sequentially through the
+widgets then their behavior is basically unambiguous but if backing up
+is allowed that may require some substantially different behavior and
+possible a different mechanism.
 
 If the user pushes \verb+cancel+ the whole thing exits (again, we need
 some decision about what gets returned). Here one might want to return
 both the exit status and the list of widgets actually visited.
-Duncan M. suggested that we want the exit status but not the list of
+We may simply want the exit status but not the list of
 widgets visited.
+It is difficult to envisage a workable solution without some
+experience. We hope that be implementing cWidgets very abstractly we
+will be able to adopt a number of useful modifications as the project
+progresses.
 
-He also proposed a paged control. In this type of widget the different
+A paged control is a type of widget where the different
 controls are represented by tabs. They can be selected in any order
 and navigated as desired by the user.
-
-Duncan M. also suggested that widgets should know why they are
-exiting.
 
 Another suggestion is that there should be platform specific labels.
 I think that this could be done by using \verb+options+ and installing
 some package specific ones for {\em tkWidgets}.
+Standard nomenclature is different depending on which platform is
+being used and we would prefer to use the appropriate names for the
+platform that is being used. 
 
 \section*{Some specifics}
 
 An example of what seems to be easy and useful is the following.
 We can have a list of the form
 \begin{verbatim}
-list(Wtype="Typein", Name="aaa", Value=NULL, ButtonText = "Brows",
+list(Wtype="Typein", Name="aaa", Value="", ButtonText = "Browse",
      ButtonFun=fileBrowser) 
 \end{verbatim}
 This would get rendered as a typein box with name \verb+aaa+. The box
-would initially be empty since \verb+Value+ was set to \verb+NULL+
-(maybe it should be the empty string). There is a button labeled
-"Brows" off the end of the box that is linked to the
+would initially be empty since \verb+Value+ was set to \verb+""+
+(which is the empty string). There is a button labeled
+\verb+Browse+ off the end of the typein-box that is linked to the
 \verb+fileBrowser+ function. This button when clicked will evaluate
-the \verb+fileBrowser+ function and put its return value into the
-typein box. 
+the \verb+fileBrowser+ function.
+The returned value of this function will be placed in the typein-box.
 
-Ok, there is a problem here. It seems that we need an additional layer
-of abstraction. The problem: suppose that the Button is linked to
+It seems that an additional layer
+of abstraction will be beneficial. 
+To see the potential problem, suppose that the Button is linked to
 \verb+objectBrowser+ and that the user has selected multiple
 objects. How do we associate those with the text in the typein box?
-It does not appear that we can do that directly. So an extra layer of
-abstraction might be enough for most purposes. There is a \verb+Value+
-slot. This value is supplied by the user or it is the return value of
-the function associated with the button. There is a \verb+toText+
-function that takes that value and renders it for the text box.
-Some care to deal with multiple values (which might not be character
-strings will be needed). Also, I believe that if the return type
-should not be a character string then editing of the box manually
-should be prevented, here we could just render the text.
+It does not appear that we can do that directly. An extra layer of
+abstraction might be enough for most purposes. A \verb+toText+
+function takes any value and transforms it into a format suitable for
+the text box. In the example given that transformation would be to
+concatenate the multiple values with a separator (generally a comma).
+There may be a need for a similar function which extracts the data
+from a typein-box.
 
-Each \verb+pWidget+ has the following slots:
+A typein-box \verb+pWidget+ has the following slots:
 \begin{itemize}
 \item Name: the print name for the item
 \item Value: a value associated with this item
@@ -137,6 +204,8 @@ Each \verb+pWidget+ has the following slots:
   type things in then this will be needed.
 \end{itemize}
 
+%%FIXME: Jianhua, we need to specify the contents of other pWidgets
+
 We will need a boolean vector for the set of pWidgets to monitor
 changes. The return value will be a list with components that include
 \begin{itemize}
@@ -149,14 +218,20 @@ When a button is clicked and a return value retrieved it is put into
 the Value slot and toText is run on it to ensure the text box has up
 to date data.
 
+%%FIXME: what are frames?
 At some point we need to worry about the layout of the primitive
 widgets on a widget to be built by \verb+widgetRender+. tk has three
-types of geometry managers namely pack, grid, and place. pack puts
-widgets in four sides namely top, right, bottom, and left. grid puts
-widgets in grids, and place places widgets at specified lacations
+types of geometry managers namely pack, grid, and place. {\em Pack} puts
+widgets in four sides namely top, right, bottom, and left. {\em Grid} puts
+widgets in grids, and {\em place} places widgets at specified locations
 based on absolute or relative values. For our purpose, pack and grid
 would be our options. With the help of frames, we should be able to
 have the widgets rendered nicely on a widget.
+
+%%FIXME: I think that with some examples of radio buttons, list boxes
+%%etc we might be able to dress this up as a submission to JSS or a
+%%similar software journal. Rnews is another possibility. But I think
+%%that we have done enough work for JSS.
 
 \end{document}
 
