@@ -134,6 +134,7 @@ initImportWizard <- function(env){
     on.exit(end())
     # Destroy the window
     end <- function(){
+        tkgrab.release(top)
         tkdestroy(top)
     }
     nextState <- function(){
@@ -197,6 +198,7 @@ initImportWizard <- function(env){
     tkpack(butFrame, pady = 10, fill = "y", expand = TRUE)
 
     args <- getArgs(env)
+    tkgrab.set(top)
     tkwait.window(top)
     return(invisible(dataList))
 }
@@ -288,7 +290,7 @@ finish <- function(env){
     if(is.null(args[["quote"]])){
         args[["quote"]] <- "\"'"
     }
-    dataName <- getName4Data(args[["file"]])
+    dataName <- getName4Data(args[["file"]], "data frame")
     options(show.error.messages = FALSE)
     dataFile <- try(do.call("read.table", args))
     options(show.error.messages = TRUE)
@@ -397,6 +399,7 @@ setState1TFrame <- function(frame, viewer, delims, env){
     tkpack(label1, side = "left")
     # An entry box to hold the result of fileBrowser
     nameEntry <- tkentry(nameFrame, width = 20, textvariable = fName)
+    tkbind(nameEntry, "<KeyPress-Return>", getFile)
     # If a file name is given, fill the widget with data
     if(!is.null(getArgs(env)[["state1"]][["file"]])){
         writeList(nameEntry, getArgs(env)[["state1"]][["file"]], clear = TRUE)
@@ -446,20 +449,24 @@ showData4State1 <- function(widget, env){
 setState1MFrame <- function(frame, env, dataViewer){
     # Executed when values in start at row list box is clicked
     startClicked <- function(){
-        setSkip(startList, env)
         args <- getArgs(env)
-        skip <- as.numeric(args[["state1"]][["skip"]])
-        assignShowNum((getShowNum(env) + skip), env)
-        dataFile <- getLineData(env)
-        showNum <- getShowNum(env)
-        if(length(dataFile) > showNum){
-            dataFile <- dataFile[(skip + 1):showNum]
-        }else{
-            dataFile <- dataFile[(skip + 1):length(dataFile)]
+        if(length(args) != 0 && args[["state1"]][["file"]] != ""){
+            setSkip(startList, env)
+            #args <- getArgs(env)
+            skip <- as.numeric(as.character(tkget(startList,
+                                 tkcurselection(startList)))) - 1
+            #skip <- as.numeric(args[["state1"]][["skip"]])
+            assignShowNum((getShowNum(env) + skip), env)
+            dataFile <- getLineData(env)
+            showNum <- getShowNum(env)
+            if(length(dataFile) > showNum){
+                dataFile <- dataFile[(skip + 1):showNum]
+            }else{
+                dataFile <- dataFile[(skip + 1):length(dataFile)]
+            }
+            setArgsList(args[["state1"]][["file"]], env, TRUE, FALSE)
+            #        showData4State1(dataViewer, env)
         }
-        setArgsList(args[["state1"]][["file"]], env, FALSE, FALSE)
-#        showData4State1(dataViewer, env)
-
     }
     leftPan <- tkframe(frame)
     delimit <- tclVar()
@@ -475,9 +482,12 @@ setState1MFrame <- function(frame, env, dataViewer){
                                 value = "fixed", variable = delimit,
                                 anchor = "nw")
     tkpack(fixedRadio, anchor = "w", expand = TRUE, fill = "x")
-    tkpack(leftPan, side = "left", anchor = "w", fill = "x", expand = TRUE)
-    rightPan <- tkframe(frame)
-    paraLabel2 <- tklabel(rightPan, text = "Start import at row:")
+    tkpack(leftPan, side = "top", anchor = "w",
+           pady = 5, padx = 5, fill = "x", expand = TRUE)
+
+    rightPan <- tkframe(frame, borderwidth = 2, relief = "groove")
+    paraLabel2 <- tklabel(rightPan, text = paste("Start importing data from",
+                          "line: "))
     tkpack(paraLabel2, side = "left", anchor = "ne")
     startFrame <- tkframe(rightPan)
     startList <- makeViewer(startFrame, vWidth = 2, vHeight = 1,
@@ -487,7 +497,10 @@ setState1MFrame <- function(frame, env, dataViewer){
     writeList(startList, 1:99, clear = TRUE)
     tkpack(startFrame, anchor = "w", side = "left",
                                           fill = "x", expand = TRUE)
-    tkpack(rightPan, side = "left", padx = 7, expand = TRUE, fill = "x")
+    tkpack(tklabel(rightPan, text = " of the data frame shown below"),
+           side = "left", expand = FALSE,  anchor = "ne")
+    tkpack(rightPan, side = "top", padx = 5, pady = 5,
+           expand = TRUE, fill = "x")
     return(list(delimit = delimitRadio, fixed = fixedRadio))
 }
 
@@ -844,7 +857,7 @@ getMoreArgs <- function(){
 }
 # This function provides the interface for uers to decide whether to
 # save the imported data in the global environment
-getName4Data <- function(filename){
+getName4Data <- function(filename, objType = "object"){
     # Gets ride of the separaters
     temp <- gsub(paste("^.*", .Platform$file.sep,
                                   "(.*)", sep = ""), "\\1", filename)
@@ -853,12 +866,20 @@ getName4Data <- function(filename){
     var <- tclVar(temp)
     # Destroy the window
     end <- function(){
+        tkgrab.release(top)
         tkdestroy(top)
     }
     # Save the data
     save <- function(){
         temp <<- tclvalue(var)
-        end()
+        if(temp == ""){
+            tkmessageBox(title = "I/O Error",
+                     message = "No name entered\nPlease try again",
+                     icon = "error",
+                     type = "ok")
+        }else{
+            end()
+        }
     }
     # Do not save the data
     noSave <- function(){
@@ -867,21 +888,26 @@ getName4Data <- function(filename){
     }
     ## Set up the interface
     top <- tktoplevel()
-    nameFrame <- tkframe(top)
+
     tktitle(top) <- "BioC Data Import Wizard"
-    inst <- tklabel(nameFrame, text = paste("Save data in .GlobalEnv as:"))
+    tkpack(tklabel(top, text = paste("Would you like to save the", objType)),
+                   side = "top", pady = 5, padx = 5)
+
+    nameFrame <- tkframe(top)
+    inst <- tklabel(nameFrame, text = "Save as: ")
     tkpack(inst, side = "left")
     nameEntry <- tkentry(nameFrame, width = 10, textvariable = var)
     tkpack(nameEntry, side = "left")
     tkpack(nameFrame, side = "top", pady = 5, padx = 5)
     butFrame <- tkframe(top)
-    noSaveBut <- tkbutton(butFrame, text = "Do'nt Save", width = 10,
+    noSaveBut <- tkbutton(butFrame, text = "Don't Save", width = 10,
                        command = noSave)
     saveBut <- tkbutton(butFrame, text = "Save", width = 10,
                         command = save)
     tkpack(noSaveBut, saveBut, side = "left")
     tkpack(butFrame, side = "top", pady = 5, padx = 5)
 
+    tkgrab.set(top)
     tkwait.window(top)
 
     return(temp)

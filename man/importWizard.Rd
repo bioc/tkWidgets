@@ -28,7 +28,7 @@
   together with the argument list used to import the data using read.table
 }
 \usage{
-importWizard(filename = "", maxRow = 400, getFocus = TRUE)
+importWizard(filename = "", maxRow = 400)
 initImportWizard(env)
 getTopCan(base, env)
 getAFrame(base, env)
@@ -48,7 +48,7 @@ showData4State2(canvas, env, state = "state2")
 getState3Frame(base, env)
 setState3TFrame(frame, env)
 setState3BFrame(frame, env)
-getName4Data(filename, getFocus)
+getName4Data(filename, objType)
 writeCol4Matrix(tempFrame, dataFile, colInfos, env)
 }
 
@@ -81,8 +81,8 @@ writeCol4Matrix(tempFrame, dataFile, colInfos, env)
   \item{reset}{\code{reset} a boolean that is TRUE when the window needs
     to be reset}
   \item{dataViewer}{\code{dataViewer} a tkwin object for a list box}
-  \item{getFocus}{\code{getFocus} a boolean indicating whether a widget
-    should grab the focus}
+  \item{objType}{\code{objType} a character string indicating the data
+    type of an object to be saved. Defaulted to "object"}
 }
 \details{
   \code{\link{importWizard}} mimics the interface of MS Excel and
