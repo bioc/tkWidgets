@@ -15,7 +15,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         pkgPath <- tclVar(pkgPaths[1])
         pkgName <- tclVar(pkgName)
     }
-    pkgNames <- list.files(tclvalue(pkgPath))
+    pkgNames <- getRPkgs(tclvalue(pkgPath))
     curDir <- file.path(tclvalue(pkgPath), tclvalue(pkgName))
 
     end <- function(){
@@ -24,7 +24,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     on.exit(end())
     pathEntered <- function(){
         options(show.error.messages = FALSE)
-        pkgNames <<- try(list.files(tclvalue(pkgPath)))
+        pkgNames <<- try(getRPkgs(tclvalue(pkgPath)))
         options(show.error.messages = TRUE)
         if(inherits(pkgNames, "try-error")){
             warning(tclvalue(pkgPath), "is not a valid name")
@@ -40,7 +40,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         if(!inherits(opt, "try-error")){
             writeList(pathEntry, opt, clear = TRUE)
             tclvalue(pkgPath) <<- opt
-            pkgNames <<- list.files(opt)
+            pkgNames <<- getRPkgs(opt)
             tclvalue(pkgName) <<- pkgNames[1]
             curDir <<- file.path(opt, pkgNames[1])
             writePkgDirs()
@@ -48,7 +48,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     }
     browse <- function(){
         tclvalue(pkgPath) <<- tkchooseDirectory()
-        pkgNames <<- list.files(tclvalue(pkgPath))
+        pkgNames <<- getRPkgs(tclvalue(pkgPath))
         tclvalue(pkgName) <<- pkgNames[1]
         curDir <<- file.path(tclvalue(pkgPath), tclvalue(pkgName))
         writePkgDirs()
@@ -84,7 +84,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
             writeList(listView, getPkgContents(curDir, getExclude()))
             tkconfigure(upBut, state = "normal")
         }else{
-            popDisplay(getFileContents(file.path(curDir, selectedObj)))
+            popDisplay(getFileContents(curDir, selectedObj))
         }
     }
     popDisplay <- function(contents){
@@ -163,7 +163,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     tkpack(leftFrame, side = "left", expand = TRUE, fill = "both")
     # Put the text box to show contents of a selected file
     rightFrame <- tkframe(midFrame)
-    tkpack(tklabel(rightFrame, text = "Dispaly window"), side = "top",
+    tkpack(tklabel(rightFrame, text = "Display window"), side = "top",
            expand = FALSE, fill = "x")
     textFrame <- tkframe(rightFrame)
     contViewer <- makeViewer(textFrame, vWidth = 50, vHeight = 10,
@@ -199,26 +199,110 @@ getPkgContents <- function(pkgName, exclude = getExclude()){
     }
 }
 
-getFileContents <- function(fileName){
+getFileContents <- function(path, fileName){
+    if(basename(path) == "help"){
+        return(procHelp(file.path(path, fileName)))
+    }
     if(regexpr("\\.rda", fileName) > 0 ){
-        load(fileName)
-        return(capture.output(get(gsub("\\.rda", "",
-                              basename(fileName)), parent.frame())))
+        return(procRda(file.path(path, fileName)))
     }
     if(regexpr("\\.gz", fileName) > 0){
-        return(readLines(gzfile(fileName)))
+        return(readLines(gzfile(file.path(path, fileName))))
     }
     if(regexpr("\\.zip", fileName) > 0){
-        return(readLines(unz(fileName)))
+        return(readLines(unz(file.path(path, fileName))))
+    }
+    if(regexpr("\\.Rd", fileName) > 0){
+        return(procRd(file.path(path, fileName)))
+    }
+    if(regexpr("\\.pdf", fileName) > 0){
+        return(procPDF(file.path(path, fileName)))
+    }
+    if(regexpr("\\.html", fileName) > 0){
+        return(procHTML(file.path(path, fileName)))
     }
     # Ohterwise, use readLines
     return(readLines(fileName))
 }
 
-getExclude <- function(){
-    return(c("Meta/", "html/", "latex/", "INDEX"))
+# For rda files, try to find the Rd file and return it
+procRda <- function(fileName){
+    return(procHelp(gsub(paste("data", .Platform$file.sep,
+                                basename(fileName), sep = ""),
+                     paste("help", .Platform$file.sep, gsub("\\.rda",
+                     "", basename(fileName)), sep = ""), fileName)))
+
 }
 
+procHelp <- function(fileName){
+    options(show.error.messages = FALSE)
+    doc <- try(readLines(fileName))
+    options(show.error.messages = TRUE)
+    if(inherits(doc, "try-error")){
+        return(paste(basename(fileName), "is not displayable"))
+    }else{
+        # Get rid of "_\b"s
+        return(gsub("_\\\b", "", doc))
+    }
+}
+
+procPDF <- function(fileName){
+   OST <- .Platform$OS.type
+   if (OST == "windows") {
+       shell.exec(fileName)
+   }
+   else if (OST == "unix") {
+       viewer <- getOption("pdfviewer")
+       if (is.null(viewer)) {
+           for (x in c("xpdf", "acroread", "acroread4")) {
+               viewer <- system(paste("which", x), intern = TRUE,
+                                ignore.stderr = TRUE)
+               if (length(viewer) > 0 && file.exists(viewer))
+                   break
+               viewer <- character()
+           }
+           if (length(viewer) == 0) {
+               return("No available PDF viewer found on system")
+           }
+       }
+   }
+
+   system(paste(viewer, fileName))
+   return(invisible())
+}
+
+procHTML <- function(fileName){
+    options(show.error.messages = FALSE)
+    tryMe <- try(browseURL(fileName))
+    options(show.error.messages = TRUE)
+    if(inherits(tryMe, "try-error")){
+        return(paste("Could not display", basename(fileName)))
+    }else{
+        return(invisible())
+    }
+}
+
+getExclude <- function(){
+    return(c("Meta/", "latex/", "INDEX"))
+}
+
+
+getRPkgs <- function(pkgPath){
+
+     toCheck <- list.files(pkgPath)
+     if (length(toCheck) == 0) return("")
+     isd <- file.info(file.path(pkgPath, toCheck))
+     dirWithDesc <- sapply(file.path(pkgPath,toCheck[isd$isdir]), hasDesc)
+     return(basename(names(dirWithDesc)[dirWithDesc]))
+}
+
+hasDesc <- function(pkgPath){
+    if(any(list.files(pkgPath) == "DESCRIPTION")){
+        return(TRUE)
+    }else{
+        return(FALSE)
+    }
+}
 
 
 

@@ -3,6 +3,12 @@
 \alias{getPkgContents}
 \alias{getFileContents}
 \alias{getExclude}
+\alias{getRPkgs}
+\alias{hasDesc}
+\alias{procRda}
+\alias{procHelp}
+\alias{procPDF}
+\alias{procHTML}
 \title{A widget to explore R packages}
 \description{
   This widget allows users to explore R packages in the R library and
@@ -11,12 +17,19 @@
 \usage{
 pExplorer(pkgName = "", pkgPath = "", exclude = getExclude())
 getPkgContents(pkgName, exclude = getExclude())
-getFileContents(fileName)
+getFileContents(path, fileName)
 getExclude()
+getRPkgs(pkgPath)
+hasDesc(pkgPath)
+procRda(fileName)
+procHelp(fileName)
+procPDF(fileName)
+procHTML(fileName)
 }
 \arguments{
   \item{pkgPath}{\code{pkgPath} a character string for the path where R
     packages are loacted}
+  \item{path}{\code{path} a character string for the path of a given file}
   \item{pkgName}{\code{pkgName} a character string for the name
     (including path) of an R package to be explored}
   \item{fileName}{\code{fileName} a character string for the name
@@ -34,6 +47,11 @@ getExclude()
 
   \code{\link{getPkgContents}} gets the contents of a given R package
   and \code{\link{getFileContents}} gets the contents of a givan file.
+
+  \code{\link{getRPkgs}}, \code{\link{hasDesc}}, \code{\link{procRda}},
+  \code{\link{procHelp}}, \code{\link{procPDF}}, and
+    \code{\link{procHTML}} are functions called by
+    \code{\link{pExplorer}} to process different file or directory types.  
 }
 \value{
   The widget returns invisiable()
@@ -47,8 +65,8 @@ getExclude()
 \examples{
     require("tkWidgets") || stop("tkWidgets not available")
     getPkgContents(.libPaths(), "tkWidgets")
-    getFileContents(list.files(file.path(.path.package("tkWidgets"),
-        "help"), full.name = TRUE)[1])
+    getFileContents(file.path(.path.package("tkWidgets"), "help"),
+        list.files(file.path(.path.package("tkWidgets"), "help"))[1])
     if(interactive()){
         pExplorer()
     }
