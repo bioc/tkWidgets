@@ -39,8 +39,7 @@ pickItems <- function (items){
     # in the list box for selected columns
     selectCol <- function(){
         for(i in colIndex){
-            columns <<- c(columns,
-                          as.character(tkget(colView, i)), sep = "")
+            columns <<- c(columns, as.character(tkget(colView, i)))
         }
         writeList(selectView, unique(columns))
         tkconfigure(selectBut, state = "disabled")
