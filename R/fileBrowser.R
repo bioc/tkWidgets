@@ -46,7 +46,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     # remembers the file name and path for that name and write the
     # contents to the list box if the name is a directory.
     inList <- function(){
-        selectedObj <- as.character(tkget(listView,(tkcurselection(listView))))
+        selectedObj <- as.character(tkget(listView,
+                                          (tkcurselection(listView))))
         if(regexpr(.Platform$file.sep, selectedObj[1]) >= 1){
 	    setwd(file.path(getwd(), selectedObj))
             write2List(listView,
@@ -72,7 +73,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     # file name in the box for selected file names.
     selInSelection <- function(){
         selIndex <<- NULL
-        if(as.character(tkcurselection(selectView)) != ""){
+        if(as.character(tkcurselection(selectView))[1] != ""){
             fileIndex <<-
                  unlist(strsplit(tkcurselection(selectView), " "))
             tkconfigure(remBut, state = "normal")
