@@ -170,6 +170,11 @@ importWizard <- function(filename = ""){
     cancel <- function(){
         end()
     }
+    # This function is invoked when the Advanced button of state3 is
+    # clicked.
+    moreArgs <- function(){
+        moreArgs <- getMoreArgs()
+    }
     # Ends the process and returns a data frame containing the
     # imported data
     finish <- function(){
@@ -259,7 +264,7 @@ importWizard <- function(filename = ""){
     comma <- tclVar()
     space <- tclVar()
     other <- tclVar()
-    checkButs <- list
+    checkButs <- list()
     checkButs[["tab"]] <- tkcheckbutton(leftFrame, text = "Tab",
                               variable = tab, width = 9, onvalue = "TRUE",
                               offvalue = "FALSE", anchor = "nw")
@@ -347,7 +352,8 @@ importWizard <- function(filename = ""){
                                    "imported."),
                        width = 80, height = 2, justify = "left")
     tkpack(label32, anchor = "w")
-    advanceBut <- tkbutton(rightFrame, width = 10, text = "Advanced")
+    advanceBut <- tkbutton(rightFrame, width = 10, text = "Advanced...",
+                           command = moreArgs)
     tkpack(advanceBut, side = "top", pady = 5)
     tkpack(rightFrame, side = "left", pady = 5)
     tkpack(midFrame, anchor = "w")
@@ -399,4 +405,13 @@ bNfGroundColor <- function(widget, bWhite = FALSE){
         tkconfigure(widget, background = "white")
         tkconfigure(widget, foreground = "black")
     }
+}
+# This function generates a widget using widgetTools to collect all
+# the arguments for read.table that are not yet collected by importWizard
+getMoreArgs <- function(){
+    args <- formals(read.table)
+    args <- setdiff(args, c("file", "header", "sep", "skip", "quote"))
+    # Argument fill has to be defined using the value of
+    # blank.lines.skip.
+    args[["fill"]] <- !args[["blank.lines.skip"]]
 }
