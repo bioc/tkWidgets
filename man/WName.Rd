@@ -8,6 +8,7 @@
 \alias{WbuttonText}
 \alias{WbuttonFun}
 \alias{WwList}
+\alias{WListByName}
 \alias{WpreFun}
 \alias{WpostFun}
 
@@ -27,6 +28,7 @@ WcanEdit(x)
 WbuttonText(x)
 WbuttonFun(x)
 WwList(x)
+WListByName(x, name)
 WpreFun(x)
 WpostFun(x)
 }
@@ -34,8 +36,7 @@ WpostFun(x)
 \arguments{
   \item{x}{A list of lists with a Name, Value, toText, fromText,
     canEdit, buttonText, buttonFun, preFun, postFun element.}
-  \item{value}{A character string to be assigned to the Name or Value
-    element of the list of lists passed}
+  \item{name}{A character string for the name of the list to be returned}
 }
 \details{
   WName(x) will return the value of the Name element of the list passed.
@@ -54,6 +55,8 @@ WpostFun(x)
   list passed.
   WwList(x) will return the value of the wList element of the list
   passed.
+  WListByName(x, name) will return the list with the name = "name" that
+  is contained by list x. 
   WpreFun(x) will return the value of the preFun element of the list
   passed.
   WpostFun(x) will return the value of the post element of the list passed.
@@ -76,7 +79,7 @@ pW1 <- list(Name="AAA", Value="bbb",
               fromText=NULL, canEdit=TRUE, buttonFun = fileBrowser,
               buttonText = "Browse")
 
-widget1 <- list(wList = list(pW1),
+widget1 <- list(wList = list(a = pW1),
                   preFun = function() "Hi",
                   postFun = function() "Bye")
 
@@ -90,6 +93,7 @@ WcanEdit(pW1)
 WbuttonText(pW1)
 WbuttonFun(pW1)
 WwList(widget1)
+WListByName(widget1, "a")
 WpreFun(widget1)
 WpostFun(widget1)
 }

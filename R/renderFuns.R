@@ -10,6 +10,10 @@ WbuttonText <- function(x) x$buttonText
 WbuttonFun <- function(x) x$buttonFun
 
 WwList <- function(x) x$wList
+WListByName <- function(x, name) {
+    eval(substitute(listByName <- x$aName, list(aName = name)))
+    return (listByName)
+}
 WpreFun <- function(x) x$preFun
 WpostFun <- function(x) x$postFun
 
