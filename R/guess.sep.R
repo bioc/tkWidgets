@@ -79,19 +79,29 @@ guess.header <- function(twoLines, sep){
 find.type <- function(line, sep){
 
      types <- NULL
-     for(i in line){
-         temp <- unlist(strsplit(i, sep))
-         options(warn = -1)
-         temp <- as.numeric(temp)
-         options(warn = 1)
-
-         temp[is.na(temp)] <- "Character"
-         temp[!is.na(temp) & temp != "Character"] <- "Numeric"
-         types <- rbind(types, temp)
+     if(!missing(sep)){
+         for(i in line){
+             temp <- unlist(strsplit(i, sep))
+             types <- rbind(types, charOrNum(temp))
+         }
+     }else{
+         for(i in 1:nrow(line)){
+             types <- rbind(types, charOrNum(line[1,]))
+         }
      }
      if(nrow(unique(types)) == 1){
          return(types[1,])
      }else{
          return("Not detected")
      }
+}
+
+charOrNum <- function(vect){
+    options(warn = -1)
+    temp <- as.numeric(vect)
+    options(warn = 1)
+
+    temp[is.na(temp)] <- "Character"
+    temp[!is.na(temp) & temp != "Character"] <- "Numeric"
+    return(temp)
 }
