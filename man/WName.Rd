@@ -8,8 +8,9 @@
 \alias{WbuttonText}
 \alias{WbuttonFun}
 \alias{WwList}
-\alias{WListByName}
-\alias{WListNewValue}
+\alias{"WwList<-"}
+\alias{WLValue}
+\alias{"WLValue<-"}
 \alias{WpreFun}
 \alias{WpostFun}
 \alias{WEnd}
@@ -30,8 +31,9 @@ WcanEdit(x)
 WbuttonText(x)
 WbuttonFun(x)
 WwList(x)
-WListByName(x, name)
-WListNewValue(x, index, newVal)
+WwList <- value
+WLValue(x, index)
+WLValue(x, index) <- value
 WpreFun(x)
 WpostFun(x)
 WEnd{x}
@@ -41,9 +43,9 @@ WEnd{x}
   \item{x}{A list of lists with a Name, Value, toText, fromText,
     canEdit, buttonText, buttonFun, preFun, postFun element.}
   \item{name}{A character string for the name of the list to be returned}  
-  \item{index}{An integer as an index for the list in the first list of
-    a list of lists for a widget.}
-  \item{newVal}{An R data type that is going to be used to update the value.}
+  \item{index}{An integer or character string as an index or name for
+    the list in the first list of a list of lists for a widget.}
+  \item{value}{An R data type that is going to be used to update the value.}
 }
 \details{
   WName(x) will return the value of the Name element of the list passed.
@@ -62,10 +64,11 @@ WEnd{x}
   list passed.
   WwList(x) will return the value of the wList element of the list
   passed.
-  WListByName(x, name) will return the list with the name = "name" that
-  is contained by list x.
-  WListNewValue(x, index, newVal) will update the value of list in the
-  first list of a widget list as indicated by the index number.
+  WwList <- value will update the wList element of a Widget list with value.
+  WLValue(x, index) will return the value of a list indicated by the
+  index in the wList of a widget list.
+  WLValue(x, index) <- value will update the value of the list indicated
+  by the index in the wList of a widget list with the value. 
   WpreFun(x) will return the value of the preFun element of the list
   passed.
   WpostFun(x) will return the value of the post element of the list passed.
@@ -86,7 +89,7 @@ WEnd{x}
 # Create the list of lists
 pW1 <- list(Name="AAA", Value="bbb",
               toText=function(x) paste(x,collapse = ","),
-              fromText=NULL, canEdit=TRUE, buttonFun = fileBrowser,
+              fromText=NULL, canEdit=TRUE, buttonFun = ls,
               buttonText = "Browse")
 
 widget1 <- list(wList = list(a = pW1),
@@ -103,8 +106,9 @@ WcanEdit(pW1)
 WbuttonText(pW1)
 WbuttonFun(pW1)
 WwList(widget1)
-WListByName(widget1, "a")
-WListNewValue(widget1, 1, "New Value")
+WwList(widget1) <- list(Name = "New list", Value = "New value")
+WLValue(widget1, 1)
+WLValue(widget1, 1) <- "New value"
 WpreFun(widget1)
 WpostFun(widget1)
 WEnd(widget1)

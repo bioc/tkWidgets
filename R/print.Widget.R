@@ -8,7 +8,7 @@ print.Widget <- function (x, ...){
 
     wList <- WwList(x)
     for(i in names(wList)) {
-        pW <- WListByName(wList, i)
+        pW <- wList[[i]]
         print(paste("widget_", i, ":", sep = ""))
         class(pW) <- "pWidget"
         print.pWidget(pW)

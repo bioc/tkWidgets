@@ -9,7 +9,7 @@ values.Widget <- function (x){
     returnList <- vector("list", length = length(names(wList)))
     counter <- 1
     for(i in names(wList)) {
-        pW <- WListByName(wList, i)
+        pW <- wList[[i]]
         returnList[[counter]] <- list(Entry = i, Value = WValue(pW))
         counter <- counter + 1
     }
