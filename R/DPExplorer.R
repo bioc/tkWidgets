@@ -5,12 +5,12 @@
 # Copyrihgt, 2003, J. Zhang, all rights reserved
 #
 
-DPExplorer <- function (title = "BioC Data Package Explorer", pkgName = ""){
+DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer"){
     # Create a working environment
     workEnv <- new.env(hash = TRUE, parent = NULL)
     on.exit(destroy(base))
     base <- getTopLevel(title)
-    createDPExplorer(base, workEnv)
+    createDPExplorer(base, pkgName, workEnv)
 
     # Initialize some of the variables
     assignSelected(NULL, workEnv)
@@ -27,10 +27,12 @@ DPExplorer <- function (title = "BioC Data Package Explorer", pkgName = ""){
             keys <- getSelectedFromEnv(workEnv)
             where <- grep(getPkgNameFromEnv(workEnv), search())
             if(length(keys) == 1){
-                return(get(keys, get(getDataNameFromEnv(workEnv), pos = where)))
+                return(get(keys, get(getDataNameFromEnv(workEnv),
+                                     pos = where)))
             }else{
                 return(multiget(keys,
-                                 get(getDataNameFromEnv(workEnv), pos = where)))
+                                 get(getDataNameFromEnv(workEnv),
+                                     pos = where)))
             }
         }
     }
@@ -102,7 +104,28 @@ getSelectedFromEnv <- function(env){
     return(get("selected", env))
 }
 
-createDPExplorer <- function(base, env){
+assignSelectBut <- function(tkWin, env){
+    assign("selectBut", tkWin, env)
+}
+getSelectBut <-function(env){
+    return(get("selectBut", env))
+}
+
+assignDropBut <- function(tkWin, env){
+    assign("dropBut", tkWin, env)
+}
+getDropBut <- function(env){
+    return(get("dropBut", env))
+}
+
+assignClearBut <- function(tkWin, env){
+    assign("clearBut", tkWin, env)
+}
+getClearBut <- function(env){
+    return(get("clearBut", env))
+}
+
+createDPExplorer <- function(base, pkgName, env){
     # The data frame contains a list box for the name of data sets in
     # a data package, a list box for the keys of a selected data set,
     # a list box for the content of a selected key, and a group of
@@ -114,7 +137,7 @@ createDPExplorer <- function(base, env){
     # The name frame contains a label, an entry box for users to entre
     # the name of a data package, and a "load" button to allow users to
     # load a data package whose name is entered in the entry box
-    nameFrame <- getNameFrame(base, env)
+    nameFrame <- getNameFrame(base, pkgName, env)
     # The button frame contains a cancel and finish button
     butFrame <- getButFrame(base, env)
 
@@ -179,6 +202,7 @@ packKeyList <- function(base, env){
         values <- get(keyName, get(getDataNameFromEnv(env), pos = where))
         writeList(getValueListFromEnv(env), values)
         assignKey(keyName, env)
+        tkconfigure(getSelectBut(env), state = "normal")
     }
     keyListFrame <- tkframe(base)
     keyLabel <- tklabel(keyListFrame, text = "Keys:")
@@ -198,16 +222,20 @@ packValueNBut <-function(base, env){
         selected <- unique(c(getSelectedFromEnv(env), getKeyFromEnv(env)))
         writeList(getSelectionListFromEnv(env), selected)
         assignSelected(selected, env)
+        tkconfigure(selectBut, state = "disabled")
+        tkconfigure(clearBut, state = "normal")
     }
     drop <- function(){
         selected <- getSelectedFromEnv(env)[getSelectedFromEnv(env)
                                             != getKeyFromEnv(env)]
         writeList(getSelectionListFromEnv(env), selected)
         assignSelected(selected, env)
+        tkconfigure(dropBut, state = "disabled")
     }
     clear <- function(){
         assignSelected(NULL, env)
         writeList(getSelectionListFromEnv(env), NULL)
+        tkconfigure(clearBut, state = "disabled")
     }
     tempFrame <- tkframe(base)
     valueLabel <- tklabel(tempFrame, text = "Value(s)")
@@ -216,11 +244,14 @@ packValueNBut <-function(base, env){
                         hScroll = FALSE, vScroll = TRUE,
                         what = "list", side = "bottom")
     selectBut <- tkbutton(tempFrame, text = "Select Key", width = 16,
-                          command = select)
+                          command = select, state = "disabled")
+    assignSelectBut(selectBut, env)
     dropBut <- tkbutton(tempFrame, text = "Drop Key", width = 16,
-                         command = drop)
+                         command = drop, state = "disabled")
+    assignDropBut(dropBut, env)
     clearBut <- tkbutton(tempFrame, text = "Clear Selection", width = 16,
-                          comman = clear)
+                          comman = clear, state = "disabled")
+    assignClearBut(clearBut, env)
     tkpack(clearBut, side = "bottom", expand = TRUE, fill = "x")
     tkpack(dropBut, side = "bottom", expand = TRUE, fill = "x")
     tkpack(selectBut, side = "bottom", expand = TRUE, fill = "x")
@@ -236,6 +267,7 @@ packSeletionList <- function(base, env){
         keyName <- as.character(tkget(selectionList,
                                        tkcurselection(selectionList)))
         assignKey(keyName, env)
+        tkconfigure(getDropBut(env), state = "normal")
     }
 
     selectionListFrame <- tkframe(base)
@@ -272,7 +304,7 @@ getButFrame <- function (base, env){
     return(butFrame)
 }
 
-getNameFrame <- function(base, env){
+getNameFrame <- function(base, pkgName, env){
     loadDP <- function(){
         pkgName <- tclvalue(nameVar)
         if(pkgName == ""){
@@ -285,15 +317,30 @@ getNameFrame <- function(base, env){
             writeList(getDataListFromEnv(env), rdas)
         }
     }
-
-    nameVar <- tclVar("")
+    activeLoadBut <- function(){
+        tkconfigure(loadBut, state = "normal")
+    }
+    if(pkgName != ""){
+        nameVar <- tclVar(pkgName)
+    }else{
+        nameVar <- tclVar("")
+    }
     tempFrame <- tkframe(base)
     label <- tklabel(tempFrame, text = "Data Package: ")
     entry <- tkentry(tempFrame, width = 15, textvariable = nameVar)
-    loadBut <- tkbutton(tempFrame, width = 8, text = "Load", command = loadDP)
+    tkbind(entry, "<KeyPress>", activeLoadBut)
+    tkbind(entry, "<Return>", loadDP)
+    loadBut <- tkbutton(tempFrame, width = 8, text = "Load",
+                        command = loadDP, state = "disabled")
     tkpack(label, side = "left")
     tkpack(entry, side = "left", expand = TRUE, fill = "x")
     tkpack(loadBut, side = "left")
+
+    if(pkgName != ""){
+        print(paste("Loading data package ", pkgName, ".", sep = ""))
+        loadDP()
+        activeLoadBut()
+    }
 
     return(tempFrame)
 }
