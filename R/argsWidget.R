@@ -64,11 +64,15 @@ formatArg <- function(toFormat){
 
     # Turns off any warnings when checking for NULL, NA, and boolean
     options(warn = -1)
+    if(is.null(toFormat)){
+        options(warn = 0)
+        return(toFormat)
+    }
     if(is.na(toFormat)){
         options(warn = -1)
         return("NA")
     }
-    if(any(is.null(toFormat), is.logical(toFormat))){
+    if(is.logical(toFormat)){
         options(warn = 0)
         return(toFormat)
     }else{
