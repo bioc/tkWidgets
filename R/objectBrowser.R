@@ -218,7 +218,7 @@ objectBrowser<- function (env = .GlobalEnv,
         objIndex <<- NULL
         tkconfigure(removeBut, state = "normal")
         objIndex <<- unlist(strsplit(
-                              as.character(tkcurselection(selectView), " "))
+                            as.character(tkcurselection(selectView), " ")))
     }
     # Write to the list box for selected objects
     writeSelection <- function (toWrite){
