@@ -25,6 +25,7 @@ objectBrowser<- function (env = .GlobalEnv,
     objsInSel <- NULL
     tempObj <- NULL
     currentEnv <- env
+    currentState <- "env"
 
     # close window
     end <- function(){
@@ -36,26 +37,30 @@ objectBrowser<- function (env = .GlobalEnv,
     # contains names of selected objects will be updated before the
     # window closes.
     finish <- function(){
-        if(length(objsInSel) != 0){
-            if(nSelect == -1){
-                returnList <<- objNameToList(objsInSel, currentEnv)
-                end()
-            }else{
-                if(nSelect != length(objsInSel)){
-                    tkmessageBox(title = "Wrong number", message =
-                       paste("You can only select", nSelect, "object(s)"),
-                       icon = "warning", type = "ok")
-                }else{
+        if(currentState != "env"){
+            returnList <<- objsInSel
+            end()
+        }else{
+            if(length(objsInSel) != 0){
+                if(nSelect == -1){
                     returnList <<- objNameToList(objsInSel, currentEnv)
                     end()
+                }else{
+                    if(nSelect != length(objsInSel)){
+                        tkmessageBox(title = "Wrong number", message =
+                         paste("You can only select", nSelect, "object(s)"),
+                         icon = "warning", type = "ok")
+                    }else{
+                        returnList <<- objNameToList(objsInSel, currentEnv)
+                        end()
+                    }
                 }
+            }else{
+                returnList <<- NULL
+                end()
             }
-        }else{
-            returnList <<- NULL
-            end()
         }
     }
-
     # Write the content of the global environment to the list box for
     # object names
     viewEnv <- function(env){
@@ -83,8 +88,10 @@ objectBrowser<- function (env = .GlobalEnv,
         tkconfigure(upBut, state = "normal")
     }
     # Will be done for other objects
-    doElse <- function(){
-        # This a temp function for now. More checking will be implemented
+    doElse <- function(data){
+        if(is.vector(data)){
+            doVector(data)
+        }
     }
     # Executed when a user double clicks an ojbect that is a
     # list. Shows the number of columns, number of rows and column names.
@@ -102,6 +109,11 @@ objectBrowser<- function (env = .GlobalEnv,
 
         writeList(listView, toWrite, clear = TRUE)
         writeCap(aList)
+    }
+
+    doVector <- function(vect){
+        currentState <<- "vector"
+        writeList(listView, get(vect), clear = TRUE)
     }
 
     # Executed when a user double clicks an object name in a list box.
@@ -125,7 +137,7 @@ objectBrowser<- function (env = .GlobalEnv,
                "environment" = doEnv(selectedObj),
                "package" =  doPack(tkcurselection(listView), selectedObj),
                "list" = doList(selectedObj),
-               doElse()
+               doElse(selectedObj)
             )
             tkconfigure(selectBut, state = "disabled")
             selectedObj <<- NULL
@@ -152,6 +164,9 @@ objectBrowser<- function (env = .GlobalEnv,
 
     # When the global environment is clicked and shows the content
     getAct <- function(){
+        currentState <<- "env"
+        tkdelete(selectView, "0", "end")
+        objsInSel <<- NULL
         selectedObj <<- ".GlobalEnv"
         goin()
     }
@@ -225,7 +240,6 @@ objectBrowser<- function (env = .GlobalEnv,
         #tkdelete(selectView, 0, "end")
         #for(i in toWrite)
         #    tkinsert(selectView, "end", i)
-        fileIndex <<- NULL
     }
     # Writes to the top of the widget to indicate the current environment
     writeCap <- function(objName, asis = FALSE){
