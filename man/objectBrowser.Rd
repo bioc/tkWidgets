@@ -75,7 +75,7 @@ objectBrowser(env = parent.frame(1), fun = function(x) TRUE,
 if(interactive()) {
 
 # Call the function with the isCharacter function.
-r <- objectBrowser(isCharacter)
+r <- objectBrowser()
 str(r) # show what we've got
 }
 }
