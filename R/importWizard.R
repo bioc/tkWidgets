@@ -1,5 +1,10 @@
 # This function provides data import interfaces by mimicing MS Excel's
-# Text Wizard.
+# Text Wizard. read.table will be used to import the data.
+#
+# filename - an optional character string for the name of the file to
+# be imported
+# maxRow - an integer for the maximum number of rows to be
+# displayed. Large row numbers may slow down the machine
 #
 # Copyright 2002, J. Zhang, all rights reserved.
 
@@ -19,10 +24,11 @@ importWizard <- function(filename, maxRow = 200){
         assignArgs(list(), workEnv)
         setColInfos(env = workEnv)
     }
-
+    # Initializes the interface
     initImportWizard(workEnv)
 }
-
+# Using function guess.sep to figure out the the header, sep, and data
+# type of a file and sets the argument list and colInfo
 setArgsList <- function(filename, env){
     argsList <- list()
 
@@ -37,42 +43,36 @@ setArgsList <- function(filename, env){
         setColInfos(fileInfo[["type"]], env)
     }
 }
-
+# Set and get methods for argument list
 assignArgs <- function(value, env){
     assign("argsList", value, env = env)
 }
 getArgs <- function(env){
     get("argsList", env = env)
 }
-
-assignType <- function(value, env){
-    assign("columnType", value, env)
-}
-getType <- function(env){
-    get("columnType", env)
-}
-
+# Set and get methods for number to show in the interface
 assignShowNum <- function(value, env){
     assign("showNum", value, env)
 }
 getShowNum <- function(env){
     get("showNum", env)
 }
-# Keeps track with state is at
+# Set and get methods for current state to keep track of the state
 assignCState <- function(value, env){
     assign("currentState", value, env)
 }
 getCState <- function(env){
     get("currentState", env)
 }
-# A ID to keep the tkwin id for a state frame
+# Set and get methods for state id that keeps the tkwin id for a state frame
 assignSID <- function(value, env){
     assign("stateID", value, env)
 }
 getSID <- function(env){
     get("stateID", env)
 }
-# A list of colInfo objects that keep column name, type, and drop info
+# Set and get methods for colInfo that is a list of colInfo objects to
+# keep column name, type, and drop info
 assignColInfo <- function(value, env){
     assign("colInfos", value, env)
 }
@@ -139,7 +139,7 @@ initImportWizard <- function(env){
     tkwait.window(top)
     return(dataList)
 }
-
+# Creates a top frame of an empty canvas
 getTopCan <- function(base, env){
     WIDTH <- 730
     HEIGHT <- 400
@@ -151,14 +151,16 @@ getTopCan <- function(base, env){
                            what = "canvas", side = "top")
     return(canvas)
 }
-
+# Changes the state and thus the interface
 changeState <- function(canvas, env, forward = TRUE){
+    # Sets the current state
     setNewState(env, forward)
     if(forward){
         addArgs(env)
     }else{
         dropArgs(env)
     }
+    # Changes the interface accordingly
     tkdelete(canvas, getSID(env))
     stateID <- tkcreate(canvas, "window", 0, 0, anchor = "nw",
                                     window = getAFrame(canvas, env))
@@ -195,13 +197,15 @@ dropArgs <- function(env){
         assignArgs(temp, env)
     }
 }
+# Gets a frame based on which state is of interest
 getAFrame <- function(base, env){
     switch(getCState(env),
            "state1" = return(getState1Frame(base, env)),
            "state2" = return(getState2Frame(base, env)),
            "state3" = return(getState3Frame(base, env)))
 }
-
+# The importing process ends. Return a list with argument list and
+# data read using read.table as elements
 finish <- function(env){
     switch(getCState(env),
            "state1" = args <- getArgs(env)[["state1"]],
@@ -247,7 +251,7 @@ getState1Frame <- function(base, env){
     tkpack(bottomFrame, pady = 5)
     return(frame)
 }
-
+# Sets the botton frame for state1
 setState1BFrame <- function(frame, env){
     # A list box to show the original data
     viewFrame <- tkframe(frame)
@@ -257,7 +261,7 @@ setState1BFrame <- function(frame, env){
     tkpack(viewFrame, anchor = "w", pady = 10)
     return(dataViewer)
 }
-
+# Sets the top frame for state1
 setState1TFrame <- function(frame, viewer, delims, env){
     # Populate the entry box for file name when the brose button is
     # clicked
@@ -289,7 +293,7 @@ setState1TFrame <- function(frame, viewer, delims, env){
     tkpack(browseBut)
     tkpack(nameFrame)
 }
-
+# Sets the mid frame for state1
 setState1MFrame <- function(frame, env){
     # Executed when values in start at row list box is clicked
     startClicked <- function(){
@@ -566,17 +570,13 @@ setColType <- function(index, entryBox, env){
     colInfos[[index]] <- type(colInfos[[index]]) <- entry
     assignColInfo(colInfos, env)
 }
-
+# Show the data read in using readLines for state1
 showData4State1 <- function(widget, env){
      dataFile <- readLines(getArgs(env)[["state1"]][["file"]])
      writeList(widget, paste(1:getShowNum(env), ": ",
                              dataFile[1:getShowNum(env)], sep = ""), TRUE)
 }
-
-showData4State3 <- function(){
-}
-
-
+# Gets the word representation of delimiters
 whatDeli <- function(delimiter){
     switch(delimiter,
            "\t" = return("tab"),
@@ -585,7 +585,8 @@ whatDeli <- function(delimiter){
            "," = return("comma"),
            stop("Unknown delimiter"))
 }
-
+# Given a matrix of characters, figures out the maximum number of
+#characters for each column
 numberChar <- function(matr){
     nchars <- NULL
     for(i in 1:ncol(matr)){
@@ -593,7 +594,6 @@ numberChar <- function(matr){
     }
     return(nchars)
 }
-
 # This function generates a widget using widgetTools to collect all
 # the arguments for read.table that are not yet collected by importWizard
 getMoreArgs <- function(){
