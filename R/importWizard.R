@@ -851,7 +851,7 @@ getMoreArgs <- function(){
 
     args <- args[setdiff(names(args),
                          c("file", "header", "sep", "skip","quote",
-                           "row.names", "col.names"))]
+                           "row.names", "col.names", "colClasses"))]
 
     # Argument fill has to be defined using the value of
     # blank.lines.skip.
