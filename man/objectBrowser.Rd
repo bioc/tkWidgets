@@ -67,7 +67,7 @@ objectBrowser(env = parent.frame(1), fun = function(x) TRUE,
 \note{This function is part of the Bioconductor project at Dana-Farber
   Cancer Institute to provide Bioinformatics functionalities through \R.}
 
-\seealso{\code{\link{writeObj}}}
+\seealso{\code{\link{fileBrowser}}}
 
 \examples{
 ## The example here is only run interactively since it requires user

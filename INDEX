@@ -1,15 +1,17 @@
+DPExplorer              Functions constuct a widget to explore BioC's
+                        data packages
+WName                   Accessors for Primitive Widget Objects
 appendSepDir            List File and Directories for a Given Path
 args2XML                Converting the formal arguments to a function
                         and converts into an XML format
 argsWidget              Functions to construct a widget that takes
                         inputs from users
-colInfo-class           Class "colInfo" a class to keep column
-                        information for a data file
+colInfo-class           Class "colInfo" presents column information
+                        for a data frame
 dataViewer              Function to view a data object passed
 dbArgsWidget            Function to build a widget for inputing
                         database arguments
-DPExplorer              Functions constuct a widget to explore BioC's
-                        data packages
+eSetFilter              A function to filter an eSet object
 fileBrowser             Simple Interface to View and Pick Files
 fileWizard              A function that import a text file into R
 getLightTW              Function to create a light weight widget
@@ -22,10 +24,12 @@ hasChar                 String Prefix and Suffix Checking
 importWizard            A widget for importing data to R
 listSelect              Utilities Creating a Widget With Selection
                         Boxes
-objectBrowser           View the Objects in the Workspace.
+neighborGeneFinder      A widget for locating genes neighboring a
+                        target gene
 objNameToList           Convert Object Names to List of Lists with
                         (name, object) Pairs
 objViewer               Show the Content of an R Object in a Widget
+objectBrowser           View the Objects in the Workspace.
 pickFiles               Pick Elements From Vector of Strings
 pickItems               Function that builds a widget to allow users
                         to select items from available sources
@@ -35,13 +39,11 @@ stdType                 Provide Default Behavior for listSelect Helper
                         Functions
 tkMIAME                 Simple Interface to enter experimental design
                         information
-tkphenoData             Simple interface to enter phenoData
 tkSampleNames           Simple interface to associate sample names
                         with files
-values.Widget           Deal with Names and Values of Widget Created
-                        by widgetRender()
+tkphenoData             Simple interface to enter phenoData
 vExplorer               An interface to interact with vignette code
                         chunks
+values.Widget           Deal with Names and Values of Widget Created
+                        by widgetRender()
 widgetRender            Render a Tk Widget from Given Specifications
-WName                   Accessors for Primitive Widget Objects
-writeObj                Write Object Lists into a List Box

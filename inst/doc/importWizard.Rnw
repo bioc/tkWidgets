@@ -24,12 +24,12 @@ buttons that allow users to travel back and forth between the three
 steps (states). When importWizard is invoked, an environment object is 
 created to keep data for each step. Data stored for each step
 include a list for the formal arguments that will be used to import
-the file at the end using the function {texttt{read.table}} and
+the file at the end using the function {\texttt{read.table}} and
 an object of class colInfo with three slots for the
 name, data type, and retention of data columns of the file to be
 imported. Each step receives inputs from users until values for those
 arguments that are needed to import a file are filled. Some of the
-arguments are given defulat values that can be modified by users.
+arguments are given default values that can be modified by users.
  
 \section*{Step one: file browsing}
 
@@ -38,13 +38,13 @@ have the following elements:
 
 \begin{itemize}
 \item An entry box for the name of the file to be imported. A file
-  with a full path name isexpected if users chooses to type in a file
-  name. An alternative is to use the {texttt{Browse}} but to reterive
+  with a full path name is expected if users chooses to type in a file
+  name. An alternative is to use the {\texttt{Browse}} but to retrieve
   a file name.
-\item A {texttt{Browse}} button that allows users to browse directories for
+\item A {\texttt{Browse}} button that allows users to browse directories for
   the name of a file to import. The file name will be placed in the
-  entry box that can be read in using the {texttt{Get}} button.
-\item A {texttt{Get}} button to get the file specified by the file
+  entry box that can be read in using the {\texttt{Get}} button.
+\item A {\texttt{Get}} button to get the file specified by the file
   name in the entry box.
 \item Two radio buttons defining the type of the file to be
   imported. One button for delimited file and one for fixed width
@@ -54,18 +54,18 @@ have the following elements:
   number from which import begins.
 \item A list box to show the content of the file to be imported as
   lines read in one at a time.
-\item  Four buttons ({texttt{Cancel}}, {texttt{< Back}}, {texttt{Next
-      >}}, {texttt{Finish}}) to allow users to travel back and forth.
+\item  Four buttons ({\texttt{Cancel}}, {\texttt{< Back}}, {\texttt{Next
+      >}}, {\texttt{Finish}}) to allow users to travel back and forth.
 \end{itemize}
 
 If importWizard is invoked with a file name, it opens that file and
-then displaies the file name in the entry box. One of the two radio
+then displays the file name in the entry box. One of the two radio
 buttons will be checked if the system is able to detect if the file is
 delimited or has fixed width (A file is still considered as delimited
-if it only has a new line ({texttt{\\n}}) as the delimiter). The content of
+if it only has a new line ({\texttt{\\n}}) as the delimiter). The content of
 the file will be displayed as separate lines in the list
 box. Otherwise, the elements will be empty until users select a file
-using the {texttt{Browse}} button, at which time the elements will be
+using the {\texttt{Browse}} button, at which time the elements will be
 populated with relevant data. 
 
 When a file is displayed, the system will check to see if the file has
@@ -73,18 +73,18 @@ a header, a delimiter separating data columns, and the data type for
 each data column (if any). The results will be used to initiate the
 values for the argument list. The initial values for the
 argument list for step one are set using values returned by a function
-named {texttt{guess.sep}}. A new line ({texttt{\\t}}) is the default
+named {\texttt{guess.sep}}. A new line ({\texttt{\\t}}) is the default
 value for the delimiter if the file does not have any other delimiter. 
 
 Users are able to choose to import a file starting from a specified
 row by choosing a number from the list box for 
-{texttt{Start import at row}}. The default value is one (import from
+{\texttt{Start import at row}}. The default value is one (import from
 the first row)
   
 After choosing a file and the row number to start importing, clicking
-the {texttt{Next >}} button moves to step two. Clicking the
-{texttt{Cancel}} any time cancels the importing process. The
-{texttt{Finish}} will remain inactivited until step three.   
+the {\texttt{Next >}} button moves to step two. Clicking the
+{\texttt{Cancel}} button at any time cancels the importing process. The
+{\texttt{Finish}} button will remain inactivated until step three.   
 
 \section*{Step two: file examination}
 
@@ -93,11 +93,11 @@ The widget for step two has the following widget elements:
 \begin{itemize}
 \item A group of radio buttons for the exact type of delimiter used
   in the file to be imported. A delimiter that is not listed by the
-  radio buttons can be entered by selecting {texttt{Other}} radio
-  button and then enter the the type of delimiter in the actived entry
-  box beside {texttt{Other}}. 
+  radio buttons can be entered by selecting {\texttt{Other}} radio
+  button and then enter the type of delimiter in the activated entry
+  box beside {\texttt{Other}}. 
 \item A list box for users to select the the type of quote used in the
-  file. Both {texttt{"}} and {texttt{'}} are the default value. 
+  file. Both {\texttt{"}} and {\texttt{'}} are the default value. 
 \item A canvas showing the file in columns if the file is
   delimited. No function has be implemented to deal with fixed width
   file yet at this moment.
@@ -107,9 +107,9 @@ The initial values for the argument list for step two are the same as the
 values when step one is exited. Any change by users will be written to
 the argument list for this step.
 
-Clicking the {texttt{< Back}} button moves back to step one with the values of
+Clicking the {\texttt{< Back}} button moves back to step one with the values of
 the argument list set to that of the last state of step one. After
-setting the delimiter and quote, Clinking {text{Next >}} button moves
+setting the delimiter and quote, Clicking {text{Next >}} button moves
 to step three with the values of the argument list for step three set
 to the last state of step tow. 
 
@@ -118,26 +118,26 @@ to the last state of step tow.
 The widget for step three has the following widget elements:
 
 \begin{itemize}
-\item A {texttt{More Args...}} button that allows users to select some of the
+\item A {\texttt{More Args...}} button that allows users to select some of the
   additional arguments to import a file using read.table
   for advanced users. The values of those arguments are defaulted to
   some values that are commonly used to import a file. Change the
   values only when needed.  
 \item A list box with the file to be imported shown in columns if. On
   top of each column there is a radio button to indicate 
-  whether a column should be droped when the file is imported, an entry box
+  whether a column should be dropped when the file is imported, an entry box
   for the name of the column when imported as a data frame, and
   another entry box for the data type of the column. Clicking the
   radio button will prevent the column below the button from being
   imported.  
 \end{itemize}
 
-Clicking the {texttt{< Back}} button moves back to step two. When the
-{texttt{Finish}} button is clicked, a message box will pop up to allow
+Clicking the {\texttt{< Back}} button moves back to step two. When the
+{\texttt{Finish}} button is clicked, a message box will pop up to allow
 users to decide whether to save the imported file as an R object in
-the .Globalenvironment by a specified name. 
+the global environment (\texttt{.GlobalEnv}) by a specified name. 
 
-importWizard returns (invisiblly) a list with the first element being
+importWizard returns (invisibly) a list with the first element being
 the arguments used to import the file and the second being the content
 of the file imported based on the arguments.
 

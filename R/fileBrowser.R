@@ -49,7 +49,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         selectedObj <- as.character(tkget(listView,
                                           (tkcurselection(listView))))
         if(regexpr(.Platform$file.sep, selectedObj[1]) >= 1){
-	    setwd(file.path(getwd(), selectedObj))
+      setwd(file.path(getwd(), selectedObj))
             write2List(listView,
                      pickFiles(appendSepDir(getwd()), testFun,
                                prefix, suffix))
@@ -116,7 +116,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
     # Remember the path the browser has traveled.
 #    doPath <- function(){
-#	nodes <<- unlist(strsplit(path, .Platform$file.sep))
+# nodes <<- unlist(strsplit(path, .Platform$file.sep))
 #        currentNode <<- length(nodes)
 #    }
 
@@ -148,15 +148,11 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
     # Returns the file separator
     getSep <- function(){
-        if(.Platform$OS.type == "windows"){
-            return("\\\\")
-        }else{
             return(.Platform$file.sep)
-        }
     }
     # Write the content of toWrite to a list given box
     writeToView <- function(aView, toWrite){
-  	tkdelete(aView, 0, "end")
+    tkdelete(aView, 0, "end")
         if(!is.null(toWrite)){
             for (i in toWrite){
                 if(substr(i, nchar(i), (nchar(i) + 1))
@@ -176,7 +172,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
     # Refresh the path shown on the widget
     writeCap <- function(toWrite)
-	tkconfigure(caption, text = toWrite)
+  tkconfigure(caption, text = toWrite)
 
     oldDir <- getwd()
     if(path != "")
@@ -208,9 +204,9 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                          vHeight = BOXHEIGHT)
     tkgrid(dirLFrame, columnspan = 2)
     upBut <- tkbutton(leftFrame, text = "Up", width = BUTWIDTH,
-		      command = goUp)
+          command = goUp)
     selectBut <- tkbutton(leftFrame, text = "Select >>", width = BUTWIDTH,
-		      state = "disabled", command = selectAFile)
+          state = "disabled", command = selectAFile)
     tkgrid(upBut, selectBut)
     tkgrid.configure(upBut, sticky = "e")
     tkgrid.configure(selectBut, sticky = "w")
@@ -231,9 +227,9 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkconfigure(selectView, selectmode = "extended", font = LABELFONT2)
     tkbind(selectView, "<B1-ButtonRelease>", selInSelection)
     remBut <- tkbutton(rightFrame, text = "<< Remove", width = BUTWIDTH,
-		      state = "disabled", command = dropSelection)
+          state = "disabled", command = dropSelection)
     clearBut <- tkbutton(rightFrame, text = "Clear", width = BUTWIDTH,
-		      state = "disabled", command = clearSelection)
+          state = "disabled", command = clearSelection)
     tkgrid(remBut, clearBut)
     tkgrid.configure(remBut, sticky = "e")
     tkgrid.configure(clearBut, sticky = "w")
@@ -241,7 +237,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid(leftFrame, rightFrame)
     # Put the end button
     endBut <- tkbutton(base, text = "Finish", width = BUTWIDTH,
-		       command = end)
+           command = end)
     tkgrid(endBut, columnspan = 2)
 
     tkwait.window(base)

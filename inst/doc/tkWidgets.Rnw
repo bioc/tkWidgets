@@ -26,58 +26,59 @@
 
 \section{Introduction}
 
-This package contains several widgets built by using {\texttt{tcltk}}
-or package \Rpackage{widgetTools} to provide interfaces to perform
-different tasks. Available widgets include:
+This package contains several widgets built using the R \Rpackage{tcltk}
+package or the \Rpackage{widgetTools} package to provide interfaces to
+perform different tasks. Available widgets include:
 
 \begin{itemize}
-\item{argsWidget}{an interface that allows users to input values for
-    an argument list passed to the widget as an argument}
-\item{DPExplorer}{an interface that allows users to view a
-    {texttt{Bioconductor}} data package and make selections}
-\item{fileBrowser}{an interface that allows users to select a group of
-    files from a local directory}
-\item{importWizard}{an interface that allows users to import a data file
-    into R following an Excel style}
-\item{objectBrowser}{an interface that allows users to borwses R
-    objects and make a selection}
-\item{vExplorer}{an interface that allows users to explore vignettes
-    of available R packages}
+\item \texttt{argsWidget} - an interface that allows users to input values for
+    an argument list passed to the widget as an argument
+\item \texttt{DPExplorer} - an interface that allows users to view a
+    {\texttt{Bioconductor}} data package and make selections
+\item \texttt{fileBrowser} - an interface that allows users to select a group of
+    files from a local directory
+\item \texttt{importWizard} - an interface that allows users to import a data file
+    into R, following an Excel style
+\item \texttt{objectBrowser} - an interface that allows users to browse R
+    objects and make a selection
+\item \texttt{vExplorer} - an interface that allows users to explore vignettes
+    of available R packages
 \end{itemize}
 
 The following code invokes a widget that contains clickable buttons
 that show the interfaces of the widgets.
 
-<<>> =
+<<>>=
+library(tkWidgets)
 PWEnv <- new.env(hash = TRUE, parent = parent.frame(1))
 argsFun <- function(){
     argsWidget(formals("list.files"))
 }
-button1 <- button(name = "button1", value = "argsWidget",
-                     funs = list(command = argsFun), env = PWEnv)
-button2 <- button(name = "button2", value = "DPExplorer",
-                     funs = list(command = DPExplorer), env = PWEnv)
-button3 <- button(name = "button3", value = "fileBrowser",
-                     funs = list(command = fileBrowser), env = PWEnv)
-button4 <- button(name = "button4", value = "importWizard",
-                     funs = list(command = importWizard), env = PWEnv)
-button5 <- button(name = "button5", value = "objectBrowser",
-                     funs = list(command = objectBrowser), env = PWEnv)
-button6 <- button(name = "button6", value = "vExplorer",
-                     funs = list(command = vExplorer), env = PWEnv)
+button1 <- button(wName = "button1", wValue = "argsWidget",
+                     wFuns = list(command = argsFun), wEnv = PWEnv)
+button2 <- button(wName = "button2", wValue = "DPExplorer",
+                     wFuns = list(command = DPExplorer), wEnv = PWEnv)
+button3 <- button(wName = "button3", wValue = "fileBrowser",
+                     wFuns = list(command = fileBrowser), wEnv = PWEnv)
+button4 <- button(wName = "button4", wValue = "importWizard",
+                     wFuns = list(command = importWizard), wEnv = PWEnv)
+button5 <- button(wName = "button5", wValue = "objectBrowser",
+                     wFuns = list(command = objectBrowser), wEnv = PWEnv)
+button6 <- button(wName = "button6", wValue = "vExplorer",
+                     wFuns = list(command = vExplorer), wEnv = PWEnv)
 
 pWidgets <- list(A = list(button1 = button1, button2 = button2), C =
 list(button3 = button3, button4 = button4), D = list(button5 = button5,
 button6 = button6))
 if(interactive()){
-viewWidget <- widget(wTitle = "tiWidgets Examples", pWidgets, funs = list(),
+viewWidget <- widget(wTitle = "tkWidgets Examples", pWidgets, funs = list(),
                  preFun = function() print("Hello"),
                  postFun = function() print("Bye"), env = PWEnv)
 }
 @
 
 There are other widgets that are used by specific packages that may
-not of general interests. These widgets are thus not included in the examples. 
+not be of general interest. These widgets are thus not included in the examples. 
 \end{document}
 
 

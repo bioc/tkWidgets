@@ -21,15 +21,15 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
          tkdestroy(top)
     }
     # Write toPop to a given entry box
-    writeEntry <- function(name, toPop){
-        tkdelete(name, "0", "end")
-        tkinsert(name, "end", toPop)
-    }
+#    writeEntry <- function(name, toPop){
+#        tkdelete(name, "0", "end")
+#        tkinsert(name, "end", toPop)
+#    }
     # Initialize the list box if fileWizard is called with a file name
     init <- function(){
         if(!is.null(filename) && !is.na(filename) && filename != ""){
             tkinsert(nameEntry, "0", filename)
-            writeEntry(fileText, readLines(filename))
+            writeList(fileText, readLines(filename))
             makeGuess(filename)
         }else{
             tkconfigure(finishBut, state = "disabled")
