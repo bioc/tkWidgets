@@ -4,7 +4,8 @@
 eExplorer <- function(pkgName, font = "arial 13"){
     # An environment to evaluate the code within
     evalEnv <- new.env(hash = TRUE, parent = parent.frame())
-    if(missing(pkgName)){
+    if(any(missing(pkgName), is.null(pkgName), is.na(pkgName),
+           pkgName == "")){
         stop("Can not proceed without a package name")
     }
     if(!require(pkgName, character.only = TRUE)){
@@ -14,7 +15,7 @@ eExplorer <- function(pkgName, font = "arial 13"){
     chunkList <- getExCode(pkgName)
 
     if(is.null(chunkList)){
-        chunkOrNot <- "No example code"
+        chunkOrNot <- "No example code obtained"
         nameNCode <- NULL
     }else{
         chunkOrNot <- "Example code chunk"
@@ -48,7 +49,9 @@ eExplorer <- function(pkgName, font = "arial 13"){
         for(i in chunkList[[chunk]]){
             tkinsert(editViewer, "end", paste(i, "\n", sep = ""))
         }
-        tkdelete(resultViewer, "1.0", "end")
+        tkconfigure(resultViewer, state = "normal")
+        tkdelete(resultViewer, "0.0", "end")
+        tkconfigure(resultViewer, state = "disabled")
 
         tkconfigure(execButton, state = "normal")
         tkconfigure(clearButton, state = "normal")
@@ -62,46 +65,40 @@ eExplorer <- function(pkgName, font = "arial 13"){
             assign(i, temp[[i]], env = parent.frame(2))
         }
     }
-    executeChunk <- function(chunkExp){
-        results <- NULL
-        if (length(chunkExp) == 0){
-            return("")
-        }
-        for(i in 1:length(chunkExp)){
-            results <- c(results, paste(getOption("prompt"),
-                                        chunkExp[i], sep = ""))
-
-            options(show.error.messages = FALSE)
-            out <- try(capture.output(eval(parse(text = chunkExp[i]),
-                                           envir = evalEnv)))
-            options(show.error.messages = TRUE)
-            if(inherits(out, "try-error")){
-                results <- c(results, "Execution failed")
-            }else{
-                results <- c(results, out)
-            }
-        }
-        return(results[results != "NULL"])
-    }
 
     # Executes whatever that is in the text box for code chunk
     execute <- function(){
 
         code <- tclvalue(tkget(editViewer, "1.0", "end"))
-        output <- executeChunk(code)
-
+        # split the text
+        code <- unlist(strsplit(code, "\n"))
+#        output <- executeChunk(code)
         tkconfigure(resultViewer, state = "normal")
         tkdelete(resultViewer, "0.0", "end")
-        for(i in output){
-            tkinsert(resultViewer, "end", paste(i))
+
+        for(i in code){
+            tkinsert(resultViewer, "end", paste(getOption("prompt"),
+                                        i, sep = "") )
             tkinsert(resultViewer, "end", "\n")
+            options(show.error.messages = FALSE)
+            out <- try(capture.output(eval(parse(text = i),
+                                           envir = evalEnv)))
+            options(show.error.messages = TRUE)
+            if(inherits(out, "try-error")){
+                cont <- paste("Execution fauled because of:", out)
+                tkinsert(resultViewer, "end", out)
+                tkinsert(resultViewer, "end", "\n")
+            }else{
+                if(length(out) > 0 && out != "NULL"){
+                    for(outputs in out){
+                        tkinsert(resultViewer, "end", outputs)
+                        tkinsert(resultViewer, "end", "\n")
+                    }
+                }
+            }
         }
-#        tkinsert(resultViewer, "end", results)
         tkconfigure(resultViewer, state = "disabled")
         tkconfigure(expoButton, state = "normal")
-#        tkconfigure(resultViewer, state = "normal")
-#        writeList(resultViewer, results, TRUE)
-#        tkconfigure(resultViewer, state = "disabled")
     }
 
     # keeps track of code modification done
@@ -193,12 +190,18 @@ eExplorer <- function(pkgName, font = "arial 13"){
 }
 
 getExCode <- function(pkgName){
-    chunks <- list.files(file.path(.path.package(pkgName), "R-ex"))
-    if(length(chunks) == 0){
+    options(show.error.messages = FALSE)
+    tryMe <- try(list.files(file.path(.path.package(pkgName), "R-ex")))
+    options(show.error.messages = TRUE)
+
+    if(inherits(tryMe, "try-error")){
+        return(NULL)
+    }
+    if(length(tryMe) == 0){
         return(NULL)
     }
     codeChunks <- list()
-    for(i in chunks){
+    for(i in tryMe){
         codeChunks[[gsub("\\.R", "", i)]] <- readLines(
                      file.path(.path.package(pkgName), "R-ex", i))
     }
@@ -206,5 +209,21 @@ getExCode <- function(pkgName){
 }
 
 getHelpFile <- function(pkgName, fileName){
-    return(readLines(file.path(.path.package(pkgName), "help", fileName)))
+    if(any(missing(pkgName), missing(fileName))){
+        return("Can't get help file because pkgName or fileName is missing")
+    }
+    if(any(is.null(pkgName), is.null(fileName), is.na(pkgName),
+           is.na(fileName))){
+        return(paste("Can't get help file because pkgName or",
+                     "fileName is NULL or NA"))
+    }
+    options(show.error.message = FALSE)
+    tryMe <- try(readLines(file.path(.path.package(pkgName), "help",
+                                     fileName)))
+    options(show.error.messages = TRUE)
+    if(inherits(tryMe, "try-error")){
+        return("Can't get help file because pkgName or fileName is invalid")
+    }else{
+        return(tryMe)
+    }
 }

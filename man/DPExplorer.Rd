@@ -47,7 +47,7 @@ loadDataPkg(pkgName)
   Cancer Institute to provide Bioinformatics functionalities through R}
 
 \examples{
-if(interactive() && require(hgu95av2)){
+if(interactive() && require("hgu95av2", character.only = TRUE)){
     DPExplorer("hgu95av2")
 }
 }

@@ -42,9 +42,9 @@ viewVignette(title, packName, vigPath, pdfPath, font = "arial 11")
 }
 \examples{
 if(interactive()){
-    require(DynDoc)
-    require(tools)
-    require(widgetTools)
+    require("DynDoc", character.only = TRUE)
+    require("tools", character.only = TRUE)
+    require("widgetTools", character.only = TRUE)
     vExplorer()
     path <- .path.package("widgetTools")
     vigList <- getPkgVigList(path)

@@ -10,7 +10,8 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
                                     == "unix", "arial 14", "arial 11")){
 
 #    require(Biobase) || stop("Package Biobase not available!")
-    require(tools) || stop("Package tools not available!")
+    require("tools", character.only = TRUE) ||
+    stop("Package tools not available!")
 #    require(DynDoc) || stop("Package DynDoc not available!")
 
     on.exit(tkdestroy(base))
