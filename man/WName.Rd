@@ -7,6 +7,7 @@
 \alias{WcanEdit}
 \alias{WbuttonText}
 \alias{WbuttonFun}
+\alias{WwList}
 \alias{WpreFun}
 \alias{WpostFun}
 
@@ -25,6 +26,7 @@ WfromText(x)
 WcanEdit(x)
 WbuttonText(x)
 WbuttonFun(x)
+WwList(x)
 WpreFun(x)
 WpostFun(x)
 }
@@ -50,6 +52,8 @@ WpostFun(x)
   list passed.
   WbuttonFun(x) will return the value of the buttonFun element of the
   list passed.
+  WwList(x) will return the value of the wList element of the list
+  passed.
   WpreFun(x) will return the value of the preFun element of the list
   passed.
   WpostFun(x) will return the value of the post element of the list passed.
@@ -85,6 +89,7 @@ WfromText(pW1)
 WcanEdit(pW1)
 WbuttonText(pW1)
 WbuttonFun(pW1)
+WwList(widget1)
 WpreFun(widget1)
 WpostFun(widget1)
 }

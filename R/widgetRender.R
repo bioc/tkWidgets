@@ -4,8 +4,7 @@ widgetRender <- function (iWidget, tkTitle) {
     BUTWIDTH <- 10
 
     savediWidget <- iWidget
-    # This $ sign will go when a function that gets the list is ready
-    wList <- iWidget$wList
+    wList <- WwList(iWidget)
 
     if(is.null(wList) || is.na(wList) )
         stop("Either wList or/and funName is null or empty")
