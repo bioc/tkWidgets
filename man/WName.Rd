@@ -9,8 +9,10 @@
 \alias{WbuttonFun}
 \alias{WwList}
 \alias{WListByName}
+\alias{WListNewValue}
 \alias{WpreFun}
 \alias{WpostFun}
+\alias{WEnd}
 
 \title{Accessor functions for primitive widget objects.}
 \description{
@@ -29,14 +31,19 @@ WbuttonText(x)
 WbuttonFun(x)
 WwList(x)
 WListByName(x, name)
+WListNewValue(x, index, newVal)
 WpreFun(x)
 WpostFun(x)
+WEnd{x}
 }
 
 \arguments{
   \item{x}{A list of lists with a Name, Value, toText, fromText,
     canEdit, buttonText, buttonFun, preFun, postFun element.}
-  \item{name}{A character string for the name of the list to be returned}
+  \item{name}{A character string for the name of the list to be returned}  
+  \item{index}{An integer as an index for the list in the first list of
+    a list of lists for a widget.}
+  \item{newVal}{An R data type that is going to be used to update the value.}
 }
 \details{
   WName(x) will return the value of the Name element of the list passed.
@@ -56,10 +63,13 @@ WpostFun(x)
   WwList(x) will return the value of the wList element of the list
   passed.
   WListByName(x, name) will return the list with the name = "name" that
-  is contained by list x. 
+  is contained by list x.
+  WListNewValue(x, index, newVal) will update the value of list in the
+  first list of a widget list as indicated by the index number.
   WpreFun(x) will return the value of the preFun element of the list
   passed.
   WpostFun(x) will return the value of the post element of the list passed.
+  WEnd(x) will return the value of the end element of the list passed.
 }
 \value{
   \item{x}{A character string or R function represented by the element
@@ -94,8 +104,10 @@ WbuttonText(pW1)
 WbuttonFun(pW1)
 WwList(widget1)
 WListByName(widget1, "a")
+WListNewValue(widget1, 1, "New Value")
 WpreFun(widget1)
 WpostFun(widget1)
+WEnd(widget1)
 }
 \keyword{manip}
 

@@ -20,4 +20,5 @@ WListNewValue <- function (x, index, newVal){
 }
 WpreFun <- function(x) x$preFun
 WpostFun <- function(x) x$postFun
+WEnd <- function(x) x$end
 

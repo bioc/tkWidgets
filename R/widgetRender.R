@@ -39,24 +39,36 @@ widgetRender <- function (iWidget, tkTitle) {
     getEntryValues <- function(){
         entryList
         for(i in 1:length(wList) ) {
-#             print(paste("i = ", BUTTONLAST[[i]]))
-#            if(!BUTTONLAST[[i]]){
+            if(!BUTTONLAST[[i]]){
+                print(paste("entry = ", i))
                 if(!is.null(WfromText(wList)))
-                    eval(substitute(entryList[[i]] <-
-                         WfromText(wList[[i]])(tclvalue(entryValue[[i]])),
-                                           list(i = i)))
+                    eval(substitute(iWidget <<-WformText(wList[[i]])
+                                    (WListNewValue(iWidget, i,
+                                                  tclvalue(entryValue[[i]]))),
+                                    list(i = i)))
+#                    eval(substitute(entryList[[i]] <-
+#                         WfromText(wList[[i]])(tclvalue(entryValue[[i]])),
+#                                           list(i = i)))
                 else
-                    entryList[[i]] <- tclvalue(entryValue[[i]])
+                    eval(substitute(iWidget <<-
+                                    WListNewValue(iWidget, i,
+                                                  tclvalue(entryValue[[i]])),
+                                    list(i = i)))
+#                    entryList[[i]] <- tclvalue(entryValue[[i]])
             }
-#        }
+#            }else{
+#                entryList <- NULL
+#            }
+        }
         return(entryList)
     }
 
     ## Updates the widget with entries in the boxes
-    updateWidget <- function(entryList, wList){
-        for(i in 1:length(wList))
-            iWidget <<- WListNewValue(iWidget, i, entryList[[i]])
-    }
+#    updateWidget <- function(entryList, wList){
+#        for(i in 1:length(wList))
+#            if(!is.null(entryList[[i]]))
+#               iWidget <<- WListNewValue(iWidget, i, entryList[[i]])
+#    }
 
     ##build button functions
     for(i in 1:length(wList)) {
@@ -86,12 +98,12 @@ widgetRender <- function (iWidget, tkTitle) {
         pW <- wList[[i]]
         label <- tklabel(eFrame, text = WName(pW), font = LABELFONT)
         entryValue[[i]] <- tclVar()
-#        BUTTONLAST[[i]] <- TRUE
+        BUTTONLAST[[i]] <- TRUE
         entryList[[i]] <- tkentry(eFrame,
                                   textvariable = entryValue[[i]],
                                   width=ENTRYWIDTH)
-#        tkbind(entryList[[i]], "<KeyPress>",
-#               keypress <- function() BUTTONLAST[[i]] <- FALSE)
+        eval(substitute(tkbind(entryList[[i]], "<KeyPress>",
+               kpress <- function() BUTTONLAST[[i]] <<- FALSE), list(i = i)))
 
         if( !is.null(WValue(pW))){
             tkinsert(entryList[[i]], 0, WValue(pW))
@@ -118,14 +130,15 @@ widgetRender <- function (iWidget, tkTitle) {
     tkwait.window(base)
 
     if(END){
-        updateWidget(getEntryValues(), WwList(iWidget))
+#        updateWidget(getEntryValues(), WwList(iWidget))
+        getEntryValues()
         iWidget$end <- "END"
         class(iWidget) <- "Widget"
         return(iWidget)
     }else{
         savedWidget$end <- "CANCEL"
         class(iWidget) <- "Widget"
-        return(savedWidget)
+        return(savediWidget)
     }
 }
 
