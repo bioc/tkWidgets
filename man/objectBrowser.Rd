@@ -37,15 +37,16 @@ objectBrowser(fun = function(x) TRUE, textToShow = "Select object(s)", nSelect =
   in the box for object names on the left of the GUI.
 
   Select >> - When objects in the box for object names have been
-  highlighted, clicking "Select >>" will display the highlisted object
-  names in the box for selected objects on the right.
+  highlighted by clicking or clicking/draging, clicking "Select >>" will
+  display the highlisted object names in the box for selected objects on
+  the right. 
 
   Reset - Moves back to ".GlobalEnv" which is the default starting point
   of the system.
 
   << Remove - When object names in the box for seleted objects have been
-  highlighted and the "<< Remove" button pressed, the hgihlisted object
-  names will be removed from the display.
+  highlighted by clicking or clicking/draging and the "<< Remove" button
+  pressed, the hgihlisted object names will be removed from the display.
 
   Clear <- Removes all the object names from the box for selected
   objects.

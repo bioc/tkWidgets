@@ -43,21 +43,24 @@ NULL,textToShow = "Choose file(s) to be read in.", nSelect = -1)
 
   The following is a list of the buttons and the associated behavior:
 
-  Up - Moves the directory whose content is to be displyed one level up
-  along the directory tree. No action if already on top of the tree.
+  Up - Moves the directory whose content is to be displyed in the box
+  for file names one level up along the directory tree. No action if
+  already on top of the tree. 
 
-  Select >> - When a file or files in the directory box have been
-  highlighted and the "Select >>" button pushed, the highlighted file(s)
+  Select >> - When a file or files in the box for file names in a
+  directory have been highlighted by clicking or clicking and draging
+  mouse button 1 and the "Select >>" button pushed, the highlighted file(s)
   will be displyed in the box for selected file(s) on the right.
 
   << Remove - When a file or files in the box for selected files have been
-  highlighted and the "<< Remove" button pushed, the highlighted file(s)
-  will be removed from the box.
+  highlighted by clicking and clicking and draging and the "<< Remove"
+  button pushed, the highlighted file(s) will be removed from the box.
 
   Clear - Clears everything in the box for selected files when pushed.
 
-  end - Returns a vector containing all the selected file(s) in the box
-  for selected files or NULL if the box is empty.
+  end - Returns a vector containing all the names in the box
+  for selected files or NULL if the box is empty. The full path will be
+  appended to the file names.
 }
 \value{
   \item{fileSelected}{A vector of character strings for the full path
