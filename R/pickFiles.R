@@ -4,7 +4,8 @@
 #
 # Copyright 2002, J. Zhang. All rights reserved.
 #
-pickFiles <- function (fileNames, fun, prefix, suffix,
+pickFiles <- function (fileNames, fun = function(x) TRUE,
+                       prefix = NULL, suffix = NULL,
                        exclude = Platform()$file.sep){
     if(is.null(prefix) && is.null(suffix))
        whichOnes <- sapply(fileNames, fun)
