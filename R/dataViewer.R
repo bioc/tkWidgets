@@ -4,12 +4,17 @@
 #
 # Copyright 2002, J. Zhang. All right reserved.
 #
-dataViewer <- function(data, save = TRUE){
+dataViewer <- function(data, caption = "", save = TRUE){
+    on.exit(exit())
+    exit <- function() tkdestroy(base)
 
     base <- tktoplevel()
     tktitle(base) <- "BioC tkWidgets"
 
-    exit <- function() tkdestroy(base)
+    if(caption != ""){
+        label <- tklabel(base, text = caption)
+        tkpack(label)
+    }
 
     boxFrame <- tkframe(base)
 
@@ -27,6 +32,8 @@ dataViewer <- function(data, save = TRUE){
             tempName <- tkbutton(tempFrame, text = colnames(data)[i],
                                  width = colWidth)
             tkpack(tempName)
+        }else{
+            colWidth <- columnLength[i]
         }
         tempList <- tklistbox(tempFrame, width = colWidth, height = 0,
                                              background = "white")
@@ -59,4 +66,5 @@ dataViewer <- function(data, save = TRUE){
 
     tkwait.window(base)
 }
+
 
