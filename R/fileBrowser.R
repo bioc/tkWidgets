@@ -31,34 +31,30 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
 
     inList <- function(){
-       if(tkcurselection(listView) != ""){
-            selectedObj <<- tkget(listView,(tkcurselection(listView)))
-            if(regexpr(Platform()$file.sep, selectedObj) >= 1){
-	        path <<- paste(path, Platform()$file.sep,
-                               gsub(Platform()$file.sep, "\\", selectedObj),
-                               sep = "")
-                doPath()
-                writeDir(listView,
-                         pickFiles(dirsNFiles(path), testFun,
-                                   prefix, suffix))
-                writeCap(path)
-                if(currentNode >= 2)
-                    tkconfigure(upBut, state = "normal")
-            }
+        selectedObj <<- as.character(tkget(listView,(tkcurselection(listView))))
+        if(regexpr(Platform()$file.sep, selectedObj) >= 1){
+	    path <<- paste(path, Platform()$file.sep,
+                           gsub(Platform()$file.sep, "\\", selectedObj),
+                           sep = "")
+            doPath()
+            writeDir(listView,
+                     pickFiles(dirsNFiles(path), testFun,
+                               prefix, suffix))
+            writeCap(path)
+            if(currentNode >= 2)
+                tkconfigure(upBut, state = "normal")
         }
     }
 
     selInDir <- function (){
         fileIndex <<- NULL
-        if(tkcurselection(listView) != ""){
-            tkconfigure(selectBut, state = "normal")
-            selIndex <<- unlist(strsplit(tkcurselection(listView), " "))
-        }
+        tkconfigure(selectBut, state = "normal")
+        selIndex <<- unlist(strsplit(tkcurselection(listView), " "))
     }
 
     selInSelection <- function(){
         selIndex <<- NULL
-        if(tkcurselection(selectView) != ""){
+        if(as.character(tkcurselection(selectView)) != ""){
             fileIndex <<-
                  unlist(strsplit(tkcurselection(selectView), " "))
             tkconfigure(remBut, state = "normal")
@@ -69,8 +65,9 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     selectAFile <- function(){
         if(length(selIndex) > 0){
             for(i in selIndex){
-                selObj <- tkget(listView, i)
-                if(regexpr(".*/", selObj) == -1){
+                selObj <- as.character(tkget(listView, i))
+                if(regexpr(paste(".*", Platform()$file.sep, sep = ""),
+                           selObj) == -1){
                     fileSelected <<- c(fileSelected,
                                     paste(path, Platform()$file.sep,
                                           selObj, sep = ""))
