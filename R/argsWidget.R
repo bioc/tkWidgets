@@ -20,11 +20,11 @@ argsWidget <- function(argsList, defaultNames = c("OK", "Cancel"),
     # Arguments that are functions
     funcs <- getSymbol(argsList)
     # Conver functions to characters
-    argsList <- sapply(funcs2Char(argsList, funcs), formatArg)
+    tempList <- as.list(sapply(funcs2Char(argsList, funcs), formatArg))
     # Constructs the interface
     # Sets the working environment
     PWEnv <- new.env(hash = TRUE, parent = NULL)
-    pWidgets <- getPWidget(argsList, PWEnv, inst)
+    pWidgets <- getPWidget(tempList, PWEnv, inst)
     widget <- widget(wTitle = "BioC Arguments Widget", pWidgets,
                      funs = list(), preFun = function() {},
                      postFun = function() {}, env = PWEnv,
@@ -48,6 +48,8 @@ argsWidget <- function(argsList, defaultNames = c("OK", "Cancel"),
 }
 # Creates the primary widget list for building the interface
 getPWidget <- function(argsList, PWEnv, inst = ""){
+    # takes care of ""
+    argsList[argsList[] == ""] <- ""
     # Figures out the width for lables
     lWidth <- max(nchar(names(argsList)))
     pWidgets <- list()
@@ -94,7 +96,7 @@ formatArg <- function(toFormat){
     }
     if(is.na(toFormat)){
         options(warn = -1)
-        return("NA")
+        return(NA)
     }
     if(is.logical(toFormat)){
         options(warn = 0)
@@ -105,6 +107,9 @@ formatArg <- function(toFormat){
     }
     if(toFormat == "FALSE"){
         return(FALSE)
+    }
+    if(toFormat == "\\t"){
+        return("\t")
     }
     options(warn = 0)
     if(toFormat == ""){
