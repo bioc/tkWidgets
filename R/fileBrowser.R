@@ -4,11 +4,11 @@
 
 fileBrowser <- function (path = "", testFun = function(x) TRUE,
                          prefix = NULL, suffix = NULL,
-                         textToShow = "Choose file(s) to be read in."){
+                         textToShow = "Choose file(s) to be read in"){
 
     require(tcltk) || stop("tcl/tk library not available")
 
-    LABELFONT <- "Helvetica 12"
+    LABELFONT <- "Helvetica 11"
     BUTWIDTH <- 8
     CANWIDTH <- 500
     CANHEIGHT <- 400
@@ -66,12 +66,12 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         if(length(selIndex) > 0){
             for(i in selIndex){
                 selObj <- as.character(tkget(listView, i))
-                if(regexpr(paste(".*", Platform()$file.sep, sep = ""),
-                           selObj) == -1){
+#                if(regexpr(paste(".*", Platform()$file.sep, sep = ""),
+#                           selObj) == -1){
                     fileSelected <<- c(fileSelected,
                                     paste(path, Platform()$file.sep,
                                           selObj, sep = ""))
-                }
+#                }
             }
             fileSelected <<- unique(fileSelected)
             writeToView(selectView, fileSelected)
@@ -115,7 +115,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
 
     up <- function(){
-
+        tkconfigure(selectBut, state = "disabled")
         if(currentNode > 2){
 	    path <<- paste(nodes[1:(currentNode - 1)],
 			  sep = "", collapse = Platform()$file.sep)
@@ -130,8 +130,16 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 
     writeToView <- function(aView, toWrite){
   	tkdelete(aView, 0, "end")
-        if(!is.null(toWrite))
-            tkinsert(aView, 0,  gsub(".*/(.*)", "\\1", toWrite))
+        if(!is.null(toWrite)){
+            for (i in toWrite){
+                if(substr(i, nchar(i), (nchar(i) + 1))
+                      == Platform()$file.sep)
+                    i <- substr(i, 0, (nchar(i) - 1 ))
+                tkinsert(aView, 0,
+                     gsub(paste(".*", Platform()$file.sep, "(.*)",
+                                sep = ""), "\\1", i))
+            }
+        }
         if(length(toWrite) > 0)
             tkconfigure(clearBut, state = "normal")
         else{
@@ -155,11 +163,11 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkpack(canvas, side = "top", fill = "both")
 
     topFrame <- tkframe(canvas)
+    instruct <- tkbutton(topFrame, text = textToShow, font = "Helvetica 12")
     dir <- tklabel(topFrame, text = "Directory: ", font = LABELFONT)
-    caption <- tkbutton(topFrame, text = path, width = 50)
-    instruct <- tklabel(topFrame, text = textToShow, font = LABELFONT)
-    tkgrid(dir, caption)
+    caption <- tklabel(topFrame, text = path, font = LABELFONT)
     tkgrid(instruct, columnspan = 2)
+    tkgrid(dir, caption)
     tkcreate(canvas, "window", (CANWIDTH/2), (2 * OFFSET + LABELHEIGHT/2),
 	     anchor = "center", window = topFrame)
 
@@ -183,7 +191,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkbind(listView, "<B1-ButtonRelease>", selInDir)
     writeDir(listView, pickFiles(dirsNFiles(path), testFun,
                                  prefix, suffix))
-    tkcreate(canvas, "window", OFFSET, (LABELHEIGHT + 2 * OFFSET + 10),
+    tkcreate(canvas, "window", OFFSET, (LABELHEIGHT + 2 * OFFSET + 15),
 	     anchor = "nw", window = leftFrame)
 
     rightFrame <- tkframe(canvas)
@@ -204,14 +212,15 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid.configure(remBut, sticky = "e")
     tkgrid.configure(clearBut, sticky = "w")
     tkcreate(canvas, "window", (CANWIDTH/2 + OFFSET),
-             (LABELHEIGHT + 2 * OFFSET + 10),
+             (LABELHEIGHT + 2 * OFFSET + 15),
 	     anchor = "nw", window = rightFrame)
 
     botFrame <- tkframe(canvas)
     endBut <- tkbutton(botFrame, text = "End", width = BUTWIDTH,
 		       command = end)
     tkpack(endBut)
-    tkcreate(canvas, "window", CANWIDTH/2, (CANHEIGHT - OFFSET - LABELHEIGHT),
+    tkcreate(canvas, "window", CANWIDTH/2,
+             (CANHEIGHT - OFFSET - LABELHEIGHT + 10),
 	     anchor = "center", window = botFrame)
 
     tkwait.window(base)
