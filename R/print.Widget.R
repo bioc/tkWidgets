@@ -10,7 +10,9 @@ print.Widget <- function (x, ...){
     for(i in names(wList)) {
         pW <- WListByName(wList, i)
         print(paste("widget_", i, ":", sep = ""))
-        class(pW) <- c("pWidget", "textbox")
+        class(pW) <- "pWidget"
         print.pWidget(pW)
     }
+    if(length(unlist(list(...))) > 0)
+        unlist(list(...))
 }

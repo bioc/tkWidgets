@@ -4,10 +4,12 @@
 #
 # Copyright J. Zhang 2002, all rights reserved.
 #
-print.pWidget <- function (x){
+print.pWidget <- function (x, ...){
     print(paste("Name = ", WName(x), ";", sep = ""))
     print(paste("Value = ", WValue(x), ";", sep = ""))
     print(paste("canEdit = ", WcanEdit(x), ";", sep = ""))
     if(!is.null(WbuttonFun(x)))
        print(paste("buttonText = ", WbuttonText(x), ";", sep = ""))
+    if(length(unlist(list(...))) > 0)
+        unlist(list(...))
 }
