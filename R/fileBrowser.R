@@ -42,7 +42,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
 
     inList <- function(){
-        selectedObj <<- as.character(tkget(listView,(tkcurselection(listView))))
+        selectedObj <- as.character(tkget(listView,(tkcurselection(listView))))
         if(regexpr(Platform()$file.sep, selectedObj) >= 1){
 	    path <<- paste(path, Platform()$file.sep,
                            gsub(Platform()$file.sep, "\\", selectedObj),
