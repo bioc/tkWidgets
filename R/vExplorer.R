@@ -304,7 +304,7 @@ viewVignette <- function(title, packName, vigPath, pdfPath,
                 body(fun) <- as.call(body)
                 assign(paste("chunkList",k,sep=""), fun)
 
-                buts[[k]] <<- tkbutton(base, text= i,
+                buts[[k]] <<- tkbutton(base, text= i, width = 13,
                                        state = "disabled", font = font,
                                        command = get(paste("chunkList",
                                        k, sep = "")))
@@ -335,7 +335,8 @@ viewVignette <- function(title, packName, vigPath, pdfPath,
                       hScroll = FALSE, vScroll = TRUE, what = "text")
     tkconfigure(chunkText)
     popChunks()
-    tkpack(chunkFrame, side = "left", anchor = "nw")
+    tkpack(chunkFrame, side = "left", anchor = "nw", expand = FALSE,
+           fill = "y")
 
     # Create the viewers for code and results of execution
     codeNRelFrame <- tkframe(listFrame)
