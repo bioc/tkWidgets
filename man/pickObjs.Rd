@@ -1,28 +1,26 @@
 \name{pickObjs}
 \alias{pickObjs}
 
-\title{A function that determines what to be sent to a widget for display.}
+\title{Determine What to Be Sent to a Widget}
 \description{
   This function takes a vector of object names and determines what will
-  be sent to the objectBrowser widget for display based on the default and
-  user input requirements.
+  be sent to (e.g. the \code{\link{objectBrowser}}) widget for display
+  based on the default and user input requirements.
 }
 \usage{
 pickObjs(objNames, fun = function(x) TRUE)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
-  \item{objNames}{A vector of character strings for object names to be
-    precessed.} 
-  \item{fun}{A function that checks the object names for satisfaction of
-  certain requirement.} 
+  \item{objNames}{character vector with object names to be processed.}
+  \item{fun}{function checking the object names for satisfaction of
+    certain requirement.}
 }
 \details{
   Packages and environments are always displayed.
 }
 \value{
-  \item{objNames}{A vector of character string for object names that
-    satisfy the requirements.}
+  Character vector of object names that satisfy the requirements.}
 }
 
 \author{Jianhua (John) Zhang}

@@ -2,11 +2,10 @@
 \alias{values.Widget}
 \alias{print.Widget}
 \alias{print.pWidget}
-\title{Functions dealing with the names and values of a widget created
-  by using the function widgetRender.}
+\title{Deal with Names and Values of Widget Created by widgetRender()}
 \description{
-  Functions in this group prints or list the names or/and values of the
-  widget elements on the widget created by using the function widgetRender.
+  Functions in this group print or list the names or/and values of the
+  widget elements on a widget created by \code{\link{widgetRender}()}.
 }
 \usage{
 values.Widget(x)
@@ -39,11 +38,11 @@ values.Widget(x)
 
   pW3 <- list(Name="CCC", Value="ccc", toText=function(x) paste(x,
   collapse = ","), fromText=NULL, canEdit=TRUE, buttonFun=NULL,
-  buttonText=NULL) 
+  buttonText=NULL)
 
   widget1 <- list(wList = list(a = pW1, b = pW2, c = pW3), preFun =
-  function() "Hi", postFun = function() "Bye") 
-	      
+  function() "Hi", postFun = function() "Bye")
+
 }
 \value{
   \item{returnList}{values.Widget returns a list of lists each with the

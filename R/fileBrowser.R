@@ -1,13 +1,10 @@
 # This function provides the interface to browse files under a
 # given path.
-#
 
 fileBrowser <- function (path = "", testFun = function(x) TRUE,
                          prefix = NULL, suffix = NULL,
-                         textToShow = "Select file(s)", nSelect = -1){
-
-    require(tcltk) || stop("tcl/tk library not available")
-
+                         textToShow = "Select file(s)", nSelect = -1)
+{
     LABELFONT1 <- "Helvetica 12 bold"
     LABELFONT2 <- "Helvetica 11"
     BUTWIDTH <- 8
@@ -43,11 +40,11 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 
     inList <- function(){
         selectedObj <- as.character(tkget(listView,(tkcurselection(listView))))
-        if(regexpr(Platform()$file.sep, selectedObj) >= 1){
+        if(regexpr(.Platform$file.sep, selectedObj) >= 1){
             if(currentNode == 1)
                 path <<- ""
-	    path <<- paste(path, Platform()$file.sep,
-                           gsub(Platform()$file.sep, "\\", selectedObj),
+	    path <<- paste(path, .Platform$file.sep,
+                           gsub(.Platform$file.sep, "\\", selectedObj),
                            sep = "")
             doPath()
             writeDir(listView,
@@ -81,7 +78,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
             for(i in selIndex){
                 selObj <- as.character(tkget(listView, i))
                     fileSelected <<- c(fileSelected,
-                                    paste(path, Platform()$file.sep,
+                                    paste(path, .Platform$file.sep,
                                           selObj, sep = ""))
             }
             fileSelected <<- unique(fileSelected)
@@ -107,16 +104,16 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
 
     doPath <- function(){
-	nodes <<- unlist(strsplit(path, Platform()$file.sep))
+	nodes <<- unlist(strsplit(path, .Platform$file.sep))
         currentNode <<- length(nodes)
     }
 
     fileUP <- function (){
         if(currentNode > 2)
 	    path <<- paste(nodes[1:(currentNode - 1)],
-			  sep = "", collapse = Platform()$file.sep)
+			  sep = "", collapse = .Platform$file.sep)
         if(currentNode == 2)
-            path <<- Platform()$file.sep
+            path <<- .Platform$file.sep
         writeDir(listView, pickFiles(dirsNFiles(path), testFun,
                                          prefix, suffix))
         writeCap(path)
@@ -129,9 +126,9 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         tkconfigure(selectBut, state = "disabled")
         if(currentNode > 2)
 	    path <<- paste(nodes[1:(currentNode - 1)],
-			  sep = "", collapse = Platform()$file.sep)
+			  sep = "", collapse = .Platform$file.sep)
         if(currentNode == 2)
-            path <<- Platform()$file.sep
+            path <<- .Platform$file.sep
         writeDir(listView, pickFiles(dirsNFiles(path), testFun,
                                          prefix, suffix))
         writeCap(path)
@@ -145,10 +142,10 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         if(!is.null(toWrite)){
             for (i in toWrite){
                 if(substr(i, nchar(i), (nchar(i) + 1))
-                      == Platform()$file.sep)
+                      == .Platform$file.sep)
                     i <- substr(i, 0, (nchar(i) - 1 ))
                 tkinsert(aView, "end",
-                     gsub(paste(".*", Platform()$file.sep, "(.*)",
+                     gsub(paste(".*", .Platform$file.sep, "(.*)",
                                 sep = ""), "\\1", i))
             }
         }

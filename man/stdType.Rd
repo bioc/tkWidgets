@@ -1,30 +1,32 @@
 \name{stdType}
 \alias{stdType}
 \alias{stdView}
-\title{Functions that provide default behaviors for typeFun and valueFun
-functions of listSelect function} 
+\title{Provide Default Behavior for listSelect Helper Functions}
 \description{
-  The function listSelect takes two functions that defined how the type
-  information and content of R objects will be shown on the widget
-  created by listSelect. Functions stdType and stdView provide the
-  default behavior.
+  The function \code{\link{listSelect}} takes two functions which define
+  how the type information and content of \R objects will be shown on
+  the widget created by \code{listSelect}.
+  Functions \code{stdType()} and \code{stdView()} provide the default
+  behavior.
 }
 \usage{
 stdType(toCheck)
 stdView(toView)
 }
-
 \arguments{
-  \item{toCheck}{Any R object}
-  \item{toView}{any R object}
+  \item{toCheck, toView}{arbitrary \R object.}
 }
 \details{
   These functions can be viewed as exmaples of defining functions for
-  typeFun and valueFun pamaraters of listSelect function.
+  the \code{typeFun} and \code{valueFun} arguments of the
+  \code{\link{listSelect}} function.
 }
 \value{
-  \item{stdType}{Returns a character string describing the type of the R
-    object}
+  %% FIXME:
+  \code{stdType()} returns a character string describing the type of the
+  \R object.
+
+  \code{stdView()}
 }
 \author{Jianhua Zhang}
 \note{These functions are part of the Bioconductor project at
@@ -36,8 +38,15 @@ stdView(toView)
 \examples{
 stdType(123)
 stdType("What am I")
-stdType(as.data.frame(matrix(1:10, ncol = 2)))
+
+str(mydf <- data.frame(x = 2:8, ch = letters[1:7]))
+stdType(mydf)# "list"
 stdType(stdType)
+
+if(interactive()) {## stdView() needs UI:
+  stdView(1:10)
+  stdView(mydf)
+ }
 }
 \keyword{misc}
 

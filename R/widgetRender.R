@@ -4,7 +4,8 @@
 # primitive widgets such entry boxex, buttons, ...
 # tkTitle: text to be appear in the title bar of the widgets.
 #
-widgetRender <- function (iWidget, tkTitle) {
+widgetRender <- function (iWidget, tkTitle)
+{
     LABELFONT <- "Helvetica 12"
     ENTRYWIDTH <- 50
     BUTWIDTH <- 10
@@ -15,7 +16,6 @@ widgetRender <- function (iWidget, tkTitle) {
 
     if(is.null(wList) || is.na(wList) )
         stop("Either wList or/and funName is null or empty")
-    require(tcltk) || stop("tcltk is not available.")
 
     if(!is.null(WpreFun(iWidget)))
         tt <- eval(WpreFun(iWidget)())

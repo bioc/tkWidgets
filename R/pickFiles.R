@@ -6,7 +6,7 @@
 #
 pickFiles <- function (fileNames, fun = function(x) TRUE,
                        prefix = NULL, suffix = NULL,
-                       exclude = Platform()$file.sep){
+                       exclude = .Platform$file.sep){
     if(is.null(prefix) && is.null(suffix))
        whichOnes <- sapply(fileNames, fun)
     else

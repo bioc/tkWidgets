@@ -3,11 +3,10 @@
 \alias{writeSelBox}
 \alias{writeBut}
 \alias{writeLabel}
-\title{Functions that make a widget with selection boxes based on user
-  specifications}
+\title{Utilities Creating a Widget With Selection Boxes}
 \description{
-  These functions creates a widget that allows users to view and make
-  selections of items shown on the interface.
+  These functions create a widget with selection boxes allowing users to
+  view and make selections of items shown on the interface.
 }
 \usage{
 listSelect(aList, topLbl = "Select Elements From The Following List",
@@ -60,10 +59,3 @@ if(interactive())
   listSelect(aList)}
 }
 \keyword{interface}
-
-
-
-
-
-
-

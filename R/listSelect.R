@@ -3,17 +3,15 @@
 #
 # Copyright 2002, J. Zhang. All rights reserved
 #
-listSelect <- function(aList,
-                       topLbl = "Select Elements From The Following List",
-                       typeFun = stdType, valueFun = stdView){
-
-    require(tcltk) || stop("tcltk support is absent")
+listSelect <-
+    function(aList, topLbl = "Select Elements From The Following List",
+             typeFun = stdType, valueFun = stdView)
+{
+    if(is.null(aList) || length(aList) < 1)
+        stop("Invalid `aList'")
 
     returnList <- list()
     end <- FALSE
-
-    if(is.null(aList) || length(aList) < 1)
-        stop("Invalid input")
 
     for(i in names(aList))
         i <- tclVar(TRUE)

@@ -1,0 +1,80 @@
+>>> Notes on reading the code and my very minor clean ups       <<<
+>>>				Martin Maechler, Aug. 19, 2002  <<<
+
+R:
+==
+
+- Replaced  Platform() by  .Platform
+- the functions should not contain  require(tcltk)
+  since the whole package should!
+
+  --> removed this and added NEW file R/AAA.R  <<<<<<<<< CVS >>>>>>>>>>>>.
+
+- Style: The functions have long argument names with capitals,
+	 even for the first (and sometimes only) argument, e.g.
+	 "aList", "toList", "valueFun" ...
+  This is non standard (leads to less readable code IMO).
+
+
+I have some doubts about the real usefulness of several of the provided
+utility functions:
+
+o as.character.function(fun) returns the function, not a character
+o as.character.formula(fo) is complicated way of using
+    format(fo)
+    - It does *not* work as a method for "as.character"; since  standard R
+      has already defined as.character for formula objects {*differently*}.
+    - just wrong concept.
+o getContent() for almost all kind of objects returns the object itself
+  instead of ``a representation of ..'' (as the help page states).
+
+o  hasPrefix() and hasSuffix() seem wrong to me :
+   why does
+       (hasPrefix("xx"))("Dir/abc")
+   give TRUE {it does because there's one "/" in the string}
+
+o  isCharacter() returns TRUE for an environment {why ??}
+		 at least the function name is wrongly designed.
+   - also it allows non-character arguments {giving FALSE},
+     but most probably should signal an error instead!
+
+
+man:
+====
+
+- Some files should really be merged into one.
+  * I did so for man/hasPrefix.Rd and
+    man/hasSuffix.Rd <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< remove this from CVS !!
+
+- \title{}  should be (almost) all capitalized; should not end in "."
+	    shorter: it's a head line!
+	    {eg.  don't say ``Functions for ....''}
+
+- \arguments{.}:  The description in the 2nd \item{} entry
+		  should start __lower__ case.
+
+- value{} : Don't use \item{} _unless_ you return a list (where you use it
+	    for the list components.
+
+- \references{.}  mention R News article properly in only a few places
+
+
+- Using \describe{...} for widget buttons -- looks much better now, but...
+	     but button labels are still not okay.
+
+      - if(interactive()) examples: use  source() {or many example()}
+			  to test this interactively
+
+      - stdType() {almost == mode() apart from "call" }
+		   seems not too sensical to me.
+        If you really really want it, then at least provide it in Biobase,
+	so it might be used in much more places for UI consistency.
+
+      - writeDir() really is a general useful utility nothing inherently to
+		   do with "Dir"ectory -- hence has wrong name...
+
+
+      - it seems that
+	   listSelect() is the ``only really non trivial''
+	function --
+

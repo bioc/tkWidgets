@@ -4,11 +4,8 @@
 # Copyright 2002, J. Zhang. All right reserved.
 #
 objViewer <- function(toView, width = 40, height = 10){
-    require(tcltk) || stop("tcltk unavailable")
 
-    ok <- function(){
-        tkdestroy(base)
-    }
+    ok <- function() tkdestroy(base)
 
     base <- tktoplevel()
     tktitle(base) <- "BioC Object Viewer"
