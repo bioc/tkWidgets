@@ -58,7 +58,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                 tkconfigure(upBut, state = "normal")
             tkconfigure(selectBut, state = "disabled")
         }else{
-            selIndex <<- unlist(strsplit(tkcurselection(listView), ""))
+            selIndex <<- unlist(strsplit(
+                                as.character(tkcurselection(listView)), ""))
             selectAFile()
         }
     }
@@ -67,7 +68,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     selInDir <- function (){
         fileIndex <<- NULL
         tkconfigure(selectBut, state = "normal")
-        selIndex <<- unlist(strsplit(tkcurselection(listView), " "))
+        selIndex <<- unlist(strsplit(
+                            as.character(tkcurselection(listView)), " "))
     }
     # Remember the index of the file name when a user single clicked a
     # file name in the box for selected file names.
@@ -75,7 +77,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         selIndex <<- NULL
         if(as.character(tkcurselection(selectView))[1] != ""){
             fileIndex <<-
-                 unlist(strsplit(tkcurselection(selectView), " "))
+              unlist(strsplit(as.character(tkcurselection(selectView)), " "))
             tkconfigure(remBut, state = "normal")
         }else
             tkconfigure(remBut, state = "disabled")

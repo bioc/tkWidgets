@@ -138,7 +138,8 @@ objectBrowser<- function (env = .GlobalEnv,
     sClick <- function () {
         selectedObj <<- NULL
         tkconfigure(selectBut, state = "normal")
-        selIndex <<- unlist(strsplit(tkcurselection(listView), " "))
+        selIndex <<- unlist(strsplit(
+                              as.character(tkcurselection(listView)), " "))
         if(length(selIndex) == 1){
             tempObj <<- as.character(tkget(listView, selIndex))
         }else{
@@ -216,7 +217,8 @@ objectBrowser<- function (env = .GlobalEnv,
     selClick <- function (){
         objIndex <<- NULL
         tkconfigure(removeBut, state = "normal")
-        objIndex <<- unlist(strsplit(tkcurselection(selectView), " "))
+        objIndex <<- unlist(strsplit(
+                              as.character(tkcurselection(selectView), " "))
     }
     # Write to the list box for selected objects
     writeSelection <- function (toWrite){

@@ -31,7 +31,8 @@ pickItems <- function (items){
     # When a user single clicked a column name, remember that name and
     # activate the select button
     colSClicked <- function(){
-        colIndex <<- unlist(strsplit(tkcurselection(colView), " "))
+        colIndex <<- unlist(strsplit(
+                              as.character(tkcurselection(colView)), " "))
         tkconfigure(selectBut, state = "normal")
     }
     # When a user click the select button, put the selected column name
@@ -47,7 +48,8 @@ pickItems <- function (items){
     # Remember the column name when a name in the selected column names list
     # box is single clicked
     selSClick <- function(){
-        indexInSel <<- unlist(strsplit(tkcurselection(selectView), " "))
+        indexInSel <<- unlist(strsplit(
+                              as.character(tkcurselection(selectView)), " "))
         tkconfigure(remBut, state = "normal")
     }
     # Removes the selected column name from the list box for selected

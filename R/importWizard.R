@@ -612,7 +612,7 @@ setQuoteList <- function(frame, env){
 setQuote <- function(listBox, env, state = "state2"){
     quotes <- ""
     # Quote can be multiple (" and/or ')
-    selIndex <- unlist(strsplit(tkcurselection(listBox), " "))
+    selIndex <- unlist(strsplit(as.character(tkcurselection(listBox)), " "))
     for(i in selIndex){
         quotes <- paste(quotes, tkget(listBox, i), sep = "")
     }
