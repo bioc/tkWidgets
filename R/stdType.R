@@ -4,20 +4,19 @@
 #
 # Copyright 2002, J. Zhang. All rights reserved
 #
-##FIXME: please do not do this, a call is not a formula it is a call and
-## a formula is a formula -- this is going to cause all sorts of trouble
-## you can use inherits(x, "formula") to find out if something is a
-## formula
 
 stdType <- function(toCheck){
-    if(mode(toCheck) == "call")
-        return("Formula")
-    else
+    if(inherits(toCheck, "formular")){
+        return("formula")
+    }else{
         return(mode(toCheck))
+    }
 }
 
 stdView <- function(toView){
-    toView <- getContent(toView)
+    if(inherits(toView, "formular")){
+        toView <- format(toView)
+    }
     objViewer(toView)
 }
 
