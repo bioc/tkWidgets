@@ -1,0 +1,107 @@
+%\VignetteIndexEntry{tkWidgets importWizard}
+%\VignettePackage{tkWidgets}
+%\VignetteKeyword{interface}
+
+\documentclass{article}
+
+\usepackage{/scratch/homes/jzhang/R/share/texmf/Sweave}
+\begin{document}
+
+\title{Expected behavior of importWizard}
+\maketitle
+
+It takes three steps to import a file using
+\code{\link{importWizard}}. There are buttons that allow users to
+travel back and forth between the three steps.
+ 
+\section*{Step one: file browing}
+
+When \code{\link{importWizard}} is invoked, a widget that appears
+should have the following elements:
+
+\begin{itemize}
+\item An entry box for the name of the file to be imported.
+\item A "Borwse" button that allows users to browse directories for
+  the a file to import.
+\item Two radio buttons define the type of the file to be
+  imported. One button for delimited file and one for fixed width file.
+\item A list box with number for users to choose from for the line
+  number from which import begins.
+\item A list box to show the file to be imported as lines read in
+  using \code{\link{readLines}}
+\item  Four buttons ("Cancel", "< Back", "Next", "Finish") to allow
+  users to travel back and forth.
+\end{itemize}
+
+If ImportWizard is invoked with a file name, the name will appear in
+the entry box, one of the two radio buttons will be checked if the
+system is able to detect if the file is delimited or has fixed width,
+and the content of the file will be displayed as separate lines in the
+list box. Otherwise, the elements will be empty until users select a
+file using the "Browse" button.
+
+Cliking the "Next >" button moves to step two.
+
+\section*{Step two: file examination}
+
+The widget for step two has the following widget elements:
+
+\begin{itemize}
+\item A group of radio buttons for the exact type of delimiter used
+  in the file to be imported. A delimiter that is not listed by the
+  radio buttons can be chosen by selecting "Other" radio button and
+  then enter the the type of delimiter in the actived entry box beside
+  "Other". 
+\item A list box for users to select the the type of quote used in the
+  file. 
+\item A canvas showing the file in columns if the file is
+  delimited. No function has be implemented to deal with fixed width
+  file at this time.
+\item  Four buttons ("Cancel", "< Back", "Next", "Finish") to allow
+  users to travel back and forth.
+\end{itemize}
+
+Clicking the "< Back" button moves back to step one and "Next >"
+button moves to step three.
+
+\section*{Step three: file manipulation}
+
+The widget for step three has the following widget elements:
+
+\begin{itemize}
+\item A "More Args..." button that allows users to select some of the
+  additional arguments to import a file using \code{\link{read.table}}
+  for advanced users.  
+\item A list box with the file to be imported shown in columns if
+  delimited. On top of each column there is a radio button to indicate
+  whether a column will droped when the file is imported, an entry box
+  for the name of the column when imported as a data frame, and
+  another entry box for the data type of the column. Default values
+  for these elements will be set but users are always able to change
+  them.  
+\item  Four buttons ("Cancel", "< Back", "Next", "Finish") to allow
+  users to travel back and forth.
+\end{itemize}
+
+Clicking the "< Back" button moves back to step two. When the "Finish"
+button is clicked, a message box will pop up to allow users to decide
+whether to save the imported file a an R object in the .Global
+environment by a specified name.
+
+\section*{Usage}
+
+\code{\link{importWizard}} is driven by the interface. Users only need
+to type "importWizard()" or "importWizard(filename)" to begin the
+importing process.
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
