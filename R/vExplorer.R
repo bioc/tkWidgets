@@ -344,7 +344,7 @@ viewVignette <- function(title, packName, vigPath, pdfPath,
     chunkFrame <- tkframe(listFrame)
     tkpack(tklabel(chunkFrame, text = chunkOrNot, font = font))
     chunkText <- makeViewer(chunkFrame, vWidth = 18, vHeight = NULL,
-                      hScroll = FALSE, vScroll = TRUE, what = "text")
+                      hScroll = TRUE, vScroll = TRUE, what = "text")
     tkconfigure(chunkText)
     popChunks()
     tkpack(chunkFrame, side = "left", anchor = "nw", expand = FALSE,
