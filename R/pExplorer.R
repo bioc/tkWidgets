@@ -23,15 +23,16 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     }
     on.exit(end())
     pathEntered <- function(){
-        options(show.error.messages = FALSE)
-        pkgNames <<- try(getRPkgs(tclvalue(pkgPath)))
-        options(show.error.messages = TRUE)
-        if(inherits(pkgNames, "try-error")){
-            warning(tclvalue(pkgPath), "is not a valid name")
+        tempNames <- getRPkgs(tclvalue(pkgPath))
+        if(!is.null(tempNames)){
+            pkgNames <<- tempNames
+            tclvalue(pkgName) <<- pkgNames[1]
+            curDir <<- file.path(tclvalue(pkgPath), pkgNames[1])
+            writePkgDirs()
+        }else{
+            tclvalue(pkgPath) <<- gsub(paste(.Platform$file.sep,
+                                     basename(curDir), sep = ""), "", curDir)
         }
-        tclvalue(pkgName) <<- pkgNames[1]
-        curDir <<- file.path(tclvalue(pkgPath), pkgNames[1])
-        writePkgDirs()
     }
     upDatePath <- function(){
         options(show.error.messages = FALSE)
@@ -47,11 +48,16 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         }
     }
     browse <- function(){
-        tclvalue(pkgPath) <<- tkchooseDirectory()
-        pkgNames <<- getRPkgs(tclvalue(pkgPath))
-        tclvalue(pkgName) <<- pkgNames[1]
-        curDir <<- file.path(tclvalue(pkgPath), tclvalue(pkgName))
-        writePkgDirs()
+        tempPath <- tclvalue(tkchooseDirectory())
+        tempNames <- getRPkgs(tempPath)
+        if(!is.null(tempNames)){
+            pkgNames <<- tempNames
+            tclvalue(pkgPath) <<- tempPath
+            pkgNames <<- getRPkgs(tclvalue(pkgPath))
+            tclvalue(pkgName) <<- pkgNames[1]
+            curDir <<- file.path(tclvalue(pkgPath), tclvalue(pkgName))
+            writePkgDirs()
+        }
     }
     writePkgDirs <- function(){
         writeList(listView, getPkgContents(curDir, getExclude()))
@@ -212,9 +218,9 @@ getFileContents <- function(path, fileName){
     if(regexpr("\\.zip", fileName) > 0){
         return(readLines(unz(file.path(path, fileName))))
     }
-    if(regexpr("\\.Rd", fileName) > 0){
-        return(procRd(file.path(path, fileName)))
-    }
+#    if(regexpr("\\.Rd", fileName) > 0){
+#        return(procRd(file.path(path, fileName)))
+#    }
     if(regexpr("\\.pdf", fileName) > 0){
         return(procPDF(file.path(path, fileName)))
     }
@@ -222,7 +228,7 @@ getFileContents <- function(path, fileName){
         return(procHTML(file.path(path, fileName)))
     }
     # Ohterwise, use readLines
-    return(readLines(fileName))
+    return(readLines(file.path(path, fileName)))
 }
 
 # For rda files, try to find the Rd file and return it
@@ -283,17 +289,32 @@ procHTML <- function(fileName){
 }
 
 getExclude <- function(){
-    return(c("Meta/", "latex/", "INDEX"))
+    return(c("Meta/", "latex/", "INDEX", "CVS"))
 }
 
-
 getRPkgs <- function(pkgPath){
-
-     toCheck <- list.files(pkgPath)
-     if (length(toCheck) == 0) return("")
+     options(warn = -1)
+     toCheck <- try(list.files(pkgPath))
+     options(warn = 0)
+     if(length(toCheck) == 0){
+         tkmessageBox(title = "Access Info",
+                      message = ("Invalid/empty directory"),
+                      icon = "info",
+                      type = "ok")
+         return(NULL)
+     }
      isd <- file.info(file.path(pkgPath, toCheck))
      dirWithDesc <- sapply(file.path(pkgPath,toCheck[isd$isdir]), hasDesc)
-     return(basename(names(dirWithDesc)[dirWithDesc]))
+     Rpkgs <- basename(names(dirWithDesc)[dirWithDesc])
+     if(length(Rpkgs) > 0){
+         return(Rpkgs)
+     }else{
+         tkmessageBox(title = "No Packages found",
+                      message = ("No valid R packages found"),
+                      icon = "info",
+                      type = "ok")
+         return(NULL)
+     }
 }
 
 hasDesc <- function(pkgPath){
