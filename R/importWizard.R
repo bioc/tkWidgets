@@ -265,14 +265,15 @@ importWizard <- function(filename = ""){
 # Populates the list box for data file
 showData <- function(state, listWidget, datafile, argsList){
     if(state == "state1"){
-        aFrame <- tkframe(listWidget)
+#        aFrame <- tkframe(listWidget)
         for(i in 1:length(datafile)){
-            tempFrame <- tkframe(aFrame)
-            tkpack(tkbutton(tempFrame, width = 1, text = i), side = "left")
-            tkpack(tklabel(tempFrame, text = datafile[i]), side = "left")
-            tkpack(tempFrame, side = "top", anchor = "w")
+            entry <- tklabel(listWidget, text = paste(i, ": ",
+                                                datafile[i], sep = ""))
+            tkwindow.create(listWidget, "end", window = entry)
+            tkinsert(listWidget, "end", "\n")
+            #            tkpack(tempFrame, side = "top", anchor = "w")
         }
-        tkwindow.create(listWidget, "end", window = aFrame)
+#        tkwindow.create(listWidget, "end", window = aFrame)
     }else if(state == "state2"){
     }else{
     }
