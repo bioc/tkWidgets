@@ -64,6 +64,7 @@ setArgsList <- function(filename, env, isFile = TRUE, init = TRUE){
                            filename, "."), icon = "error", type = "ok")
         return(FALSE)
     }else{
+        env$rowNameCol <- 0
         if(init){
             argsList <- list()
             temp <- formals("read.table")
@@ -272,6 +273,7 @@ setNewState <- function(env, backBut, nextBut, forward = TRUE,
         }
     }else{
         if(getCState(env) == "state2"){
+            env$rowNameCol <- 0
             assignCState("state1", env)
             tkconfigure(nextBut, state = "normal")
             tkconfigure(backBut, state = "disabled")
@@ -327,6 +329,10 @@ finish <- function(env){
                      "\nwas generated while reading file ",
                      args[["file"]], "."), icon = "error", type = "ok")
     }else{
+        if(env$rowNameCol != 0){
+            rownames(dataFile) <- dataFile[, env$rowNameCol]
+            dataFile <- dataFile[, - env$rowNameCol]
+        }
         colInfos <- getColInfo(env)
         colNames <- NULL
         colToDrop <- NULL
@@ -349,7 +355,7 @@ finish <- function(env){
             dataFile <- data.frame(matrix(dataFile, ncol = 1))
             names(dataFile) <- colNames
         }else{
-            names(dataFile) <- colNames
+            colnames(dataFile) <- colNames
         }
         if(!is.null(dataName)){
             assign(dataName, dataFile, env = .GlobalEnv)
@@ -588,19 +594,67 @@ getState2Frame <- function(base, env, state = "state2",
 # Sets the state2 mid frame containing radio buttons for delimiters
 # and a list box for quote selection
 setState2MFrame <- function(frame, env){
+    if(env$rowNameCol == 0){
+        rowNames <- tclVar()
+    }else{
+        rowNames <- tclVar(env$rowNameCol)
+    }
+    rowNameEntered <- function(){
+        if(tclvalue(rowNames) != ""){
+            options(warn = -1)
+            if(is.na(as.numeric(tclvalue(rowNames)))){
+                tkmessageBox(title = "Entry Error",
+                             message = "Column number shold be numerical",
+                             icon = "error", type = "ok")
+                tkdelete(rowNameEntry, "0", "end")
+            }else{
+                if(as.numeric(tclvalue(rowNames)) > env$numCols){
+                    tkmessageBox(title = "Entry Error",
+                                 message = paste("Column number can't be",
+                                 "greater than", env$numCols),
+                                 icon = "error", type = "ok")
+                    tkdelete(rowNameEntry, "0", "end")
+                    if(env$rowNameCol != 0){
+                        env$rowNameCol <- 0
+                    }
+                }else{
+                    env$rowNameCol <- as.numeric(tclvalue(rowNames))
+                }
+            }
+            options(warn = 0)
+        }else{
+            env$rowNameCol <- 0
+        }
+    }
+    mainFrame <- tkframe(frame, borderwidth = 2, relief = "groove")
     # Radio buttons for delimiters
-    leftFrame <- tkframe(frame)
+    leftFrame <- tkframe(mainFrame)
     applyBut <- setSepRadios(leftFrame, env)
     # A list for quote selecttion (" or/and ')
-    rightFrame <- tkframe(frame)
+    rightFrame <- tkframe(mainFrame)
     setQuoteList(rightFrame, env)
     tkpack(leftFrame, side = "left", anchor = "w", fill = "x",
            expand  = TRUE)
     tkpack(rightFrame, side = "left", fill = "x", expand = TRUE)
+    tkpack(mainFrame, side = "top")
+
+    rowNameFrame <- tkframe(frame, borderwidth = 2, relief = "groove")
+    tkpack(tklabel(rowNameFrame, text = "Use column number "), side = "left")
+    rowNameEntry <- tkentry(rowNameFrame, textvariable = rowNames,
+                            width = 4, background = "white")
+    tkbind(rowNameEntry, "<KeyRelease>", rowNameEntered)
+    tkpack(rowNameEntry, side = "left", expand = FALSE)
+    tkpack(tklabel(rowNameFrame, text = " for row names"), side = "left",
+           expand = FALSE)
+    tkpack(rowNameFrame, side = "top", expand = TRUE, pady = 5,
+           anchor = "w", fill = "x")
+
     return(applyBut)
 }
 # Sets the radio buttons for separators for state2 mid frame
 setSepRadios <- function(frame, env, state = "state2"){
+
+    rowNames <- tclVar()
     labelFrame <- tkframe(frame)
     label <- tklabel(labelFrame, text = "File Delimiter:")
     tkpack(label, side = "left", anchor = "nw")
@@ -662,6 +716,7 @@ setSepRadios <- function(frame, env, state = "state2"){
     if(!is.null(getArgs(env)[[state]][["sep"]])){
         tkselect(sepButs[[whatDeli(getArgs(env)[[state]][["sep"]])]])
     }
+
     return(applyBut)
 }
 
@@ -670,6 +725,7 @@ setQuoteList <- function(frame, env){
     quoteSelected <- function(){
         setQuote(quoteList, env)
     }
+
     label1 <- tklabel(frame, text = "     Quote:")
     tkpack(label1, side = "left", anchor = "ne")
     quoteFrame <- tkframe(frame)
@@ -679,6 +735,7 @@ setQuoteList <- function(frame, env){
     tkbind(quoteList, "<B1-ButtonRelease>", quoteSelected)
     writeList(quoteList, c("\"", "'"), clear = TRUE)
     tkpack(quoteFrame, anchor = "w", fill = "x", expand = TRUE)
+
 }
 
 # Sets the value for quote when user selects quote in the list for
@@ -732,10 +789,12 @@ showData4State2 <- function(canvas, env, state = "state2"){
         # For data without a separater
         if(is.null(ncol(dataFile))){
             writeColList(1)
+            env$numCols <- length(dataFile)
         }else{
             for(i in 1:ncol(dataFile)){
                 writeColList(i)
             }
+            env$numCols <- ncol(dataFile)
         }
     }
     tkwindow.create(canvas, "end", window = tempFrame)
@@ -807,6 +866,10 @@ setState3BFrame <- function(frame, env){
                      "\nwas generated while reading file ",
                      args[["file"]], "."), icon = "error", type = "ok")
     }else{
+        if(env$rowNameCol != 0){
+            # Take out the column that will be used for row names
+            dataFile <- dataFile[, -env$rowNameCol]
+        }
         setColInfos(find.type(dataFile, argsList[["state3"]][["sep"]],
                           isFile = FALSE), env)
     # Cut to right size of file if longer than maxRow
