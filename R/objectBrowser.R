@@ -2,7 +2,7 @@
 # work place.
 #
 
-objectBrowser <- function (){
+objectBrowser <- function (fun = function(x) TRUE){
 
     require(tcltk) || stop("tcl/tk library not available")
 
@@ -21,10 +21,12 @@ objectBrowser <- function (){
     viewObj <- function(){
         writeCap(objLevel[length(objLevel)])
         if(length(objLevel) == 1)
-            writeObj(listView, search())
+            writeObj(listView, pickFiles(fileNames = search(),
+                                         fun = fun))
         else
-            writeObj(listView,
-                     ls(env = get(objLevel[length(objLevel)])))
+            writeObj(listView, pickFiles(fileNames =
+                               ls(env = get(objLevel[length(objLevel)])),
+                                         fun = fun))
 
         if(length(objLevel) > 1)
             tkconfigure(upBut, state = "normal")
@@ -33,7 +35,8 @@ objectBrowser <- function (){
     }
 
     doEnv <- function (item){
-        writeObj(listView, ls(env = get(item)))
+        writeObj(listView,  pickFiles(fileName = ls(env = get(item)),
+                                      fun = fun))
         objLevel <<- c(objLevel, item)
         writeCap(item)
     }
@@ -63,7 +66,7 @@ objectBrowser <- function (){
                      paste("Number of row(s):", nrow(get(item))),
                      paste("Column Name(s):"),names(get(item)))
 
-        writeObj(listView, toWrite)
+        writeObj(listView, pickFiles(toWrite, fun = fun))
         writeCap(item)
 
     }
@@ -108,20 +111,23 @@ objectBrowser <- function (){
     up <- function(){
         if(isPack){
             if(length(objLevel) > 1){
-                writeObj(listView,
-                     ls(env = get(objLevel[length(objLevel)])))
+                writeObj(listView, pickFiles(fileName =
+                     ls(env = get(objLevel[length(objLevel)])),
+                                             fun = fun))
                 writeCap(objLevel[length(objLevle)])
             }else{
                 viewObj()
             }
         }else{
             if(length(objLevel) > 2){
-                writeObj(listView,
-                     ls(env = get(objLevel[length(objLevel) - 1])))
+                writeObj(listView, pickFiles(fileName =
+                     ls(env = get(objLevel[length(objLevel) - 1])),
+                                             fun = fun))
                 writeCap(objLevel[length(objLevel) - 1])
                 objLevel <<- objLevel[1:(length(objLevel) - 1)]
             }else{
-                writeObj(listView, search())
+                writeObj(listView, pickFiles(fileName = search(),
+                                             fun = fun))
                 writeCap(objLevel[1])
                 tkconfigure(upBut, state = "disabled")
             }
