@@ -21,37 +21,7 @@ DPExplorer <- function (pkgName = "",
                          type = "ok")
         stop()
     }
-    # multiget is copied form Biobase to remove the dependency of
-    # tkWidgets on Biobase
-    multiget <- function(x, pos=-1, envir=as.environment(pos), mode =
-                         "any",inherits = TRUE, iffail=NA){
-        lenx <- length(x)
-        ans <- vector("list", length=lenx)
-        if( ! is.environment(envir) )
-            stop("envir argument is not an environment")
-        options(show.error.messages = FALSE)
-        on.exit(options(show.error.messages = TRUE))
-        for(i in 1:lenx)
-            if( is.list(x) )
-                ans[[i]] <- try(get(x[[i]],pos,envir, mode, inherits))
-            else
-                ans[[i]] <- try(get(x[i],pos,envir, mode, inherits))
-        options(show.error.messages = TRUE)
-        on.exit(NULL)
 
-        failfun <- function(x) {
-            cx <- class(x)
-            if( !is.null(cx) && cx == "try-error")
-                TRUE
-            else
-                FALSE
-        }
-        failed <- sapply(ans, failfun)
-        ans[failed] <- iffail
-
-        names(ans) <- x
-        ans
-    }
     loadDP <- function(){
         pkgName <<- tclvalue(nameVar)
         if(pkgName == ""){
@@ -220,8 +190,10 @@ DPExplorer <- function (pkgName = "",
                 return(get(keySelection,
                            get(dataName, pos = grep(pkgName, search()))))
             }else{
-                return(multiget(keySelection,
-                           get(dataName, pos = grep(pkgName, search()))))
+                return(mget(keySelection,
+                            get(dataName, pos = grep(pkgName,
+                                          search())), ifnotfound=NA))
+
             }
         }
     }
