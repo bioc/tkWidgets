@@ -4,14 +4,21 @@
 \title{A function to view the objects in the work space.}
 \description{
   This function provides a GUI to view objects and select one that is
-  going to be returned. 
+  going to be returned. When the "End" button is pressed,the selected
+  object will be returned. 
 }
 \usage{
 objectBrowser()
 }
 
 \details{
-  A copy of the selected object will be returned at the end of the session.
+  If the selected object is a package, a description of the contents of
+  the package will be returned. If the selected object is a function, a
+  text string of the original code will be returned. Otherwise, the
+  object will be returned.
+
+  The function is at its preliminary stage of development and will be
+  enhanced later.
 }
 \value{
   \item{obj}{The selected object.}

@@ -24,8 +24,10 @@ fileBrowser(path="")
   into that directory and the files displayed. When a file/directory is
   selected and the "End" button pressed, the full path for the selected
   file/directory will be returned. The GUI is modal and has to be closed
-  by pressing the "End" button before doing any other
-  operations. 
+  by pressing the "End" button before doing any other operations.
+
+  This function is at its preliminary stage of development and will be
+  enhanced later.
 }
 \value{
   \item{fileSelected}{A character string for the full path for the file
