@@ -1,15 +1,15 @@
 \name{objectBrowser}
 \alias{objectBrowser}
 
-\title{View the Objects in the Workspace}
+\title{View the Objects in the Workspace.}
 \description{
-  This widget allows uers to view and select objects from the
-  workspace. When the \code{End} button is pressed, the selected objects
-  will be returned as a list. 
+  This function provides a widget to view objects and select some which
+  are going to be returned.  When the \code{End} button is pressed, the
+!  selected objects will be returned.
 }
 \usage{
-objectBrowser(env = .GlobalEnv,fun = noAuto, textToShow = "Select
-object(s)", nSelect = -1) 
+objectBrowser(env = .GlobalEnv, fun = noAuto,
+              textToShow = "Select object(s)", nSelect = -1)
 }
 \arguments{
   \item{fun}{function to test whether certain conditions are met by
@@ -17,13 +17,13 @@ object(s)", nSelect = -1)
   \item{textToShow}{character with the message to be shown on the
     widget as an instruction.}
   \item{nSelect}{integer indicating the number of objects to select.
-    No limitation if \code{nSelect = -1} as per default.}
-  \item{env}{\code{env} a default environment object to start object Browser}
+      No limitation if \code{nSelect = -1} as per default.}
+  \item{env}{an R environment object whose objects will be browsed}  
 }
 \details{
   This function will return a list of lists with a "name" and "obj" pair
-  for each object selected. The "name" will be the name of the object
-  and "obj" will be the value of the object. If the object is a package, a
+  for each object. The "name" will be the name of the object and "obj"
+  will be the value of the object. If the object is a package, a
   description of the contents of the package will be the value. If the
   selected object is a function, a text string of the original code will
   be the value. A function can be passed to impose a filtering mechanisms
@@ -66,6 +66,8 @@ object(s)", nSelect = -1)
 \author{Jianhua (John) Zhang}
 \note{This function is part of the Bioconductor project at Dana-Farber
   Cancer Institute to provide Bioinformatics functionalities through \R.}
+
+\seealso{\code{\link{fileBrowser}}}
 
 \examples{
 ## The example here is only run interactively since it requires user

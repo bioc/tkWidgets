@@ -13,8 +13,6 @@ DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer",
     keyName <- NULL
     keySelection <- NULL
 
-    currentList <- list()
-
     if(typeof(pkgName) != "character"){
         tkmessageBox(title = "Argument Error",
                          message = "Package name must be a character string",
@@ -47,20 +45,16 @@ DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer",
             writeList(valueList, capture.output(get(dName)))
         }else{
             dataName <<- dName
-            currentList <<- as.list(get(dataName,
-                                        pos = grep(pkgName, search())))
-            #keys <- ls(get(dataName, pos = grep(pkgName, search())))
-            writeList(keyList, names(currentList))
+            keys <- ls(get(dataName, pos = grep(pkgName, search())))
+            writeList(keyList, keys)
             tkdelete(valueList, "0", "end")
         }
     }
     keySelected <- function(){
-        keyName <<- paste(as.character(tkget(keyList,
-                                       tkcurselection(keyList))),
-                          sep = "", collapse = " ")
-        #values <- get(keyName, get(dataName, pos = grep(pkgName, search())))
-        #writeList(valueList, values)
-        writeList(valueList, currentList[[keyName]])
+        keyName <<- as.character(tkget(keyList,
+                                       tkcurselection(keyList)))
+        values <- get(keyName, get(dataName, pos = grep(pkgName, search())))
+        writeList(valueList, values)
         tkconfigure(selectBut, state = "normal")
     }
     select <- function(){
@@ -122,7 +116,7 @@ DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer",
     dataLabel <- tklabel(dataListFrame, text = "Data:")
     tempFrame <- tkframe(dataListFrame)
     dataNameList <- makeViewer(tempFrame, vWidth = NULL, vHeight = NULL,
-                        hScroll = TRUE, vScroll = TRUE,
+                        hScroll = FALSE, vScroll = TRUE,
                         what = "list", side = "bottom")
     tkconfigure(dataNameList, exportselection = FALSE)
     tkbind(dataNameList, "<B1-ButtonRelease>", dataSelected)
@@ -134,7 +128,7 @@ DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer",
     keyLabel <- tklabel(keyListFrame, text = "Keys:")
     tempFrame <- tkframe(keyListFrame)
     keyList <- makeViewer(tempFrame, vWidth = 13, vHeight = 15,
-                        hScroll = TRUE, vScroll = TRUE,
+                        hScroll = FALSE, vScroll = TRUE,
                         what = "list", side = "bottom")
     tkconfigure(keyList, exportselection = FALSE)
     tkbind(keyList, "<B1-ButtonRelease>", keySelected)
