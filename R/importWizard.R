@@ -833,6 +833,7 @@ whatDeli <- function(delimiter){
 # the arguments for read.table that are not yet collected by importWizard
 getMoreArgs <- function(){
     args <- formals(read.table)
+
     args <- args[setdiff(names(args),
                          c("file", "header", "sep", "skip","quote"))]
 

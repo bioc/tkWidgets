@@ -33,7 +33,7 @@ viewVignette(title, packName, vigPath, pdfPath, font = "arial 11")
   to choose from.
 }
 \value{
-  This function does not return any value.
+  This function does not return any useful value.
 }
 \references{\url{http://www.bioconductor.org}}
 \author{Jianhua Zhang}
@@ -42,12 +42,13 @@ viewVignette(title, packName, vigPath, pdfPath, font = "arial 11")
 }
 \examples{
 if(interactive()){
-    library(Biobase)
-    library(tools)
-    vExplorer(pkgName = c("AnnBuilder"))
-    path <- .path.package("Biobase")
+    require(DynDoc)
+    require(tools)
+    require(widgetTools)
+    vExplorer()
+    path <- .path.package("widgetTools")
     vigList <- getPkgVigList(path)
-    viewVignette("BioC VignetteBrowser", "Biobase", vigList[[1]]$VigPath,
+    viewVignette("BioC VignetteBrowser", "widgetTools", vigList[[1]]$VigPath,
      file.path(path, "doc"))
 }
 }

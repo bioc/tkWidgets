@@ -52,7 +52,7 @@ that show the interfaces of the widgets.
 library(tkWidgets)
 PWEnv <- new.env(hash = TRUE, parent = parent.frame(1))
 argsFun <- function(){
-    argsWidget(formals("list.files"))
+    argsWidget(list(Entry1 = "aaaaa", Ehtry2 = "bbbb"))
 }
 button1 <- button(wName = "button1", wValue = "argsWidget",
                      wFuns = list(command = argsFun), wEnv = PWEnv)
@@ -78,7 +78,7 @@ viewWidget <- widget(wTitle = "tkWidgets Examples", pWidgets, funs = list(),
 @
 
 There are other widgets that are used by specific packages that may
-not be of general interest. These widgets are thus not included in the examples. 
+not be of general interest. These widgets are thus not included in the examples.
 \end{document}
 
 

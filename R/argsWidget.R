@@ -8,6 +8,15 @@
 argsWidget <- function(argsList, defaultNames = c("OK", "Cancel"),
                        inst = ""){
 
+#    if(is.pairlist(argsList)){
+        # as.list does not work.
+#        temp <- list()
+#        for(i in names(argsList)){
+#            temp[[i]] <- argsList[[i]]
+#        }
+#        argsList <- temp
+#    }
+
     # Arguments that are functions
     funcs <- getSymbol(argsList)
     # Conver functions to characters
@@ -61,7 +70,7 @@ getPWidget <- function(argsList, PWEnv, inst = ""){
                      wEnv = PWEnv), list(j = i)))
         }else{
             eval(substitute(j <- entryBox(wName = j,
-                                 wValue = argsList[j],
+                                 wValue = argsList[[j]],
                                  wWidth = 15, wEnv = PWEnv), list(j = i)))
 
         }
