@@ -8,7 +8,7 @@
 !  selected objects will be returned.
 }
 \usage{
-objectBrowser(fun = function(x) TRUE,
+objectBrowser(env = parent.frame(1), fun = function(x) TRUE,
               textToShow = "Select object(s)", nSelect = -1)
 }
 \arguments{
@@ -16,8 +16,9 @@ objectBrowser(fun = function(x) TRUE,
     the objects.  Only objects that meet the conditions will be displayed.}
   \item{textToShow}{character with the message to be shown on the
     widget as an instruction.}
-    \item{nSelect}{integer indicating the number of objects to select.
+  \item{nSelect}{integer indicating the number of objects to select.
       No limitation if \code{nSelect = -1} as per default.}
+  \item{env}{an R environment object whose objects will be browsed}  
 }
 \details{
   This function will return a list of lists with a "name" and "obj" pair

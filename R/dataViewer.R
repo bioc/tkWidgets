@@ -1,4 +1,4 @@
-# This function creates a widget with a top frame that will filled
+# This function creates a widget with a top frame that will be filled
 # with a widget passed as one of the arguments and bottom frame with
 # buttons.
 #

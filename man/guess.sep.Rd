@@ -2,6 +2,7 @@
 \alias{guess.sep}
 \alias{guess.header}
 \alias{find.type}
+\alias{charOrNum}
 
 \title{Automatically determines whether a data file has a header and
   what delimiter is used to separate data columns}
@@ -13,7 +14,8 @@
 \usage{
 guess.sep(file.name, n = 5, seps = "")
 guess.header(twoLines, sep)
-find.type(line, sep)
+find.type(line, sep, header = FALSE)
+charOrNum(vect)
 }
 
 \arguments{
@@ -31,11 +33,18 @@ find.type(line, sep)
   \item{sep}{\code{sep} a character for the delimiter used to separate
     columns in a file}
   \item{line}{\code{line} a vector of character strings including the
-    first few lines of file to be checked for data type of whose columns}
+    first few lines of file to be checked for data type of whose
+    columns}
+  \item{vect}{\code{vect} a vector of character or numeric string}
+  \item{header}{\code{header} a boolean indicating whether a file has
+    headers}
 }
 \details{
   guess.sep calls \code{\link{guess.sep}} and \code{\link{find.type}} to
-  determine the header, delimiter, and column data type of a file.  
+  determine the header, delimiter, and column data type of a file.
+
+  \code{\link{charOrNum}} determines which elements of a vector are
+  numeric or character.
 }
 \value{
   This function returns a list containing

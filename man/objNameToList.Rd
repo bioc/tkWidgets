@@ -8,10 +8,11 @@
   and the corresponding objects. 
 }
 \usage{
-objNameToList(objNames)
+objNameToList(objNames, env)
 }
 \arguments{
   \item{objNames}{character vector giving the names of objects.}
+  \item{env}{an R environment where R objects are stored}
 }
 \details{
   Each list in the list that is going to be returned contains a name for

@@ -3,12 +3,7 @@
 # type - data type for a column
 # drop - a boolean indicating whether the column will be droped
 
-initColInfo <- function(){
-
-    require(methods, quietly=TRUE) ||
-                                 stop("Package methods unavailable!")
-    where <- match("package:tkWidgets", search())
-
+.initColInfo <- function(where){
     setClass("colInfo", representation(name = "character",
                                        type = "character",
                                        drop = "logical"),

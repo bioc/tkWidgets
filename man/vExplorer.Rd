@@ -8,16 +8,17 @@
   code chunks of vignettes.
 }
 \usage{
-vExplorer(title = "BioC Vignettes Browser", packNames = "")
+vExplorer(title = "BioC Vignettes Browser", pkgName = "")
 viewVignette(title, packName, vigPath, pdfPath)
 }
 
 \arguments{
   \item{title}{character string for the name to be
     displayed as the title of the widget to interact with code chunks.}
-  \item{packNames,packName}{vector (of length 1 for \code{packName}) of
+  \item{pkgName}{vector (of length 1 for \code{pkgName}) of
     character strings for names of Bioconductor packages the code chunks
     of whose vignettes will be explored.}
+  \item{packName}{same as pkgName}
   \item{vigPath}{character string for the full qualified name of a
     vignette to be explored.}
   \item{pdfPath}{character string for the full path of a pdf file (if

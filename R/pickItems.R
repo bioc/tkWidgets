@@ -1,6 +1,5 @@
-# This function provides the interface for inputing query parameters
-# for querying a table in a given database. Interface between R and
-# the underlaying database management system is through Rdbi.
+# This function provides the interface for users to select items from
+# a set of source elements.
 #
 # items - a vector of character strings for the items to be picked
 # from.
