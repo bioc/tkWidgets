@@ -56,12 +56,11 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
                                sep = args$sep, as.is = TRUE)
 
         tkdelete(fileText, 0, "end")
-#        tkinsert(fileText, "end", unlist(fileRead))
         doFormat <- function(line){
             temp <- paste(line, sep = "", collapse = "      ")
             tkinsert(fileText, "end", temp)
         }
-        lapply(as.data.frame(fileRead), doFormat)
+        lapply(fileRead, doFormat)
     }
 
     showMore <- function(){
