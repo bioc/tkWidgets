@@ -144,7 +144,7 @@ tkphenoData <- function(sampleNames){
 
     ###### JZ add this to save the phenoData object to .Global Env
     saveFrame <- tkframe(win.fr, background = "white")
-    tkpack(tklabel(saveFrame, text = "Save as", background = "white"),
+    tkpack(tklabel(saveFrame, text = "Save phenoData as", background = "white"),
            side = "left", expand = FALSE)
     pdName <- tclVar("")
     pdNameEntry <- tkentry(saveFrame, width = 40, textvariable = pdName,
