@@ -52,8 +52,7 @@ vExplorer <- function (title = "BioC Vignettes Explorer", pkgName = ""){
                      message = paste("Package", selectedPkg,
                      "has no vignette"))
          }else{
-             path <- .path.package(selectedPkg)
-             vigList <<- getPkgVigList(path)
+             vigList <<- vignette(selectedPkg)
              tkdelete(vigViewer, 0, "end")
              for(i in names(vigList)){
                  if(!inherits(chunkList, "try-error")){
