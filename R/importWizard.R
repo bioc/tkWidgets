@@ -634,7 +634,8 @@ showData4State2 <- function(canvas, env, state = "state2"){
     writeColList <- function(i){
         tempList <- tklistbox(tempFrame, height = 0, width = 0,
                               background = "white")
-        tkinsert(tempList, "end", dataFile[,i])
+        writeList(tempList, dataFile[,i])
+        #tkinsert(tempList, "end", dataFile[,i])
         tkpack(tempList, side = "left", fill = "both", expand = TRUE)
     }
 
