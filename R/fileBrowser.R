@@ -6,8 +6,6 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                          prefix = NULL, suffix = NULL,
                          textToShow = "Select file(s)", nSelect = -1){
 
-    require(tcltk) || stop("tcl/tk library not available")
-
     LABELFONT1 <- "Helvetica 12 bold"
     LABELFONT2 <- "Helvetica 11"
     BUTWIDTH <- 8

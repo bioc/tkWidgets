@@ -15,7 +15,6 @@ widgetRender <- function (iWidget, tkTitle) {
 
     if(is.null(wList) || is.na(wList) )
         stop("Either wList or/and funName is null or empty")
-    require(tcltk) || stop("tcltk is not available.")
 
     if(!is.null(WpreFun(iWidget)))
         tt <- eval(WpreFun(iWidget)())

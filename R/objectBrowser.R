@@ -5,8 +5,6 @@
 objectBrowser<- function (fun = function(x) TRUE,
                           textToShow = "Select object(s)",
                           nSelect = -1){
-
-    require(tcltk) || stop("tcl/tk library not available")
     on.exit(options(show.error.messages = TRUE))
     on.exit(end())
 
