@@ -12,8 +12,13 @@ importWizard <- function(filename, maxRow = 200){
     assignCState("state1", env = workEnv)
     # Number of row to be displayed
     assignShowNum(maxRow, env = workEnv)
-
-    setArgsList(filename, workEnv)
+    # Do this if a file name is given
+    if(!missing(filename)){
+        setArgsList(filename, workEnv)
+    }else{
+        assignArgs(list(), workEnv)
+        setColInfos(env = workEnv)
+    }
 
     initImportWizard(workEnv)
 }
@@ -21,20 +26,15 @@ importWizard <- function(filename, maxRow = 200){
 setArgsList <- function(filename, env){
     argsList <- list()
 
-    if(!missing(filename)){
-        fileInfo <- guess.sep(file.name = filename, n = 40)
-        if(!is.null(fileInfo)){
-            temp <- list()
-            temp[["file"]] <- filename
-            temp[["header"]] <- fileInfo[["header"]]
-            temp[["sep"]] <- fileInfo[["separator"]]
-            argsList[["state1"]] <- temp
-            assignArgs(argsList, env)
-            assignType(fileInfo[["type"]], env)
-        }
-    }else{
-        assignArgs(list(), env)
-        assignType(NULL, env)
+    fileInfo <- guess.sep(file.name = filename, n = 40)
+    if(!is.null(fileInfo)){
+        temp <- list()
+        temp[["file"]] <- filename
+        temp[["header"]] <- fileInfo[["header"]]
+        temp[["sep"]] <- fileInfo[["separator"]]
+        argsList[["state1"]] <- temp
+        assignArgs(argsList, env)
+        setColInfos(fileInfo[["type"]], env)
     }
 }
 
@@ -72,87 +72,31 @@ assignSID <- function(value, env){
 getSID <- function(env){
     get("stateID", env)
 }
-
-temp <- function(){
-    # A vector to keep the data type guessed by funtion guess.sep
-    columnType <- NULL
-    # Keeps track which of the data coloumns is on focus for state 3
-    currentCol <- NULL
-    #  A list for data columns of state 3
-    colList <- list()
-    # A list of buttons for data folumn types of state3
-    typeButs <- list()
-    # The imported data
-    dataFile <- NULL
-    # Keeps track of the data type and skip information for state3
-    keepOrType <- list()
-
-
-    # Function for buttons on top of data column lists for state 3
-    typeButFun <- function(index){
-        if(!is.null(currentCol)){
-            bNfGroundColor(colList[[currentCol]], TRUE)
+# A list of colInfo objects that keep column name, type, and drop info
+assignColInfo <- function(value, env){
+    assign("colInfos", value, env)
+}
+getColInfo <- function(env){
+    get("colInfos", env)
+}
+# Creates colInfo objects and sets the value of 'colInfos' list
+setColInfos <- function(types, env){
+    if(missing(types)){
+        assignColInfo(list(), env)
+    }else{
+        temp <- list()
+        for(i in 1:length(types)){
+            temp[[i]] <- colInfo("", types[i], FALSE)
         }
-        currentCol <<- index
-        bNfGroundColor(colList[[index]], FALSE)
-    }
-    # Moves one step back when the back button is clicked
-    back <- function(){
-        if(state == "state3"){
-            state <<- "state1"
-            args1[["sep"]] <<- args2[["sep"]]
-            nextState()
-            tkconfigure(nextBut, state = "normal")
-        }else{
-            state <<- "state1"
-            tkdelete(midCanv, stateID)
-            stateID <<- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
-                            anchor = "nw", window = stateFrame[[state]])
-            initState1()
-            tkconfigure(backBut, state = "disabled")
-            tkconfigure(nextBut, state = "normal")
-            deleteValue(otherEntry, "entry")
-        }
-    }
-    # Closes the top window then the cancel button is clicked
-    cancel <- function(){
-        end()
-    }
-    # This function is invoked when the Advanced button of state3 is
-    # clicked.
-
-
-    # Ends the process and returns a data frame containing the
-    # imported data
-    finish <- function(){
-        if(state == "state1"){
-            args <- args1
-        }else if(state == "state2"){
-            args <- args2
-        }else{
-            args <- args3
-        }
-        print(args)
-        dataFile <<- do.call("read.table", args)
-        if(state == "state3"){
-            for(i in 1:length(keepOrType)) {
-                if(keepOrType[[i]] == "Skip"){
-                    dataFile <<- dataFile[, -i]
-                }
-                switch(keepOrType[[i]],
-                       "Character" = dataFile[, i] <<-
-                                             as.character(dataFile[, i]),
-                       "Numeric" = dataFile[, i] <<-
-                       as.numeric(dataFile[, i]))
-            }
-        }
-        end()
+        assignColInfo(temp, env)
     }
 }
 # This function initializes the interface for importWizard by creating
 # a widget with an empty top canvas and bottom frame filled with four buttons
 initImportWizard <- function(env){
-
+    # A list to be returned that contains an argument list and data
+    # imported using read.table
+    dataList <- NULL
     on.exit(end())
     # Destroy the window
     end <- function(){
@@ -163,6 +107,10 @@ initImportWizard <- function(env){
     }
     preState <- function(){
         changeState(canvas, env, FALSE)
+    }
+    finishClicked <- function(){
+        dataList <<- finish(env)
+        end()
     }
 
     ## Set up the interface
@@ -183,11 +131,13 @@ initImportWizard <- function(env){
                         state = "disabled", command = preState)
     nextBut <- tkbutton(butFrame, text = "Next >", width = 8,
                         command = nextState)
-    endBut <- tkbutton(butFrame, text = "Finish", width = 8)
+    endBut <- tkbutton(butFrame, text = "Finish", width = 8,
+                       command = finishClicked)
     tkpack(canBut, backBut, nextBut, endBut, side = "left")
     tkpack(butFrame, pady = 10)
 
     tkwait.window(top)
+    return(dataList)
 }
 
 getTopCan <- function(base, env){
@@ -252,6 +202,27 @@ getAFrame <- function(base, env){
            "state3" = return(getState3Frame(base, env)))
 }
 
+finish <- function(env){
+    switch(getCState(env),
+           "state1" = args <- getArgs(env)[["state1"]],
+           "state2" = args <- getArgs(env)[["state2"]],
+           "state3" = args <- getArgs(env)[["state3"]])
+    print(args)
+    dataFile <- do.call("read.table", args)
+    colInfos <- getColInfo(env)
+    colNames <- NULL
+    for(i in 1:length(colInfos)) {
+        if(drop(colInfos[[i]])){
+            dataFile <- dataFile[, -i]
+        }
+        switch(type(colInfos[[i]]),
+               "Character" = dataFile[, i] <- as.character(dataFile[, i]),
+               "Numeric" = dataFile[, i] <- as.numeric(dataFile[, i]))
+        colNames <- c(colNames, name(colInfos[[i]]))
+    }
+    names(dataFile) <- colNames
+    return(list(args = args, data = dataFile))
+}
 # Gets the frame containing the interface for the top frame of
 # importWizard for state1
 getState1Frame <- function(base, env){
@@ -412,9 +383,9 @@ setSepRadios <- function(frame, env, state = "state2"){
                               variable = sepVar, value = "other",
                               width = 9, anchor = "nw")
     otherEntry <- tkentry(sepFrame, width = 11)
-    tkselect(sepButs[[whatDeli(getArgs(env)[[state]][["sep"]])]])
     tkgrid(sepButs[["space"]], sepButs[["other"]], otherEntry)
     tkpack(sepFrame, side = "left", anchor = "ne")
+    tkselect(sepButs[[whatDeli(getArgs(env)[[state]][["sep"]])]])
 }
 # Sets the list box for quotes for state2 mid frame
 setQuoteList <- function(frame, env){
@@ -518,6 +489,11 @@ setState3BFrame <- function(frame, env){
     typeEntry <- list()
     dropCheck <- list()
     nameEntry <- list()
+    # Lists to keep the command associated with the radio buttons of
+    # entry boxex
+    dropCMD <- list()
+    nameCMD <- list()
+    typeCMD <- list()
     colList <- list()
     rCanv <-  makeViewer(frame, vWidth = 700, vHeight = 280,
                        vScroll = TRUE, hScroll = TRUE,
@@ -527,25 +503,36 @@ setState3BFrame <- function(frame, env){
     argsList[["nrow"]] <- getShowNum(env)
     dataFile <- do.call("read.table", argsList)
     # Finds the data type for columns
-    columnType <- getType(env)
+    colInfos <- getColInfo(env)
     # Finds the maximum number of characters for each column
     columnLength <- numberChar(dataFile)
     for(i in 1:ncol(dataFile)){
         colFrame <- tkframe(tempFrame)
-        colWidth <- max(columnLength[i], nchar(columnType[i]))
-#        cmds[[i]] <- function(){}
-#        body <- list(as.name("{"),
-#                     substitute(eval(typeButFun(j)), list(j = i)))
-#        body(cmds[[i]]) <- as.call(body)
+        colWidth <- max(columnLength[i], nchar(name(colInfos[[i]])),
+                                            nchar(type(colInfos[[i]])))
+        dropCMD[[i]] <- function(){}
+        body <- list(as.name("{"),
+                     substitute(eval(dropColumn(j, env)), list(j = i)))
+        body(dropCMD[[i]]) <- as.call(body)
         var <- tclVar()
         dropCheck[[i]] <- tkcheckbutton(colFrame, text = "Drop",
-                                                         variable = var)
+                                   variable = var, command = dropCMD[[i]])
         tkpack(dropCheck[[i]], side = "top")
         nameEntry[[i]] <- tkentry(colFrame, width = colWidth)
         writeList(nameEntry[[i]], colnames(dataFile)[1])
+        nameCMD[[i]] <- function(){}
+        body <- list(as.name("{"), substitute(eval(setColName(j,
+                                           nameEntry, env)), list(j = i)))
+        body(nameCMD[[i]]) <- as.call(body)
+        tkbind(nameEntry[[i]], "<KeyPress>", nameCMD[[i]])
         tkpack(nameEntry[[i]], side = "top")
         typeEntry[[i]] <- tkentry(colFrame, width = colWidth)
-        writeList(typeEntry[[i]], getType(env)[i])
+        writeList(typeEntry[[i]], type(colInfos[[i]]))
+        typeCMD[[i]] <- function(){}
+        body <- list(as.name("{"), substitute(eval(setColType(j,
+                                      typeEntry[[i]], env)), list(j = i)))
+        body(typeCMD[[i]]) <- as.call(body)
+        tkbind(typeEntry[[i]], "<KeyPress>", typeCMD[[i]])
         tkpack(typeEntry[[i]], side = "top")
         colList[[i]] <- tklistbox(colFrame, width = (colWidth),
                                    height = 0, background = "white")
@@ -555,52 +542,29 @@ setState3BFrame <- function(frame, env){
     }
     tkcreate(rCanv, "window", 0, 0, anchor = "nw", window = tempFrame)
 }
-
-# Shows the data for previewing
-showData <- function(state, widget, argsList, dataType){
-    if(state == "state1"){
-
-    }else if(state == "state2"){
-        # Set a limit of number of rows for better performance and
-        # presentation
-        argsList[["nrows"]] <- maxRow
-        dataFile <- as.matrix(do.call("read.table", argsList))
-        tempFrame <- tkframe(widget)
-        for(i in 1:ncol(dataFile)){
-            tempList <- tklistbox(tempFrame, width = 0, height = 0,
-                                  background = "white")
-            tkinsert(tempList, "end", dataFile[,i])
-            tkpack(tempList, side = "left")
-        }
-        tkcreate(widget, "window", 0, 0, anchor = "nw",
-                 window = tempFrame)
-        }else{
-            argsList[["nrows"]] <- 200
-            dataFile <- as.matrix(do.call("read.table", argsList))
-             # Figures out the maximum number of characters for each column
-            colLength <- numberChar(dataFile)
-            # Puts buttons on top of each data column for data type
-            tempFrame <- tkframe(widget)
-            cmds <- list()
-            for(i in 1:ncol(dataFile)){
-                colFrame <- tkframe(tempFrame)
-                colWidth <- max(colLength[i], nchar(columnType[i]))
-                cmds[[i]] <- function(){}
-                body <- list(as.name("{"),
-                             substitute(eval(typeButFun(j)), list(j = i)))
-                body(cmds[[i]]) <- as.call(body)
-                typeButs[[i]] <<- tkbutton(colFrame, text = columnType[i],
-                                      width = colWidth, command = cmds[[i]])
-                tkpack(typeButs[[i]], side = "top")
-                colList[[i]] <<- tklistbox(colFrame, width = (colWidth + 3),
-                                          height = 0, background = "white")
-                tkinsert(colList[[i]], "end", dataFile[,i])
-                tkpack(colList[[i]], side = "top")
-                tkpack(colFrame, side = "left")
-            }
-            tkcreate(widget, "window", 0, 0, anchor = "nw",
-                     window = tempFrame)
-        }
+# Set the value of slot 'drop' of a colInfo object
+dropColumn <- function(index, env){
+    colInfos <- getColInfo(env)
+    if(drop(colInfos[[index]])){
+        colInfos[[index]] <- drop(colInfos[[index]]) <- FALSE
+    }else{
+        colInfos[[index]] <- drop(colInfos[[index]]) <- TRUE
+    }
+    assignColInfo(colInfos, env)
+}
+# Set the value of slot (column) 'name' of a colInfo object
+setColName <- function(index, entryBox, env){
+    colInfos <- getColInfo(env)
+    entry <- as.character(tkget(entryBox))
+    colInfos[[index]] <- name(colInfos[[index]]) <- entry
+    assignColInfo(colInfos, env)
+}
+# Set the value of slot 'type' of a colInfo object
+setColType <- function(index, entryBox, env){
+    colInfos <- getColInfo(env)
+    entry <- as.character(tkget(entryBox))
+    colInfos[[index]] <- type(colInfos[[index]]) <- entry
+    assignColInfo(colInfos, env)
 }
 
 showData4State1 <- function(widget, env){
@@ -643,206 +607,3 @@ getMoreArgs <- function(){
     return(argsWidget(args))
 }
 
-
-
-dropMeLater <- function(){
-    ###################################################################
-    ## The following code defines the interface for state 1 when the ##
-    ## widget is first initiated                                     ##
-    ###################################################################
-    fileType <- c("Text", "Genepix", "Spotfire", "Dchip")
-    stateFrame[["state1"]] <- tkframe(midCanv)
-    paraLabel1 <- tklabel(stateFrame[["state1"]], text =
-               "Choose the file type that best describes your data")
-    tkpack(paraLabel1, anchor = "w")
-    midFrame <- tkframe(stateFrame[["state1"]])
-    leftPan <- tkframe(midFrame)
-    delimit <- tclVar()
-    delimitRadio <- tkradiobutton(leftPan, text = paste("Delimited",
-                                  " - Files are separated by a character",
-                                  " such as a comma or tab", sep =""),
-                                  value = 1, variable = delimit,
-                                  width = 71, anchor = "nw")
-    tkpack(delimitRadio, anchor = "w")
-    fixedRadio <- tkradiobutton(leftPan, text = paste("Fixed",
-                                " width - Fields are aligned in columns",
-                                " with spaces between fields", sep = ""),
-                                value = 2, variable = delimit,
-                                width = 71, anchor = "nw")
-    tkpack(fixedRadio, anchor = "w")
-    tkpack(leftPan, side = "left", anchor = "w")
-    rightPan <- tkframe(midFrame)
-    paraLabel2 <- tklabel(rightPan, text = "Start import at row:")
-    tkpack(paraLabel2, side = "left", anchor = "ne")
-    startFrame <- tkframe(rightPan)
-    startList <- makeViewer(startFrame, vWidth = 2, vHeight = 1,
-                            what  = "list", side = "top")
-    tkconfigure(startList, selectmode = "single")
-    tkbind(startList, "<B1-ButtonRelease>", setSkip)
-    writeList(startList, 1:99, clear = TRUE)
-#    tkselect(startList, 1)
-    tkpack(startFrame, anchor = "w", side = "left")
-    tkpack(rightPan, side = "left", padx = 7)
-    tkpack(midFrame, anchor = "w")
-    # A list box to show the original data
-    viewFrame <- tkframe(stateFrame[["state1"]])
-    dataView1 <- makeViewer(viewFrame, vWidth = 99, vHeight = 11,
-                           vScroll = TRUE, hScroll = TRUE,
-                           what = "list", side = "top")
-    tkpack(viewFrame, anchor = "w", pady = 10)
-    # State 1 is entered now
-    stateID <- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
-                        anchor = "nw", window = stateFrame[["state1"]])
-
-
-    ##################################################################
-    ## The following code defines the interface of state 2 when the ##
-    ## next button of interface state 1 is clicked                  ##
-    ##################################################################
-    stateFrame[["state2"]] <- tkframe(midCanv)
-    paraLabel21 <- tklabel(stateFrame[["state2"]], text = "Delimiters")
-    tkpack(paraLabel21, anchor = "w")
-    midFrame <- tkframe(stateFrame[["state2"]])
-    leftFrame <- tkframe(midFrame)
-    sepVar <- tclVar()
-    sepButs <- list()
-    sepButs[["tab"]] <- tkradiobutton(leftFrame, text = "Tab",
-                              variable = sepVar, width = 9,
-                              value = "\t", anchor = "nw")
-    sepButs[["semi"]] <- tkradiobutton(leftFrame, text = "Semicolon",
-                               variable = sepVar, width = 9,
-                               value = ";", anchor = "nw")
-    sepButs[["comma"]] <- tkradiobutton(leftFrame, text = "Comma",
-                              variable = sepVar, value = ",",
-                              width = 9, anchor = "nw")
-    tkgrid(sepButs[["tab"]], sepButs[["semi"]], sepButs[["comma"]])
-    sepButs[["space"]] <- tkradiobutton(leftFrame, text = "Space",
-                              variable = sepVar, value = "\"\"",
-                              width = 9, anchor = "nw")
-    sepButs[["other"]] <- tkradiobutton(leftFrame, text = "Other:",
-                              variable = sepVar, value = "other",
-                              width = 9, anchor = "nw")
-    otherEntry <- tkentry(leftFrame, width = 11)
-    tkgrid(sepButs[["space"]], sepButs[["other"]], otherEntry)
-    tkpack(leftFrame, side = "left", anchor = "w")
-    rightFrame <- tkframe(midFrame)
-    paraLabel22 <- tklabel(rightFrame, text = "        Quote:")
-    tkpack(paraLabel22, side = "left", anchor = "ne")
-    quoteFrame <- tkframe(rightFrame)
-    quoteList <- makeViewer(quoteFrame, vWidth = 8, vHeight = 1,
-                            what  = "list", side = "top")
-    tkconfigure(quoteList, selectmode = "extended")
-    tkbind(quoteList, "<B1-ButtonRelease>", setQuote)
-    writeList(quoteList, c("\"", "'"), clear = TRUE)
-    tkpack(quoteFrame, anchor = "w")
-    tkpack(rightFrame, side = "left", padx = 5)
-    tkpack(midFrame, anchor = "w")
-    # A text box to show the original data
-    viewFrame <- tkframe(stateFrame[["state2"]])
-    dataView2 <- makeViewer(viewFrame, vWidth = 700, vHeight = 192,
-                           vScroll = TRUE, hScroll = TRUE,
-                           what = "canvas", side = "top")
-    tkpack(viewFrame, anchor = "w", pady = 10)
-
-
-    ###################################################################
-    ## The following code defines the interface for state 3 when the ##
-    ## next button of interface state 2 is clicked                   ##
-    ###################################################################
-    stateFrame[["state3"]] <- tkframe(midCanv)
-    label31 <- tklabel(stateFrame[["state3"]],
-                           text = "Column data format")
-    tkpack(label31, anchor = "w")
-    midFrame <- tkframe(stateFrame[["state3"]])
-    leftFrame <- tkframe(midFrame)
-    dataType <- tclVar()
-    textRCmd <- function(){
-        tkconfigure(typeButs[[currentCol]], text = "Character")
-        keepOrType[[currentCol]] <<- "Character"
-    }
-    textRadio <- tkradiobutton(leftFrame, text = "Character",
-                               value = 1, variable = dataType,
-                               width = 13, anchor = "nw",
-                               command = textRCmd)
-    tkpack(textRadio, anchor = "w")
-    numRCmd <- function(){
-        tkconfigure(typeButs[[currentCol]], text = "Numeric")
-        keepOrType[[currentCol]] <<- "Numeric"
-    }
-    numRadio <- tkradiobutton(leftFrame, text = "Numeric",
-                              value = 2, variable = dataType,
-                              width = 13, anchor = "nw",
-                              command = numRCmd)
-    tkpack(numRadio, anchor = "w")
-#    dateRadio <- tkradiobutton(leftFrame, text = "Date",
-#                                  value = 3, variable = dataType,
-#                                  width = 13, anchor = "nw")
-#    tkpack(dateRadio, anchor = "w")
-    skipRCmd <- function(){
-        tkconfigure(typeButs[[currentCol]], text = "Skip")
-        keepOrType[[currentCol]] <<- "Skip"
-    }
-    skipRadio <- tkradiobutton(leftFrame, text = "Drop column",
-                               value = 4, variable = dataType,
-                               width = 13, anchor = "nw",
-                               command = skipRCmd)
-    tkpack(skipRadio, anchor = "w")
-    tkpack(leftFrame, side = "left", anchor = "w")
-    rightFrame <- tkframe(midFrame)
-    label32 <- tklabel(rightFrame, text = paste("Use the radio buttons",
-                                   "on the left to define the data",
-                                   "type for each \ncolumn.", "Drop column",
-                                   "prevents a column from being",
-                                   "imported."),
-                       width = 80, height = 2, justify = "left")
-    tkpack(label32, anchor = "w")
-    advanceBut <- tkbutton(rightFrame, width = 10, text = "Advanced...",
-                           command = moreArgs)
-    tkpack(advanceBut, side = "top", pady = 5)
-    tkpack(rightFrame, side = "left", pady = 5)
-    tkpack(midFrame, anchor = "w")
-    # A canvas to show the original data
-    viewFrame <- tkframe(stateFrame[["state3"]])
-    dataView3 <- makeViewer(viewFrame, vWidth = 700, vHeight = 150,
-                           vScroll = TRUE, hScroll = TRUE,
-                           what = "canvas", side = "top")
-    tkpack(viewFrame, anchor = "w", pady = 10)
-
-}
-
-# Moves to the next state of the three available states when the
-# next button is clicked
-     nextState <- function(){
-        if(state == "state1"){
-            # Retains the state of state1 and initializes the state of state2
-            args2 <<- args1
-            # Figures out the starting line to import
-            options(show.error.messages = FALSE)
-            tkdelete(midCanv, stateID)
-            stateID <<- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
-                            anchor = "nw", window = stateFrame[["state2"]])
-            state <<- "state2"
-            if(!is.null(args2[["sep"]])){
-                tkselect(sepButs[[whatDeli(args2[["sep"]])]])
-            }
-            tkconfigure(backBut, state = "normal")
-            showData(state, dataView2, args2)
-        }else if(state == "state2"){
-            if(tclvalue(sepVar) != "other"){
-                args2[["sep"]] <<- tclvalue(sepVar)
-            }else{
-                args2[["sep"]] <<- as.character(tkget(otherEntry))
-            }
-            args3 <<- args2
-            keepOrType <<- columnType
-            tkdelete(midCanv, stateID)
-#            stateID <<- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
-#                          anchor = "nw", window = stateFrame[["state3"]])
-            stateID <<- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
-                                 anchor = "nw", window =
-                                     getState3Frame(canvas, args3))
-            state <<- "state3"
-            tkconfigure(nextBut, state = "disabled")
-#            showData(state, dataView3, args2)
-        }
-    }
