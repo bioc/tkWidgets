@@ -1,10 +1,8 @@
 # This function provides the interface to view the objects in the
 # work place.
 
-objectBrowser<- function (fun = function(x) TRUE,
-                          textToShow = "Select object(s)",
-                          nSelect = -1)
-{
+objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
+                          nSelect = -1){
 
     on.exit(options(show.error.messages = TRUE))
     on.exit(end())
@@ -20,6 +18,7 @@ objectBrowser<- function (fun = function(x) TRUE,
     selIndex <- NULL
     objIndex <- NULL
     objsInSel <- NULL
+    tempObj <- NULL
 
     end <- function(){
         if(length(objsInSel) != 0){
@@ -86,13 +85,60 @@ objectBrowser<- function (fun = function(x) TRUE,
 
     dClick <- function (){
 #        if(tkcurselection(listView) != ""){
-            selectedObj <<- as.character(tkget(listView,
-                                      tkcurselection(listView)))
-            goin(envir = selectedObj)
+        selectedObj <<- as.character(tkget(listView,
+                                           tkcurselection(listView)))
+        goin()
 #        }
     }
-)
+
+    goin <- function (){
+        if(!is.null(selectedObj)){
+            if(regexpr("^package", selectedObj) > 0){
+                objType <- "package"
+            }else{
+                objType <- typeof(get(selectedObj))
+            }
+            switch(objType,
+               "environment" = doEnv(selectedObj),
+               "package" =  doPack(tkcurselection(listView), selectedObj),
+               "list" = doList(selectedObj),
+               doElse()
+            )
+            tkconfigure(selectBut, state = "disabled")
+            selectedObj <<- NULL
+        }
     }
+
+
+    sClick <- function () {
+        selectedObj <<- NULL
+#        selIndex <<- NULL
+        tkconfigure(selectBut, state = "normal")
+        selIndex <<- unlist(strsplit(tkcurselection(listView), " "))
+
+#        for(i in selIndex){
+#            temp <- as.character(tkget(listView, i))
+#            objsInSel <<- c(objsInSel, temp)
+#            selectedObj <<- c(selected
+#        }
+        if(length(selIndex) == 1){
+            tempObj <<- as.character(tkget(listView, selIndex))
+#            objType <- typeof(get(selectedObj))
+        }else{
+            for(i in selIndex){
+                tempObj <<- c(tempObj,
+                                  as.character(tkget(listView, i)))
+            }
+
+        }
+    }
+
+
+    getAct <- function(){
+        selectedObj <<- ".GlobalEnv"
+        goin()
+    }
+
 
     up <- function(){
         options(show.error.messages = FALSE)
@@ -116,12 +162,12 @@ objectBrowser<- function (fun = function(x) TRUE,
     }
 
     selectObj <- function (){
-        if(length(selIndex) > 0){
-            for(i in selIndex){
-                selObj <- as.character(tkget(listView, i))
-                objsInSel <<- c(objsInSel, selObj)
-            }
-        }
+#        if(length(selIndex) > 0){
+#            for(i in selIndex){
+#                selObj <- as.character(tkget(listView, i))
+        objsInSel <<- c(objsInSel, tempObj)
+#            }
+#        }
         objsInSel <<- unique(objsInSel)
         writeSelection(objsInSel)
         tkconfigure(clearBut, state = "normal")

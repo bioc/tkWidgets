@@ -3,10 +3,6 @@
 #
 # Copyright 2002, J. Zhang, all rights reserved
 #
-##FIXME: why is this called read.args? It writes out an XML
-## rendering of the arguments. It should be called args2XML or some
-##thing much more like that. Please try to think about what the function
-##is doing and use a name that reflects what it does
 
 args2XML<- function(fun, xml.name = "", full.names = NULL,
                       priority = NULL){
