@@ -48,7 +48,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         }
     }
     browse <- function(){
-        tempPath <- tclvalue(tkchooseDirectory())
+        tempPath <- tclvalue(tkchooseDirectory(mustexist = TRUE))
         tempNames <- getRPkgs(tempPath)
         if(!is.null(tempNames)){
             pkgNames <<- tempNames
@@ -70,9 +70,9 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         opt <- try(getListOption(pkgEntry, pkgNames))
         options(show.error.messages = TRUE)
         if(!inherits(opt, "try-error")){
-            tkconfigure(pkgEntry, state = "normal")
-            writeList(pkgEntry, opt, clear = TRUE)
-            tkconfigure(pkgEntry, state = "disabled")
+            #tkconfigure(pkgEntry, state = "normal")
+            #writeList(pkgEntry, opt, clear = TRUE)
+            #tkconfigure(pkgEntry, state = "disabled")
             tclvalue(pkgName) <<- opt
             curDir <<- file.path(tclvalue(pkgPath), opt)
             writePkgDirs()
@@ -103,7 +103,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     # Move the browser one level up the directory path
     goUp <- function(){
         curDir <<- gsub(paste(.Platform$file.sep,
-                              basename(curDir), sep = ""), "", curDir)
+                              basename(curDir), "$", sep = ""), "", curDir)
         writeList(listView, getPkgContents(curDir, getExclude()))
         if(curDir == file.path(tclvalue(pkgPath), tclvalue(pkgName))){
             tkconfigure(upBut, state = "disabled")
@@ -138,13 +138,13 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
            pady = 5, padx = 5)
 
     pkgFrame <- tkframe(base)
-    tkpack(tklabel(pkgFrame, text = "Package to explore:"), side = "left",
+    tkpack(tklabel(pkgFrame, text = "Exploring:"), side = "left",
            expand = FALSE)
     pkgDFrame <- tkframe(pkgFrame, borderwidth = 2, relief = "sunken")
-    pkgEntry <- tkentry(pkgDFrame, width = 40, textvariable = pkgName,
-                     borderwidth = 1, state = "disabled")
+    pkgEntry <- tklabel(pkgDFrame, textvariable = pkgName,
+                        borderwidth  = 1)
     tkpack(pkgEntry, side = "left", expand = TRUE, fill = "both")
-    pkgDropBut <- tkbutton(pkgDFrame, width = 1, text = "v", font = "bold",
+    pkgDropBut <- tkbutton(pkgDFrame, width = 14, text = "Select Package",
                         command = pkgSelect)
     tkpack(pkgDropBut, side = "left", expand = FALSE)
     tkpack(pkgDFrame, side = "left", expand = TRUE, fill = "x")
@@ -159,14 +159,14 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     dirLFrame <- tkframe(leftFrame)
     listView <- makeViewer(dirLFrame, vWidth = 15, vHeight = 20,
                            hScroll = TRUE)
-    tkpack(dirLFrame, side = "top", expand = TRUE, fill = "both")
+    tkpack(dirLFrame, side = "top", expand = TRUE, fill = "y")
     upBut <- tkbutton(leftFrame, text = "Back", width = 10,
                       state = "disabled", command = goUp)
     tkpack(upBut, side = "top", expand = FALSE, fill = "x")
 
     tkbind(listView, "<Double-Button-1>", dClick)
 #    tkbind(listView, "<B1-ButtonRelease>", sClick)
-    tkpack(leftFrame, side = "left", expand = TRUE, fill = "both")
+    tkpack(leftFrame, side = "left", expand = FALSE, fill = "y")
     # Put the text box to show contents of a selected file
     rightFrame <- tkframe(midFrame)
     tkpack(tklabel(rightFrame, text = "Display window"), side = "top",
@@ -199,7 +199,13 @@ getPkgContents <- function(pkgName, exclude = getExclude()){
     cont <- try(list.files(pkgName))
     options(show.error.messages = TRUE)
     if(inherits(cont, "try-error")){
-        return(paste(pkgName, "may not be a valid directory"))
+        tkmessageBox(title = "Access Error",
+                     message = (paste("Problem accessing", pkgName,
+                                      "\nbecause of:\n",
+                                      cont)),
+                     icon = "info",
+                     type = "ok")
+        return("")
     }else{
         return(setdiff(appendSepDir(file.path(pkgName)), exclude))
     }
@@ -233,11 +239,22 @@ getFileContents <- function(path, fileName){
 
 # For rda files, try to find the Rd file and return it
 procRda <- function(fileName){
-    return(procHelp(gsub(paste("data", .Platform$file.sep,
-                                basename(fileName), sep = ""),
-                     paste("help", .Platform$file.sep, gsub("\\.rda",
-                     "", basename(fileName)), sep = ""), fileName)))
-
+    if(regexpr(paste("data", .Platform$file.sep,
+                     basename(fileName), sep = ""), fileName) > 0){
+        return(procHelp(gsub(paste("data", .Platform$file.sep,
+                               basename(fileName), sep = ""),
+                         paste("help", .Platform$file.sep,
+                               gsub("\\.rda", "", basename(fileName)),
+                               sep = ""), fileName)))
+    }else{
+    # If not in "data" directory, ust do not display
+        tkmessageBox(title = "Display Error",
+                     message = paste("Data in\n", fileName,
+                                      "\nare binary and are not displayed"),
+                     icon = "info",
+                     type = "ok")
+        return("")
+    }
 }
 
 procHelp <- function(fileName){
@@ -245,7 +262,12 @@ procHelp <- function(fileName){
     doc <- try(readLines(fileName))
     options(show.error.messages = TRUE)
     if(inherits(doc, "try-error")){
-        return(paste(basename(fileName), "is not displayable"))
+        tkmessageBox(title = "Display Error",
+                     message = (paste("Problem displaying\n", fileName,
+                                      "\nbecause of:\n", doc)),
+                     icon = "info",
+                     type = "ok")
+        return("")
     }else{
         # Get rid of "_\b"s
         return(gsub("_\\\b", "", doc))
@@ -268,7 +290,11 @@ procPDF <- function(fileName){
                viewer <- character()
            }
            if (length(viewer) == 0) {
-               return("No available PDF viewer found on system")
+               tkmessageBox(title = "Display Error",
+                       message = ("No available PDF viewer found on system"),
+                       icon = "info",
+                       type = "ok")
+               return("")
            }
        }
    }
@@ -282,10 +308,14 @@ procHTML <- function(fileName){
     tryMe <- try(browseURL(fileName))
     options(show.error.messages = TRUE)
     if(inherits(tryMe, "try-error")){
-        return(paste("Could not display", basename(fileName)))
-    }else{
-        return(invisible())
+        tkmessageBox(title = "Display Error",
+                       message = (paste("Problem displaying\n", fileName,
+                                        "becuase of:\n",
+                                        tryMe)),
+                       icon = "info",
+                       type = "ok")
     }
+    return(invisible())
 }
 
 getExclude <- function(){
@@ -297,20 +327,30 @@ getRPkgs <- function(pkgPath){
      toCheck <- try(list.files(pkgPath))
      options(warn = 0)
      if(length(toCheck) == 0){
-         tkmessageBox(title = "Access Info",
-                      message = ("Invalid/empty directory"),
-                      icon = "info",
-                      type = "ok")
+         tkmessageBox(title = "No Packages found",
+                       message = paste("No R packages found in\n",
+                                 pkgPath),
+                       icon = "info",
+                       type = "ok")
          return(NULL)
      }
      isd <- file.info(file.path(pkgPath, toCheck))
      dirWithDesc <- sapply(file.path(pkgPath,toCheck[isd$isdir]), hasDesc)
-     Rpkgs <- basename(names(dirWithDesc)[dirWithDesc])
-     if(length(Rpkgs) > 0){
-         return(Rpkgs)
+     if(length(dirWithDesc) == 0){
+         tkmessageBox(title = "No Packages found",
+                       message = paste("No R packages found in\n",
+                                 pkgPath),
+                       icon = "info",
+                       type = "ok")
+         return(NULL)
+     }
+     pkgs <- basename(names(dirWithDesc)[dirWithDesc])
+     if(length(pkgs) != 0){
+         return(pkgs)
      }else{
          tkmessageBox(title = "No Packages found",
-                      message = ("No valid R packages found"),
+                      message = paste("No R packages found in\n",
+                                       pkgPath),
                       icon = "info",
                       type = "ok")
          return(NULL)
