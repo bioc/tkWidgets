@@ -25,12 +25,18 @@
               fromText=NULL, canEdit=TRUE, buttonFun=NULL,
               buttonText=NULL)
 
-  widget1 <- list(wList = list(a = pW1, b = pW2, c = pW3),
-                  preFun = function() "Hi Jianhua",
-                  postFun = function() "Bye Jianhua")
+  but1 <- list(buttonFun = function() {print("test 1 OK")}, buttonText = "Test1")
+
+  but2 <- list( buttonFun = function() {print("test 2 OK")}, buttonText = "Test2")
+
+  widget1 <- list(wList = list(a = pW1, b = pW2, c = pW3),preFun =
+function() "Hi Jianhua",postFun = function() "Bye Jianhua", buttons =
+list(a = but1, b = but2))
 
 #
   x <- widgetRender(widget1, "HI")
+
+
 
 
 

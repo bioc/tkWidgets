@@ -17,7 +17,7 @@ objViewer <- function(toView, width = 40, height = 10){
     boxView <- makeView(boxFrame, vWidth = width,
                         vHeight = height, vScroll = TRUE,
                         hScroll = TRUE)
-    writeObj(boxView, getContent(toView))
+    writeObj(boxView, toView)
     tkpack(boxFrame, side = "top")
 
     okBut <- tkbutton(base, text = "OK", command = ok)

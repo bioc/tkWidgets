@@ -4,10 +4,15 @@
 #
 # Copyright 2002, J. Zhang. All rights reserved
 #
-stdType <- function(toCheck = "It works"){
+stdType <- function(toCheck){
     if(mode(toCheck) == "call")
         return("Formula")
     else
         return(mode(toCheck))
+}
+
+stdView <- function(toView){
+    toView <- getContent(toView)
+    objViewer(toView)
 }
 

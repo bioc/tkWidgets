@@ -9,9 +9,6 @@ listSelect <- function(aList,
 
     require(tcltk) || stop("tcltk support is absent")
 
-    returnList <- list()
-    end <- FALSE
-
     if(is.null(aList) || length(aList) < 1)
         stop("Invalid input")
 
@@ -30,9 +27,10 @@ listSelect <- function(aList,
     finish <- function(){
         for(i in names(aList)){
             if(tclvalue(i) == 1)
-                returnList[[i]] <<- aList[[i]]
+                aList[[i]] <<- TRUE
+            else
+                aList[[i]] <<- FALSE
         }
-        end <<- TRUE
         cancel()
     }
 
@@ -51,7 +49,7 @@ listSelect <- function(aList,
     titlelbl <- tklabel(topFrame, text = topLbl, font = "Helvetica 12")
     tkpack(titlelbl, side = "top", fill = "both", expand = TRUE)
     selFrame <- tkframe(topFrame, borderwidth = 5)
-    writeRBut(selFrame, aList, typeFun, valueFun)
+    writeSelBox(selFrame, aList, typeFun, valueFun)
     tkpack(selFrame, side = "top")
     butFrame <- tkframe(topFrame, borderwidth = 5)
     writeBut(butFrame, butList)
@@ -62,13 +60,11 @@ listSelect <- function(aList,
     tkpack(scr, side="right", fill = "y", expand = TRUE)
 
     tkwait.window(base)
-    if(end)
-        return(returnList)
-    else
-        return(aList)
+
+    return(aList)
 }
 
-writeRBut <- function(baseW, aList, typeFun = NULL, valueFun = NULL){
+writeSelBox <- function(baseW, aList, typeFun = NULL, valueFun = NULL){
 
     LABELFONT <- "Helvetica 12"
     for (i in names(aList)){
@@ -82,6 +78,8 @@ writeRBut <- function(baseW, aList, typeFun = NULL, valueFun = NULL){
         else
             tempType <- tklabel(baseW, text = "")
         if(!is.null(valueFun)){
+            print(call(paste(quote(valueFun)),
+                          eval(substitute(aList[[i]], list(i = i)))))
             fun <- function(){
                 eval(call(paste(quote(valueFun)),
                           eval(substitute(aList[[i]], list(i = i)))))

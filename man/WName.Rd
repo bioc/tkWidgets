@@ -11,6 +11,7 @@
 \alias{"WwList<-"}
 \alias{WLValue}
 \alias{"WLValue<-"}
+\alias{WRButtons}
 \alias{WpreFun}
 \alias{WpostFun}
 \alias{WEnd}
@@ -34,6 +35,7 @@ WwList(x)
 WwList <- value
 WLValue(x, index)
 WLValue(x, index) <- value
+WRButtons(x)
 WpreFun(x)
 WpostFun(x)
 WEnd{x}
