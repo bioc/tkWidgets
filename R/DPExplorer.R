@@ -122,7 +122,7 @@ DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer",
     dataLabel <- tklabel(dataListFrame, text = "Data:")
     tempFrame <- tkframe(dataListFrame)
     dataNameList <- makeViewer(tempFrame, vWidth = NULL, vHeight = NULL,
-                        hScroll = FALSE, vScroll = TRUE,
+                        hScroll = TRUE, vScroll = TRUE,
                         what = "list", side = "bottom")
     tkconfigure(dataNameList, exportselection = FALSE)
     tkbind(dataNameList, "<B1-ButtonRelease>", dataSelected)
@@ -134,7 +134,7 @@ DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer",
     keyLabel <- tklabel(keyListFrame, text = "Keys:")
     tempFrame <- tkframe(keyListFrame)
     keyList <- makeViewer(tempFrame, vWidth = 13, vHeight = 15,
-                        hScroll = FALSE, vScroll = TRUE,
+                        hScroll = TRUE, vScroll = TRUE,
                         what = "list", side = "bottom")
     tkconfigure(keyList, exportselection = FALSE)
     tkbind(keyList, "<B1-ButtonRelease>", keySelected)
