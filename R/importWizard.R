@@ -81,6 +81,7 @@ getColInfo <- function(env){
 }
 # Creates colInfo objects and sets the value of 'colInfos' list
 setColInfos <- function(types, env){
+    initColInfo()
     if(missing(types)){
         assignColInfo(list(), env)
     }else{
@@ -215,7 +216,7 @@ finish <- function(env){
     dataFile <- do.call("read.table", args)
     colInfos <- getColInfo(env)
     colNames <- NULL
-    for(i in 1:length(colInfos)) {
+    for(i in 1:length(colInfos)){
         if(drop(colInfos[[i]])){
             dataFile <- dataFile[, -i]
         }
@@ -336,11 +337,12 @@ setSkip <- function(widget, env, state = "state1"){
                     as.numeric(tkget(widget, tkcurselection(widget))) - 1
     assignArgs(temp, env)
 }
-
+# Gets a frame for state2
 getState2Frame <- function(base, env, state = "state2"){
     temp <- getArgs(env)
     temp[[state]] <- temp
     frame <- tkframe(base)
+    # Shows the name of the file
     label1 <- tklabel(frame, text = paste("File:",
                                  getArgs(env)[[state]][["file"]]))
     tkpack(label1, pady = 5, padx = 5)
@@ -352,10 +354,13 @@ getState2Frame <- function(base, env, state = "state2"){
     tkpack(bottomFrame)
     return(frame)
 }
-# Sets the state2 mid frame
+# Sets the state2 mid frame containing radio buttons for delimiters
+# and a list box for quote selection
 setState2MFrame <- function(frame,env){
+    # Radio buttons for delimiters
     leftFrame <- tkframe(frame)
     setSepRadios(leftFrame, env)
+    # A list for quote selecttion (" or/and ')
     rightFrame <- tkframe(frame)
     setQuoteList(rightFrame, env)
     tkpack(leftFrame, side = "left", anchor = "w")
@@ -370,23 +375,45 @@ setSepRadios <- function(frame, env, state = "state2"){
     sepFrame <- tkframe(frame)
     sepVar <- tclVar()
     sepButs <- list()
+    sepButFun <- function(){
+        if(tclvalue(sepVar) != "other"){
+            temp <- getArgs(env)
+            temp[[state]][["sep"]] <- tclvalue(sepVar)
+            assignArgs(temp, env)
+        }
+    }
+    sepEntered <- function(){
+        tkselect(sepButs[["other"]])
+        temp <- getArgs(env)
+        print(paste("sep = ", tkget(otherEntry)))
+        temp[[state]][["sep"]] <- as.character(tkget(otherEntry))
+        assignArgs(temp, env)
+    }
     sepButs[["tab"]] <- tkradiobutton(sepFrame, text = "Tab",
                               variable = sepVar, width = 9,
-                              value = "\t", anchor = "nw")
+                              value = "\t", anchor = "nw",
+                                      command = sepButFun)
     sepButs[["semi"]] <- tkradiobutton(sepFrame, text = "Semicolon",
                                variable = sepVar, width = 9,
-                               value = ";", anchor = "nw")
+                               value = ";", anchor = "nw",
+                                       command = sepButFun)
     sepButs[["comma"]] <- tkradiobutton(sepFrame, text = "Comma",
                               variable = sepVar, value = ",",
-                              width = 9, anchor = "nw")
+                              width = 9, anchor = "nw",
+                                        command = sepButFun)
+    # Puts the buttons in two rows. First row now
     tkgrid(sepButs[["tab"]], sepButs[["semi"]], sepButs[["comma"]])
     sepButs[["space"]] <- tkradiobutton(sepFrame, text = "Space",
                               variable = sepVar, value = "\"\"",
-                              width = 9, anchor = "nw")
+                              width = 9, anchor = "nw",
+                                        command = sepButFun)
     sepButs[["other"]] <- tkradiobutton(sepFrame, text = "Other:",
                               variable = sepVar, value = "other",
-                              width = 9, anchor = "nw")
+                              width = 9, anchor = "nw",
+                                        command = sepButFun)
     otherEntry <- tkentry(sepFrame, width = 11)
+    tkbind(otherEntry, "<KeyRelease>", sepEntered)
+    # Second row with an entry box for delimiters other those given here
     tkgrid(sepButs[["space"]], sepButs[["other"]], otherEntry)
     tkpack(sepFrame, side = "left", anchor = "ne")
     tkselect(sepButs[[whatDeli(getArgs(env)[[state]][["sep"]])]])
@@ -402,12 +429,13 @@ setQuoteList <- function(frame, env){
     quoteList <- makeViewer(quoteFrame, vWidth = 8, vHeight = 1,
                             what  = "list", side = "top")
     tkconfigure(quoteList, selectmode = "extended")
-    tkbind(quoteList, "<B1-ButtonRelease>", setQuote)
+    tkbind(quoteList, "<B1-ButtonRelease>", quoteSelected)
     writeList(quoteList, c("\"", "'"), clear = TRUE)
     tkpack(quoteFrame, anchor = "w")
 }
 
-# Sets the value for quote when user selects quote in state2
+# Sets the value for quote when user selects quote in the list for
+# quotes in state2
 setQuote <- function(listBox, env, state = "state2"){
     quotes <- ""
     selIndex <- unlist(strsplit(tkcurselection(listBox), " "))
@@ -415,7 +443,7 @@ setQuote <- function(listBox, env, state = "state2"){
         quotes <- paste(quotes, tkget(listBox, i), sep = "")
     }
     temp <- getArgs(env)
-    temp[[state]][["quote"]] <- quote
+    temp[[state]][["quote"]] <- quotes
     assignArgs(temp, env)
 }
 # Sets the canvas holding the preview of data for state2
