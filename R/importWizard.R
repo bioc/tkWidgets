@@ -77,28 +77,28 @@ assignLineData <- function(lineData, env){
 }
 # Get the temp data stroed as lines with a maxmun number
 getLineData <- function(env){
-    get("lineData", env = env)
+    env$lineData
 }
 # Set and get methods for argument list
 assignArgs <- function(value, env){
     assign("argsList", value, env = env)
 }
 getArgs <- function(env){
-    get("argsList", env = env)
+    env$argsList
 }
 # Set and get methods for number to show in the interface
 assignShowNum <- function(value, env){
     assign("showNum", value, env)
 }
 getShowNum <- function(env){
-    get("showNum", env)
+    env$showNum
 }
 # Set and get methods for current state to keep track of the state
 assignCState <- function(value, env){
     assign("currentState", value, env)
 }
 getCState <- function(env){
-    get("currentState", env)
+    env$currentState
 }
 # Set and get methods for colInfo that is a list of colInfo objects to
 # keep column name, type, and drop info
@@ -106,7 +106,7 @@ assignColInfo <- function(value, env){
     assign("colInfos", value, env)
 }
 getColInfo <- function(env){
-    get("colInfos", env)
+    env$colInfos
 }
 # Creates colInfo objects and sets the value of 'colInfos' list
 setColInfos <- function(types, env){
