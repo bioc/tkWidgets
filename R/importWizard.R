@@ -470,7 +470,9 @@ setSepRadios <- function(frame, env, state = "state2"){
     tkgrid(sepButs[["space"]], sepButs[["other"]], otherEntry)
     tkpack(sepFrame, side = "left", anchor = "ne", fill = "x",
            expand = TRUE)
-    tkselect(sepButs[[whatDeli(getArgs(env)[[state]][["sep"]])]])
+    if(!is.null(getArgs(env)[[state]][["sep"]])){
+        tkselect(sepButs[[whatDeli(getArgs(env)[[state]][["sep"]])]])
+    }
 }
 # Sets the list box for quotes for state2 mid frame
 setQuoteList <- function(frame, env){
@@ -515,20 +517,34 @@ setState2BFrame <- function(frame, env){
 showData4State2 <- function(canvas, env, state = "state2"){
     # Only show the number of rows defined
     temp <- getArgs(env)[[state]]
-    dataFile <- as.matrix(do.call("read.table", temp))
-    # Cut to right size of file is longer than maxRow
-    if(nrow(dataFile) > getShowNum(env)){
-        dataFile <- dataFile[1:getShowNum(env),]
-    }
     tempFrame <- tkframe(canvas)
-    for(i in 1:ncol(dataFile)){
+    # If there is no sep, just read the lines
+    if(is.null(getArgs(env)[[state]][["sep"]])){
+        dataFile <- readLines(temp$file)
+        if(length(dataFile) > getShowNum(env)){
+            # Cut to right size of file is longer than maxRow
+            dataFile <- dataFile[1:getShowNum(env)]
+        }
         tempList <- tklistbox(tempFrame, height = 0, width = 0,
-                              background = "white")
-        tkinsert(tempList, "end", dataFile[,i])
+                                  background = "white")
+        tkinsert(tempList, "end", dataFile)
         tkpack(tempList, side = "left", fill = "both", expand = TRUE)
+    }else{
+        dataFile <- as.matrix(do.call("read.table", temp))
+        if(nrow(dataFile) > getShowNum(env)){
+            # Cut to right size of file is longer than maxRow
+            dataFile <- dataFile[1:getShowNum(env),]
+        }
+        for(i in 1:ncol(dataFile)){
+            tempList <- tklistbox(tempFrame, height = 0, width = 0,
+                                  background = "white")
+            tkinsert(tempList, "end", dataFile[,i])
+            tkpack(tempList, side = "left", fill = "both", expand = TRUE)
+        }
     }
     tkcreate(canvas, "window", 0, 0, anchor = "nw", window = tempFrame)
 }
+
 # Gets the frame containing the interface for the top frame of
 # importWizard for state3
 getState3Frame <- function(base, env){
@@ -602,43 +618,61 @@ setState3BFrame <- function(frame, env){
     colInfos <- getColInfo(env)
     # Finds the maximum number of characters for each column
     columnLength <- numberChar(dataFile)
-    for(i in 1:ncol(dataFile)){
-        colFrame <- tkframe(tempFrame)
-        colWidth <- max(columnLength[i], nchar(name(colInfos[[i]])),
-                                            nchar(type(colInfos[[i]])))
-        dropCMD[[i]] <- function(){}
-        body <- list(as.name("{"),
-                     substitute(eval(dropColumn(j, env)), list(j = i)))
-        body(dropCMD[[i]]) <- as.call(body)
-        var <- tclVar()
-        dropCheck[[i]] <- tkcheckbutton(colFrame, text = "Drop",
-                                   variable = var, command = dropCMD[[i]])
-        tkpack(dropCheck[[i]], side = "top", fill = "x", expand = TRUE)
-        nameEntry[[i]] <- tkentry(colFrame, width = colWidth)
-        writeList(nameEntry[[i]], colnames(dataFile)[i])
-        # Also updates the value of colInfos
-        temp <- colInfos[[i]]
-        name(temp) <- colnames(dataFile)[i]
-        colInfos[[i]] <- temp
-        nameCMD[[i]] <- function(){}
-        body <- list(as.name("{"), substitute(eval(setColName(j,
+    if(is.null(argsList[["sep"]])){
+        dataFile <- readLines(argsList[["file"]])
+        # Cut to right size of file if longer than maxRow
+        if(length(dataFile) > getShowNum(env)){
+            dataFile <- dataFile[1:getShowNum(env)]
+        }
+
+    }else{
+        dataFile <- do.call("read.table", argsList)
+        # Cut to right size of file if longer than maxRow
+        if(nrow(dataFile) > getShowNum(env)){
+            dataFile <- dataFile[1:getShowNum(env),]
+        }
+        # Finds the data type for columns
+        colInfos <- getColInfo(env)
+        # Finds the maximum number of characters for each column
+        columnLength <- numberChar(dataFile)
+        for(i in 1:ncol(dataFile)){
+            colFrame <- tkframe(tempFrame)
+            colWidth <- max(columnLength[i], nchar(name(colInfos[[i]])),
+                            nchar(type(colInfos[[i]])))
+            dropCMD[[i]] <- function(){}
+            body <- list(as.name("{"),
+                         substitute(eval(dropColumn(j, env)), list(j = i)))
+            body(dropCMD[[i]]) <- as.call(body)
+            var <- tclVar()
+            dropCheck[[i]] <- tkcheckbutton(colFrame, text = "Drop",
+                                      variable = var, command = dropCMD[[i]])
+            tkpack(dropCheck[[i]], side = "top", fill = "x", expand = TRUE)
+            nameEntry[[i]] <- tkentry(colFrame, width = colWidth)
+            writeList(nameEntry[[i]], colnames(dataFile)[i])
+            # Also updates the value of colInfos
+            temp <- colInfos[[i]]
+            name(temp) <- colnames(dataFile)[i]
+            colInfos[[i]] <- temp
+            nameCMD[[i]] <- function(){}
+            body <- list(as.name("{"), substitute(eval(setColName(j,
                                       nameEntry[[j]], env)), list(j = i)))
-        body(nameCMD[[i]]) <- as.call(body)
-        tkbind(nameEntry[[i]], "<KeyRelease>", nameCMD[[i]])
-        tkpack(nameEntry[[i]], side = "top", fill = "x", expand = TRUE)
-        typeEntry[[i]] <- tkentry(colFrame, width = colWidth)
-        writeList(typeEntry[[i]], type(colInfos[[i]]))
-        typeCMD[[i]] <- function(){}
-        body <- list(as.name("{"), substitute(eval(setColType(j,
+            body(nameCMD[[i]]) <- as.call(body)
+            tkbind(nameEntry[[i]], "<KeyRelease>", nameCMD[[i]])
+            tkpack(nameEntry[[i]], side = "top", fill = "x", expand = TRUE)
+            typeEntry[[i]] <- tkentry(colFrame, width = colWidth)
+            writeList(typeEntry[[i]], type(colInfos[[i]]))
+            typeCMD[[i]] <- function(){}
+            body <- list(as.name("{"), substitute(eval(setColType(j,
                                       typeEntry[[j]], env)), list(j = i)))
-        body(typeCMD[[i]]) <- as.call(body)
-        tkbind(typeEntry[[i]], "<KeyRelease>", typeCMD[[i]])
-        tkpack(typeEntry[[i]], side = "top", fill = "x", expand = TRUE)
-        colList[[i]] <- tklistbox(colFrame, width = (colWidth),
-                                   height = 0, background = "white")
-        tkinsert(colList[[i]], "end", dataFile[,i])
-        tkpack(colList[[i]], side = "top", fill = "x", expand = TRUE)
-        tkpack(colFrame, side = "left", fill = "both", expand = TRUE)
+            body(typeCMD[[i]]) <- as.call(body)
+            tkbind(typeEntry[[i]], "<KeyRelease>", typeCMD[[i]])
+            tkpack(typeEntry[[i]], side = "top", fill = "x", expand = TRUE)
+            colList[[i]] <- tklistbox(colFrame, width = (colWidth),
+                                      height = 0, background = "white")
+            tkinsert(colList[[i]], "end", dataFile[,i])
+            tkpack(colList[[i]], side = "top", fill = "x", expand = TRUE)
+            tkpack(colFrame, side = "left", fill = "both", expand = TRUE)
+        }
     }
     tkcreate(rCanv, "window", 0, 0, anchor = "nw", window = tempFrame)
     # Sets values for colInfo object
