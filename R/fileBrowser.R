@@ -2,9 +2,11 @@
 # given path.
 #
 
-fileBrowser <- function (path = ""){
+fileBrowser <- function (path = "", testFun = function(x) TRUE,
+                         prefix = NULL, suffix = NULL){
 
     require(tcltk) || stop("tcl/tk library not available")
+    require(tkUtil) || stop("tkUtil package not available!")
 
     LABELFONT <- "Helvetica 10"
     BUTWIDTH <- 8
@@ -25,7 +27,9 @@ fileBrowser <- function (path = ""){
                                gsub(Platform()$file.sep, "\\", selectedObj),
                                sep = "")
                 doPath()
-                writeDir(listView, list.files(path), path)
+                writeDir(listView,
+                         pickFiles(list.files(path), testFun,
+                                   prefix, suffix), path)
                 writeCap(path)
                 if(currentNode >= 2)
                     tkconfigure(upBut, state = "normal")
@@ -51,7 +55,8 @@ fileBrowser <- function (path = ""){
         if(currentNode > 2){
 	    path <<- paste(nodes[1:(currentNode - 1)],
 			  sep = "", collapse = Platform()$file.sep)
-            writeDir(listView, list.files(path), path)
+            writeDir(listView, pickFiles(list.files(path), testFun,
+                                         prefix, suffix), path)
             writeCap(path)
             currentNode <<- currentNode - 1
             if(currentNode == 2)
@@ -64,7 +69,8 @@ fileBrowser <- function (path = ""){
         if(currentNode > 2){
 	    path <<- paste(nodes[1:(currentNode - 1)],
 			  sep = "", collapse = Platform()$file.sep)
-            writeDir(listView, list.files(path), path)
+            writeDir(listView, pickFiles(list.files(path), testFun,
+                                         prefix, suffix), path)
             writeCap(path)
             currentNode <<- currentNode - 1
             if(currentNode == 2)
@@ -97,7 +103,8 @@ fileBrowser <- function (path = ""){
 
     tkbind(listView, "<Double-Button-1>", inList)
     tkbind(listView, "<B1-ButtonRelease>", selFile)
-    writeDir(listView, list.files(path), path)
+    writeDir(listView, pickFiles(list.files(path), testFun,
+                                 prefix, suffix), path)
 
     butFrame <- tkframe(base)
     upBut <- tkbutton(butFrame, text = "Up", width = BUTWIDTH,
