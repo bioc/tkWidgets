@@ -31,17 +31,19 @@ guess.sep <- function(file.name, n = 5, seps = ""){
     sep <- names(found[found])
     if(length(sep) == 1){
         separator <- sep
-    }
+        if(length(unlist(strsplit(toCheck[1], separator)))
+                                              == v[[separator]][1] - 1){
+            header <- TRUE
+        }else{
+            header <- guess.header(toCheck[1:2], separator)
+        }
 
-    if(length(unlist(strsplit(toCheck[1], separator)))
-                                      == v[[separator]][1] - 1){
-        header <- TRUE
+        type <- find.type(toCheck[2:length(toCheck)],separator)
+        return(list(header = header, separator = separator, type = type))
     }else{
-        header <- guess.header(toCheck[1:2], separator)
+        warning("I could not detect any delimiter")
+        return(NULL)
     }
-
-    type <- find.type(toCheck[2:length(toCheck)],separator)
-    return(list(header = header, separator = separator, type = type))
 }
 
 guess.header <- function(twoLines, sep){
@@ -83,8 +85,8 @@ find.type <- function(line, sep){
          temp <- as.numeric(temp)
          options(warn = 1)
 
-         temp[is.na(temp)] <- "character"
-         temp[!is.na(temp) & temp != "character"] <- "numeric"
+         temp[is.na(temp)] <- "Character"
+         temp[!is.na(temp) & temp != "Character"] <- "Numeric"
          types <- rbind(types, temp)
      }
      if(nrow(unique(types)) == 1){
