@@ -5,8 +5,7 @@
 # Copyrihgt, 2002, J. Zhang, all rights reserved
 #
 
-vExplorer <- function (title = "BioC Vignettes Explorer",
-                           packNames = ""){
+vExplorer <- function (title = "BioC Vignettes Explorer", pkgName = ""){
 
     require(Biobase) || stop("Package Biobase not available!")
     require(tools) || stop("Package tools not available!")
@@ -26,6 +25,27 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     packSelected <- function(){
          selectedPkg <<-
              tclvalue(tkget(packViewer,(tkcurselection(packViewer))))
+
+         write2VigList(selectedPkg)
+ #        checkMe <- .getPackNames(selectedPkg)
+ #        if(is.null(checkMe)){
+ #            tkmessageBox(title = "No vignette found",
+ #                    message = paste("Package", selectedPkg,
+ #                    "has no vignette"))
+ #        }else{
+ #            path <- .path.package(selectedPkg)
+ #            vigList <<- getPkgVigList(path)
+ #            tkdelete(vigViewer, 0, "end")
+ #            for(i in names(vigList)){
+ #                if(!inherits(chunkList, "try-error")){
+ #                    tkinsert(vigViewer, "end", i)
+ #                }
+ #            }
+ #            tkconfigure(vButton, state = "disabled")
+ #        }
+    }
+    # Writes vignette names to the list box for vignettes
+    write2VigList <- function(selectedPkg){
          checkMe <- .getPackNames(selectedPkg)
          if(is.null(checkMe)){
              tkmessageBox(title = "No vignette found",
@@ -94,7 +114,10 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     tkgrid(endButton, columnspan = 3, pady = 10)
 
     # Populates the list box for package names
-    .popPackList(packViewer)
+    .popPackList(packViewer, pkgName)
+    if(pkgName != ""){
+         write2VigList(pkgName)
+     }
 
     tkconfigure(vButton, state = "disabled")
 
@@ -103,10 +126,14 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
 
 # Check for the availability of vignettes and populate the list box
 # for packages that have a vignette
-.popPackList <- function(packViewer){
-    packs <- .packages(all = TRUE)
+.popPackList <- function(packViewer, packName){
+    if(packName == ""){
+        packs <- sort(.packages(all = TRUE))
+    }else{
+        packs <- packName
+    }
     tkdelete(packViewer, 0, "end")
-    for(i in sort(packs)){
+    for(i in packs){
         if(!is.null(pkgVignettes(i)) &&
            length(pkgVignettes(i)$docs) > 0){
             tkinsert(packViewer, "end", i)

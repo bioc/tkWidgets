@@ -21,7 +21,12 @@ argsWidget <- function(argsList){
                      value = c("TRUE" = TRUE,"FALSE" = FALSE),
                      env = PWEnv), list(j = i)))
         }else{
-            eval(substitute(j <- entryBox(name = j, value = argsList[j],
+            if(is.primitive(argsList[i])){
+                eval(substitute(j <- entryBox(name = j,
+                                 value = deparse(substitute(argsList[i])),
+                                 width = 15, env = PWEnv), list(j = i)))
+            }
+            eval(substitute(j <- entryBox(name = j, value = argsList[i],
                                  width = 15, env = PWEnv), list(j = i)))
         }
         label <- label(name = "label", value = i,
