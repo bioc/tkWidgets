@@ -35,12 +35,12 @@ fileBrowser(path="")
 \seealso{\code{\link{makeView}},\code{\link{writeDir}}}
 
 \examples{
+# The example here is commented out as it requires user interference
+# that may cause problem is not available. Auto build for example. 
 # Call the function to view the current directory
-fileBrowser()
+# fileBrowser()
 
 # To call the function with a path do
 # fileBrowser(path = "yourPath")
-
-# Please click on the "End" button to end the demon session.
 }
 \keyword{interface}
