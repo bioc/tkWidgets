@@ -57,7 +57,7 @@ pickItems <- function (items){
         for(i in indexInSel){
             columns <<- columns[columns != as.character(tkget(selectView, i))]
         }
-        writeList(selectView, columns)
+        writeList(selectView, unique(columns))
         tkconfigure(remBut, state = "disabled")
     }
     # Remove everything from the list box for selected column names
