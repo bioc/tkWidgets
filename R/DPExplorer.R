@@ -47,6 +47,13 @@ getValueListFromEnv <- function(env){
     return(get("valueList", env))
 }
 
+assignSelectionList <- function(selectionList, env){
+    assign("selectionList", selectionList, env)
+}
+getSelectionList <- function(env){
+    return(get("selectionList", env))
+}
+
 createDPExplorer <- function(base, env){
     # The data frame contains a list box for the name of data sets in
     # a data package, a list box for the keys of a selected data set,
@@ -55,15 +62,21 @@ createDPExplorer <- function(base, env){
     # selections. getData frame returns the id for the list box for
     # the names of data sets as the id is need for the entry box in
     # nameFrame to interate with
-    getDataFrame(base, env)
+    dataFrame <- getDataFrame(base, env)
     # The name frame contains a label, an entry box for users to entre
     # the name of a data package, and a "load" button to allow users to
     # load a data package whose name is entered in the entry box
-    getNameFrame(base, env)
+    nameFrame <- getNameFrame(base, env)
+    # The button frame contains a cancel and finish button
+    butFrame <- getButFrame(base, env)
+
+    tkpack(nameFrame, expand = TRUE, fill = "x")
+    tkpack(dataFrame, expand = TRUE, fill = "both")
+    tkpack(butFrame, expand = TRUE, fill = "x")
 }
 
-destroy <- function(env){
-    tkdestroy(getBaseFromEnv(env))
+destroy <- function(base){
+    tkdestroy(base)
 }
 
 getTopLevel <- function(title){
@@ -75,12 +88,15 @@ getTopLevel <- function(title){
 getDataFrame <- function(base, env){
     tempFrame <- tkframe(base)
     # Pack the list box for data set names
-    dataNameList <- packDataNameList(tempFrame, env)
+    packDataNameList(tempFrame, env)
     # Pack the list box for keys
-    keyList <- packKeyList(tempFrame, env)
+    packKeyList(tempFrame, env)
     # Pack the list box fro values and three buttons
-    valueList <- packValueNBut(tempFrame, env)
-    tkpack(tempFrame, side = "bottom", expand = TRUE, fill = "both")
+    packValueNBut(tempFrame, env)
+    # Pack the list box for selected keys
+    packSeletionList(tempFrame, env)
+
+    return(tempFrame)
 }
 
 packDataNameList <- function(base, env){
@@ -110,7 +126,7 @@ packKeyList <- function(base, env){
     tempFrame <- tkframe(keyListFrame)
     keyList <- makeViewer(tempFrame, vWidth = NULL, vHeight = NULL,
                         hScroll = FALSE, vScroll = TRUE,
-                        what = "text", side = "bottom")
+                        what = "list", side = "bottom")
     tkpack(keyLabel, side = "top")
     tkpack(tempFrame, side = "bottom", expand = TRUE, fill = "both")
     tkpack(keyListFrame, side = "left", expand = TRUE, fill = "both")
@@ -118,13 +134,11 @@ packKeyList <- function(base, env){
 }
 
 packValueNBut <-function(base, env){
-    cancel <- function(){
-        destroy(getBaseFromEnv(env))
+    select <- function(){
+    }
+    drop <- function(){
     }
     clear <- function(){
-    }
-    finish <- function(){
-        destroy(getBaseFromEnv(env))
     }
     tempFrame <- tkframe(base)
     valueLabel <- tklabel(tempFrame, text = "Value(s)")
@@ -132,22 +146,52 @@ packValueNBut <-function(base, env){
     valueList <- makeViewer(temp, vWidth = NULL, vHeight = NULL,
                         hScroll = FALSE, vScroll = TRUE,
                         what = "list", side = "bottom")
-    valueList <- tklistbox(tempFrame)
-    butFrame <- tkframe(tempFrame)
-    cancelBut <- tkbutton(butFrame, text = "Cancel", width = 8,
-                          command = cancel)
-    clearBut <- tkbutton(butFrame, text = "Clear", width = 8,
-                         command = clear)
-    finishBut <- tkbutton(butFrame, text = "Finish", width = 8,
-                          comman = finish)
-    tkpack(cancelBut, side = "left")
-    tkpack(clearBut, side = "left")
-    tkpack(finishBut, side = "left")
-    tkpack(butFrame, side = "bottom")
+    selectBut <- tkbutton(tempFrame, text = "Select Key", width = 16,
+                          command = select)
+    dropBut <- tkbutton(tempFrame, text = "Drop Key", width = 16,
+                         command = drop)
+    clearBut <- tkbutton(tempFrame, text = "Clear Selection", width = 16,
+                          comman = clear)
+    tkpack(clearBut, side = "bottom", expand = TRUE, fill = "x")
+    tkpack(dropBut, side = "bottom", expand = TRUE, fill = "x")
+    tkpack(selectBut, side = "bottom", expand = TRUE, fill = "x")
     tkpack(temp, side = "bottom", expand = TRUE, fill = "both")
     tkpack(valueLabel, side = "bottom")
-    tkpack(tempFrame, side = "bottom", expand = TRUE, fill = "both")
+    tkpack(tempFrame, side = "left", expand = TRUE, fill = "both")
     assignValueList(valueList, env)
+}
+
+packSeletionList <- function(base, env){
+    selectionListFrame <- tkframe(base)
+    selectionLabel <- tklabel(selectionListFrame, text = "Selected keys:")
+    tempFrame <- tkframe(selectionListFrame)
+    selectionList <- makeViewer(tempFrame, vWidth = NULL, vHeight = NULL,
+                        hScroll = FALSE, vScroll = TRUE,
+                        what = "list", side = "bottom")
+    tkpack(selectionLabel, side = "top")
+    tkpack(tempFrame, side = "bottom", expand = TRUE, fill = "both")
+    tkpack(selectionListFrame, side = "left", expand = TRUE, fill = "both")
+    assignSelectionList(selectionList, env)
+}
+
+getButFrame <- function (base, env){
+    cancel <- function(){
+        destroy(base)
+    }
+    finish <- function(){
+        destroy(base)
+    }
+
+    butFrame <- tkframe(base)
+    temp <- tkframe(butFrame)
+    cancelBut <- tkbutton(temp, text = "Cancel", width = 8,
+                          command = cancel)
+    finishBut <- tkbutton(temp, text = "Finish", width = 8,
+                          comman = finish)
+    tkgrid(cancelBut, finishBut, padx = 10)
+    tkpack(temp, side = "top", expand = TRUE, fill = "x")
+
+    return(butFrame)
 }
 
 getNameFrame <- function(base, env){
@@ -172,7 +216,8 @@ getNameFrame <- function(base, env){
     tkpack(label, side = "left")
     tkpack(entry, side = "left", expand = TRUE, fill = "x")
     tkpack(loadBut, side = "left")
-    tkpack(tempFrame, side = "bottom", expand = TRUE, fill = "x")
+
+    return(tempFrame)
 }
 
 loadDataPkg <- function(pkgName){
