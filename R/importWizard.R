@@ -31,6 +31,10 @@ importWizard <- function(filename = ""){
     colList <- list()
     # A list of buttons for data folumn types of state3
     typeButs <- list()
+    # The imported data
+    dataFile <- NULL
+    # Keeps track of the data type and skip information for state3
+    keepOrType <- list()
 
     # Destroy the window
     end <- function(){
@@ -78,15 +82,16 @@ importWizard <- function(filename = ""){
             tkconfigure(backBut, state = "normal")
             showData(state, dataView2, args2)
         }else if(state == "state2"){
-            args3 <- args2
-            # Figures out whether there are quoptes
-            options(show.error.messages = FALSE)
-            quote <- try(as.character(tkget(quoteList,
-                                            tkcurselection(quoteList))))
-            options(show.error.messages = TRUE)
-            if(inherits(quote, "try-error")){
-                args3[["quote"]] <<- quote
-            }
+            args3 <<- args2
+            keepOrType <<- columnType
+            # Figures out whether there are quotes
+#            options(show.error.messages = FALSE)
+#            quote <- try(as.character(tkget(quoteList,
+#                                            tkcurselection(quoteList))))
+#            options(show.error.messages = TRUE)
+#            if(inherits(quote, "try-error")){
+#                args3[["quote"]] <<- quote
+#            }
             tkdelete(midCanv, stateID)
             stateID <<- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
                           anchor = "nw", window = stateFrame[["state3"]])
@@ -174,11 +179,64 @@ importWizard <- function(filename = ""){
     # clicked.
     moreArgs <- function(){
         moreArgs <- getMoreArgs()
+        for(i in names(moreArgs)){
+            args3[[i]] <<- moreArgs[[i]]
+        }
+    }
+    # Sets the value for skip when user selects line to start in
+    # state1
+    setSkip <- function(){
+        args2[["skip"]] <<- as.numeric(tkget(startList,
+                              tkcurselection(startList))) - 1
+    }
+    # Sets the value for quote when user selects quote in state2
+    setQuote <- function(){
+        quotes <- ""
+        selIndex <- unlist(strsplit(tkcurselection(quoteList), " "))
+        for(i in selIndex){
+            quotes <- paste(quotes, tkget(quoteList, i), sep = "")
+        }
+        args2[["quote"]] <<- quotes
     }
     # Ends the process and returns a data frame containing the
     # imported data
     finish <- function(){
-
+        if(state == "state1"){
+            args <- args1
+        }else if(state == "state2"){
+            args <- args2
+        }else{
+            args <- args3
+        }
+        print(args)
+        print("OK before")
+        dataFile <<- do.call("read.table", args)
+        print("OK here")
+        if(state == "state3"){
+            for(i in 1:length(keepOrType)) {
+                if(keepOrType[[i]] == "Skip"){
+                    dataFile <<- dataFile[, -i]
+                }
+                switch(keepOrType[[i]],
+                       "Character" = dataFile[, i] <<-
+                                             as.character(dataFile[, i]),
+                       "Numeric" = dataFile[, i] <<-
+                       as.numeric(dataFile[, i]))
+            }
+        }
+#            for(i in 1:length(typeButs)){
+#                print(paste("but = ", typeButs[[i]]))
+#                if(as.character(tkcget(typeButs[[i]], "-text")) == "Skip"){
+#                    print(paste("text = ", tkcget(typeButs[[i]])))
+#                    dataFile <<- dataFile[, -i]
+#                }
+#                switch(as.character(tkcget(typeButs[[i]], "-text")),
+#                       "Character" = dataFile[, i] <<-
+#                       as.character(dataFile[, i]),
+#                       "Numeric" = dataFile[, i] <<-
+#                       as.numeric(dataFile[, i]))
+#            }
+        end()
     }
     ## Set up the interface
     top <- tktoplevel()
@@ -236,6 +294,8 @@ importWizard <- function(filename = ""){
     startFrame <- tkframe(rightPan)
     startList <- makeViewer(startFrame, vWidth = 2, vHeight = 1,
                             what  = "list", side = "top")
+    tkconfigure(startList, selectmode = "single")
+    tkbind(startList, "<B1-ButtonRelease>", setSkip)
     writeList(startList, 1:99, clear = TRUE)
 #    tkselect(startList, 1)
     tkpack(startFrame, anchor = "w", side = "left")
@@ -294,6 +354,8 @@ importWizard <- function(filename = ""){
     quoteFrame <- tkframe(rightFrame)
     quoteList <- makeViewer(quoteFrame, vWidth = 8, vHeight = 1,
                             what  = "list", side = "top")
+    tkconfigure(quoteList, selectmode = "extended")
+    tkbind(quoteList, "<B1-ButtonRelease>", setQuote)
     writeList(quoteList, c("\"", "'"), clear = TRUE)
     tkpack(quoteFrame, anchor = "w")
     tkpack(rightFrame, side = "left", padx = 5)
@@ -317,6 +379,7 @@ importWizard <- function(filename = ""){
     dataType <- tclVar()
     textRCmd <- function(){
         tkconfigure(typeButs[[currentCol]], text = "Character")
+        keepOrType[[currentCol]] <<- "Character"
     }
     textRadio <- tkradiobutton(leftFrame, text = "Character",
                                value = 1, variable = dataType,
@@ -325,6 +388,7 @@ importWizard <- function(filename = ""){
     tkpack(textRadio, anchor = "w")
     numRCmd <- function(){
         tkconfigure(typeButs[[currentCol]], text = "Numeric")
+        keepOrType[[currentCol]] <<- "Numeric"
     }
     numRadio <- tkradiobutton(leftFrame, text = "Numeric",
                               value = 2, variable = dataType,
@@ -337,6 +401,7 @@ importWizard <- function(filename = ""){
 #    tkpack(dateRadio, anchor = "w")
     skipRCmd <- function(){
         tkconfigure(typeButs[[currentCol]], text = "Skip")
+        keepOrType[[currentCol]] <<- "Skip"
     }
     skipRadio <- tkradiobutton(leftFrame, text = "Drop column",
                                value = 4, variable = dataType,
@@ -378,6 +443,8 @@ importWizard <- function(filename = ""){
     tkpack(butFrame, pady = 10)
 
     tkwait.window(top)
+
+    return(dataFile)
 }
 
 whatDeli <- function(delimiter){
@@ -410,8 +477,11 @@ bNfGroundColor <- function(widget, bWhite = FALSE){
 # the arguments for read.table that are not yet collected by importWizard
 getMoreArgs <- function(){
     args <- formals(read.table)
-    args <- setdiff(args, c("file", "header", "sep", "skip", "quote"))
+    args <- args[setdiff(names(args),
+                         c("file", "header", "sep", "skip","quote"))]
+
     # Argument fill has to be defined using the value of
     # blank.lines.skip.
     args[["fill"]] <- !args[["blank.lines.skip"]]
+    return(argsWidget(args))
 }
