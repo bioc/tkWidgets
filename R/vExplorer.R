@@ -189,6 +189,11 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
         for(i in nameNCode[[chunkName]]){
             tkinsert(editViewer, "end", paste(i, "\n", sep = ""))
         }
+        tkconfigure(buts[[chunkName]], state = "disabled")
+        tkconfigure(buts[[chunkName]], state = "active")
+        if(chunkName != 1){
+            tkconfigure(buts[[chunkName - 1]], state = "normal")
+        }
         tkconfigure(execButton, state = "normal")
         tkconfigure(clearButton, state = "normal")
     }
@@ -208,9 +213,6 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
 #                modButton(buts[[selectedChunk]], "libhtblue")
                 tkconfigure(buts[[selectedChunk]], relief = "sunken",
                             state = "active")
-                if(selectedChunk != 1){
-                    tkconfigure(buts[[selectedChunk - 1]], state = "normal")
-                }
                 if(selectedChunk < length(buts)){
                     tkconfigure(buts[[selectedChunk + 1]], state = "normal")
                 }
@@ -219,7 +221,7 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
             tkdelete(resultViewer,0, "end")
             tkinsert(resultViewer, 0, result)
 #            modButton(buts[[selectedChunk]], "blue")
-            executed <<- unique(c(executed, selectedChunk))
+#            executed <<- unique(c(executed, selectedChunk))
 #        }else{
 #             tkmessageBox(title = "Execution failed",
 #                     message = "Code chunks need to be executed in order")
