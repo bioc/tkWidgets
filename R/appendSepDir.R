@@ -4,13 +4,16 @@
 #
 
 appendSepDir <- function(path = ".") {
+
      toCheck <- list.files(path)
 
-     if(length(toCheck) == 0 ) return("")
+     if (length(toCheck) == 0) return("")
 
-     isd <- file.info(toCheck)
-     toCheck <- paste(toCheck, ifelse(isd$isdir, .Platform$file.sep, ""),
-                   sep="")
+     toCheck <- list.files(path)
+     isd <- file.info(file.path(path, toCheck))
+     toCheck <- paste(toCheck,
+                      ifelse(isd$isdir, .Platform$file.sep, ""),
+                      sep="")
      toCheck
 }
 

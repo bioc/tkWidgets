@@ -26,14 +26,19 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
     objsInSel <- NULL
     tempObj <- NULL
 
+    # close window
+    end <- function(){
+        tkdestroy(base)
+    }
+
     # Executed when a user clicks the end button. returnList that
     # contains names of selected objects will be updated before the
     # window closes.
-    end <- function(){
+    finish <- function(){
         if(length(objsInSel) != 0){
             if(nSelect == -1){
                 returnList <<- objNameToList(objsInSel)
-                tkdestroy(base)
+                end()
             }else{
                 if(nSelect != length(objsInSel)){
                     tkmessageBox(title = "Wrong number", message =
@@ -41,12 +46,12 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
                        icon = "warning", type = "ok")
                 }else{
                     returnList <<- objNameToList(objsInSel)
-                    tkdestroy(base)
+                    end()
                 }
             }
         }else{
             returnList <<- NULL
-            tkdestroy(base)
+            end()
         }
     }
 
@@ -190,7 +195,7 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
     # Destroy the widow and returns NULL
     cancel <- function (){
         objsInSel <<- NULL
-        end()
+        finish()
     }
     # Removes items from the list box for selected objects
     removeSelection <- function (){
@@ -278,7 +283,7 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
     canBut <- tkbutton(butFrame2, text = "Cancel", width = BUTWIDTH,
                        command = cancel)
     endBut <- tkbutton(butFrame2, text = "Finish", width = BUTWIDTH,
-		       command = end)
+		       command = finish)
     tkgrid(removeBut, clearBut)
     tkgrid(canBut, endBut)
     tkgrid(butFrame2)
