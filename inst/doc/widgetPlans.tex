@@ -22,6 +22,7 @@ Some examples:
 \item A text string, a type--in box and a button.
 \item A set of linked radio buttons
 \item A set of linked check boxes
+\item A list-box
 \item A button -- can have an arbitrary R function associated with it.
 \end{itemize}
 
@@ -40,13 +41,13 @@ time) to allow it to determine how the exit was achieved (is it an end
 or a next or an error or ...).
 
 Widgets are rendered by the \verb+widgetRender+ function.
-It returns an object of the \verb+widgetRender+. If the exit is normal
-(ie via the {\em end} button) then the users changes will be contained
-in the return value. For all other forms of exit the input will be
-returned. We need to figure out a good mechanism for signalling the
-type of exit.
-The rendered widget has an \verb+end+ button and a \verb+cancel+
-button.
+It returns an object of the \verb+iWidget+ which is a list of
+lists. If the exit is normal (ie via the {\em end} button) then the
+users changes will be contained in the return value and an element
+"end" whose value will be "END". For all other forms of exit the input
+will be returned. The rendered widget by default will have a
+\verb+cancel+ button and an \verb+end+ button if there is no
+definition for an end button in the controlbuttons list. 
 
 In the not too distant future the pwidgets will be implemented as S4
 classes. This will give them more structure. In the first
@@ -55,16 +56,17 @@ abstract data type implementation that should let us reuse much of the
 code when the methods and classes are implemented.
 
 Next we introduce the concept of {\em chained widgets},
-\verb+cWidgets+. 
-Basically this is simply a list of widgets that will be rendered
-sequentially. 
-The \verb+cWidgets+ will also have pre and post rendering hooks (these
-happen once for the entire process).
+\verb+cWidgets+. Basically this is simply a list of widgets that will
+be rendered sequentially. The \verb+cWidgets+ will also have pre and
+post rendering hooks (these happen once for the entire
+process). except for the first and last widgets in the list of
+cWidgets who will have a \verb+next+ (first) or \verb+previous+
+(last). The last widget will also have an \verb+end+ button. A counter
+to indicate state is maintained and used for navigation.  
 
-The widgets will have the buttons described in each widget in the list
-and additionally \verb+previous+, \verb+next+, \verb+end+ and
-\verb+cancel+ buttons.
-A counter to indicate state is maintained and used for navigation.
+The buttons will be defined by a list named controlbuttons that has a
+bottonText and buttonFun defining the label and behavior of the button
+respectively.  
 
 We need to decide how to run the pre and post widget hooks when the
 different buttons are pushed (does \verb+next+ run the hook or does
@@ -92,34 +94,30 @@ some package specific ones for {\em tkWidgets}.
 An example of what seems to be easy and useful is the following.
 We can have a list of the form
 \begin{verbatim}
-list(Wtype="Typein", Name="aaa", Value=NULL, Button=fileBrowser)
+list(Wtype="Typein", Name="aaa", Value=NULL, ButtonText = "Brows",
+     ButtonFun=fileBrowser) 
 \end{verbatim}
 This would get rendered as a typein box with name \verb+aaa+. The box
 would initially be empty since \verb+Value+ was set to \verb+NULL+
-(maybe it should be the empty string). There is a button off the end
-of the box that is linked to the \verb+fileBrowser+ function.
-This button when clicked will evaluate the \verb+fileBrowser+ function
-and put its return value into the typein box.
-
-Then when the widget function returns this value is stored in the
-\verb+Value+ slot.
+(maybe it should be the empty string). There is a button labeled
+"Brows" off the end of the box that is linked to the
+\verb+fileBrowser+ function. This button when clicked will evaluate
+the \verb+fileBrowser+ function and put its return value into the
+typein box. 
 
 Ok, there is a problem here. It seems that we need an additional layer
-of abstraction.
-The problem: suppose that the Button is linked to \verb+objectBrowser+
-and that the user has selected multiple objects. How do we associate
-those with the text in the typein box?
-It does not appear that we can do that directly.
-So an extra layer of abstraction might be enough for most purposes.
-There is a \verb+Value+ slot. This value is supplied by the user or 
-it is the return value of the function associated with the button.
-There is a \verb+toText+ function that takes that value and renders it
-for the text box.
+of abstraction. The problem: suppose that the Button is linked to
+\verb+objectBrowser+ and that the user has selected multiple
+objects. How do we associate those with the text in the typein box?
+It does not appear that we can do that directly. So an extra layer of
+abstraction might be enough for most purposes. There is a \verb+Value+
+slot. This value is supplied by the user or it is the return value of
+the function associated with the button. There is a \verb+toText+
+function that takes that value and renders it for the text box.
 Some care to deal with multiple values (which might not be character
-strings will be needed).
-Also, I believe that if the return type should not be a character
-string then editing of the box manually should be prevented, here we
-could just render the text.
+strings will be needed). Also, I believe that if the return type
+should not be a character string then editing of the box manually
+should be prevented, here we could just render the text.
 
 Each \verb+pWidget+ has the following slots:
 \begin{itemize}
@@ -138,8 +136,7 @@ Each \verb+pWidget+ has the following slots:
 \end{itemize}
 
 We will need a boolean vector for the set of pWidgets to monitor
-changes.
-The return value will be a list with components that include
+changes. The return value will be a list with components that include
 \begin{itemize}
 \item wList: the returned input list with values changed.
 \item exit: a character string indicating which button was pushed,
@@ -149,6 +146,15 @@ The return value will be a list with components that include
 When a button is clicked and a return value retrieved it is put into
 the Value slot and toText is run on it to ensure the text box has up
 to date data.
+
+At some point we need to worry about the layout of the primitive
+widgets on a widget to be built by \verb+widgetRender+. tk has three
+types of geometry managers namely pack, grid, and place. pack puts
+widgets in four sides namely top, right, bottom, and left. grid puts
+widgets in grids, and place places widgets at specified lacations
+based on absolute or relative values. For our purpose, pack and grid
+would be our options. With the help of frames, we should be able to
+have the widgets rendered nicely on a widget.
 
 \end{document}
 
