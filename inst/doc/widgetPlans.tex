@@ -86,4 +86,50 @@ and put its return value into the typein box.
 Then when the widget function returns this value is stored in the
 \verb+Value+ slot.
 
+Ok, there is a problem here. It seems that we need an additional layer
+of abstraction.
+The problem: suppose that the Button is linked to \verb+objectBrowser+
+and that the user has selected multiple objects. How do we associate
+those with the text in the typein box?
+It does not appear that we can do that directly.
+So an extra layer of abstraction might be enough for most purposes.
+There is a \verb+Value+ slot. This value is supplied by the user or 
+it is the return value of the function associated with the button.
+There is a \verb+toText+ function that takes that value and renders it
+for the text box.
+Some care to deal with multiple values (which might not be character
+strings will be needed).
+Also, I believe that if the return type should not be a character
+string then editing of the box manually should be prevented, here we
+could just render the text.
+
+Each \verb+pWidget+ has the following slots:
+\begin{itemize}
+\item Name: the print name for the item
+\item Value: a value associated with this item
+\item toText: a function that takes the value and turns it into a text
+  string suitable for rendering in the text box.
+\item canEdit: a boolean, can the user edit this box directly or only
+  make changes via the button
+\item buttonFun: a function associated with the button, the return
+  value is put into Value
+\item buttonText: the text to appear in the button
+\item fromText: a function that takes the text from the text box and
+  turns it into a value for the Value slot. If the user is allowed to
+  type things in then this will be needed.
+\end{itemize}
+
+We will need a boolean vector for the set of pWidgets to monitor
+changes.
+The return value will be a list with components that include
+\begin{itemize}
+\item wList: the returned input list with values changed.
+\item exit: a character string indicating which button was pushed,
+  maybe even error?
+\end{itemize}
+
+When a button is clicked and a return value retrieved it is put into
+the Value slot and toText is run on it to ensure the text box has up
+to date data.
+
 \end{document}
