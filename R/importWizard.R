@@ -67,12 +67,13 @@ getCState <- function(env){
     get("currentState", env)
 }
 # Set and get methods for state id that keeps the tkwin id for a state frame
-assignSID <- function(value, env){
-    assign("stateID", value, env)
-}
-getSID <- function(env){
-    get("stateID", env)
-}
+#assignSID <- function(value, env){
+#    assign("stateID", value, env)
+#}
+#getSID <- function(env){
+#    get("stateID", env)
+#}
+
 # Set and get methods for colInfo that is a list of colInfo objects to
 # keep column name, type, and drop info
 assignColInfo <- function(value, env){
@@ -129,7 +130,8 @@ initImportWizard <- function(env){
     canvas <- getTopCan(top, env)
     # Sets current frame to state1 now
     currentFrame <- getAFrame(canvas, env)
-    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = currentFrame)
+    tkpack(currentFrame, fill = "both", expand = TRUE)
+#    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = currentFrame)
     ## The bottom frame contains the buttons that allow users to
     ## navigate the importing process
     butFrame <- tkframe(top)
@@ -142,7 +144,7 @@ initImportWizard <- function(env){
     endBut <- tkbutton(butFrame, text = "Finish", width = 8,
                        command = finishClicked)
     tkpack(canBut, backBut, nextBut, endBut, side = "left")
-    tkpack(butFrame, pady = 10)
+    tkpack(butFrame, pady = 10, fill = "both", expand = TRUE)
 
     tkwait.window(top)
     return(dataList)
@@ -170,7 +172,8 @@ changeState <- function(canvas, backBut, nextBut, env, forward = TRUE){
         dropArgs(env)
     }
     newFrame <- getAFrame(canvas, env)
-    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = newFrame)
+    tkpack(newFrame, fill = "both", expand = TRUE)
+#    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = newFrame)
 
     return(newFrame)
 }
@@ -274,10 +277,10 @@ getState1Frame <- function(base, env){
     # allows for browing directories for a file name
     topFrame <- tkframe(frame)
     setState1TFrame(topFrame, dataViewer, delims, env)
-    tkpack(topFrame, pady = 5, padx = 5)
-    tkpack(midFrame, padx = 5)
+    tkpack(topFrame, pady = 5, padx = 5, fill = "both", expand = TRUE)
+    tkpack(midFrame, padx = 5, fill = "both", expand = TRUE)
     # Pack the bottom frame last
-    tkpack(bottomFrame, pady = 5, padx = 5)
+    tkpack(bottomFrame, pady = 5, padx = 5, fill = "both", expand = TRUE)
     return(frame)
 }
 # Sets the botton frame for state1
@@ -287,7 +290,8 @@ setState1BFrame <- function(frame, env){
     dataViewer <- makeViewer(viewFrame, vWidth = 99, vHeight = 17,
                             vScroll = TRUE, hScroll = TRUE,
                             what = "list", side = "top")
-    tkpack(viewFrame, anchor = "w", pady = 10)
+    tkpack(viewFrame, anchor = "w", pady = 10, fill = "both",
+                                                      expand = TRUE)
     return(dataViewer)
 }
 # Sets the top frame for state1
@@ -323,7 +327,7 @@ setState1TFrame <- function(frame, viewer, delims, env){
     browseBut <- tkbutton(nameFrame, width = 8, text = "Browse",
                           command = browse)
     tkpack(browseBut)
-    tkpack(nameFrame)
+    tkpack(nameFrame, fill = "both", expand = TRUE)
 }
 # Show the data read in using readLines for state1
 showData4State1 <- function(widget, env){
@@ -520,7 +524,8 @@ showData4State2 <- function(canvas, env, state = "state2"){
         tkinsert(tempList, "end", dataFile[,i])
         tkpack(tempList, side = "left")
     }
-    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = tempFrame)
+    tkpack(tempFrame, fill = "both", expand = TRUE)
+#    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = tempFrame)
 }
 # Gets the frame containing the interface for the top frame of
 # importWizard for state3
@@ -633,7 +638,8 @@ setState3BFrame <- function(frame, env){
         tkpack(colList[[i]], side = "top")
         tkpack(colFrame, side = "left")
     }
-    tkcreate(rCanv, "window", 0, 0, anchor = "nw", window = tempFrame)
+    tkpack(tempFrame, fill = "both", expand = TRUE)
+#    tkcreate(rCanv, "window", 0, 0, anchor = "nw", window = tempFrame)
     # Sets values for colInfo object
     assignColInfo(colInfos, env)
 }
