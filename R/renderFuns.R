@@ -14,6 +14,10 @@ WListByName <- function(x, name) {
     eval(substitute(listByName <- x$aName, list(aName = name)))
     return (listByName)
 }
+WListNewValue <- function (x, index, newVal){
+    x[[1]][[index]]$Value <- newVal
+    return(x)
+}
 WpreFun <- function(x) x$preFun
 WpostFun <- function(x) x$postFun
 
