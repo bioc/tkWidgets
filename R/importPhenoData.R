@@ -446,11 +446,10 @@ createPData <- function(pdata, varList){
                         "the table below:")), pady = 5)
     noteFrame <- tkframe(base, borderwidth = 2, relief = "groove")
     tkpack(tklabel(noteFrame, text = paste("Cells in the first row",
-                              "show covariate names. \nCells in the",
-                         "the first column show sample names.",
-                         "\nEmpty cells below covariate names are for",
-                         "entries for descriptions of covariates.",
-                         "\nValues in all cells are edit-able."),
+                              "show covariate names and cells in the",
+                         "the first column show \n sample names.",
+                         "Values in all cells (including covariate/sample",
+                         "names) are edit-able."),
                    justify = "left"),
                   side = "top", expand = FALSE, pady = 5)
     tkpack(noteFrame, side = "top", expand = FALSE, padx = 5)
