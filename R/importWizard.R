@@ -72,11 +72,16 @@ importWizard <- function(filename = "", maxRow = 200){
                             anchor = "nw", window = stateFrame[["state2"]])
             state <<- "state2"
             if(!is.null(args2[["sep"]])){
-                tkselect(checkButs[[whatDeli(args2[["sep"]])]])
+                tkselect(sepButs[[whatDeli(args2[["sep"]])]])
             }
             tkconfigure(backBut, state = "normal")
             showData(state, dataView2, args2)
         }else if(state == "state2"){
+            if(tclvalue(sepVar) != "other"){
+                args2[["sep"]] <<- tclvalue(sepVar)
+            }else{
+                args2[["sep"]] <<- as.character(tkget(otherEntry))
+            }
             args3 <<- args2
             keepOrType <<- columnType
             tkdelete(midCanv, stateID)
@@ -147,6 +152,7 @@ importWizard <- function(filename = "", maxRow = 200){
     back <- function(){
         if(state == "state3"){
             state <<- "state1"
+            args1[["sep"]] <<- args2[["sep"]]
             nextState()
             tkconfigure(nextBut, state = "normal")
         }else{
@@ -156,6 +162,8 @@ importWizard <- function(filename = "", maxRow = 200){
                             anchor = "nw", window = stateFrame[[state]])
             initState1()
             tkconfigure(backBut, state = "disabled")
+            tkconfigure(nextBut, state = "normal")
+            deleteValue(otherEntry, "entry")
         }
     }
     # Closes the top window then the cancel button is clicked
@@ -292,34 +300,26 @@ importWizard <- function(filename = "", maxRow = 200){
     tkpack(paraLabel21, anchor = "w")
     midFrame <- tkframe(stateFrame[["state2"]])
     leftFrame <- tkframe(midFrame)
-    tab <- tclVar()
-    semicolon <- tclVar()
-    comma <- tclVar()
-    space <- tclVar()
-    other <- tclVar()
-    checkButs <- list()
-    checkButs[["tab"]] <- tkcheckbutton(leftFrame, text = "Tab",
-                              variable = tab, width = 9, onvalue = "TRUE",
-                              offvalue = "FALSE", anchor = "nw")
-    checkButs[["semi"]] <- tkcheckbutton(leftFrame, text = "Semicolon",
-                               variable = semicolon,
-                               width = 9, onvalue = "TRUE",
-                               offvalue = "FALSE", anchor = "nw")
-    checkButs[["comma"]] <- tkcheckbutton(leftFrame, text = "Comma",
-                              variable = comma,
-                              width = 9, onvalue = "TRUE",
-                              offvalue = "FALSE", anchor = "nw")
-    tkgrid(checkButs[["tab"]], checkButs[["semi"]], checkButs[["comma"]])
-    checkButs[["space"]] <- tkcheckbutton(leftFrame, text = "Space",
-                              variable = space,
-                              width = 9, onvalue = "TRUE",
-                              offvalue = "FALSE", anchor = "nw")
-    checkButs[["other"]] <- tkcheckbutton(leftFrame, text = "Other:",
-                              variable = other,
-                              width = 9, onvalue = "TRUE",
-                              offvalue = "FALSE", anchor = "nw")
+    sepVar <- tclVar()
+    sepButs <- list()
+    sepButs[["tab"]] <- tkradiobutton(leftFrame, text = "Tab",
+                              variable = sepVar, width = 9,
+                              value = "\t", anchor = "nw")
+    sepButs[["semi"]] <- tkradiobutton(leftFrame, text = "Semicolon",
+                               variable = sepVar, width = 9,
+                               value = ";", anchor = "nw")
+    sepButs[["comma"]] <- tkradiobutton(leftFrame, text = "Comma",
+                              variable = sepVar, value = ",",
+                              width = 9, anchor = "nw")
+    tkgrid(sepButs[["tab"]], sepButs[["semi"]], sepButs[["comma"]])
+    sepButs[["space"]] <- tkradiobutton(leftFrame, text = "Space",
+                              variable = sepVar, value = "\"\"",
+                              width = 9, anchor = "nw")
+    sepButs[["other"]] <- tkradiobutton(leftFrame, text = "Other:",
+                              variable = sepVar, value = "other",
+                              width = 9, anchor = "nw")
     otherEntry <- tkentry(leftFrame, width = 11)
-    tkgrid(checkButs[["space"]], checkButs[["other"]], otherEntry)
+    tkgrid(sepButs[["space"]], sepButs[["other"]], otherEntry)
     tkpack(leftFrame, side = "left", anchor = "w")
     rightFrame <- tkframe(midFrame)
     paraLabel22 <- tklabel(rightFrame, text = "        Quote:")
@@ -437,15 +437,6 @@ numberChar <- function(matr){
     return(nchars)
 }
 
-bNfGroundColor <- function(widget, bWhite = FALSE){
-    if(!bWhite){
-        tkconfigure(widget, background = "black")
-        tkconfigure(widget, foreground = "white")
-    }else{
-        tkconfigure(widget, background = "white")
-        tkconfigure(widget, foreground = "black")
-    }
-}
 # This function generates a widget using widgetTools to collect all
 # the arguments for read.table that are not yet collected by importWizard
 getMoreArgs <- function(){
