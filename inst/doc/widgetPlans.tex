@@ -32,13 +32,19 @@ of the different pwidgets is recorded in the list, which is returned.
 A widget can have two hooks, these are not rendered. One is a
 pre--rendering hook (a function that takes no arguments) and if
 present is run before the widget is rendered.
-A post--rendering hook which is run when the user pushes the
-\verb+end+ button (but not the \verb+cancel+ button?).
+A post--rendering hook which is run when the widget is closed.
+The pre--hook is run on entry and the post--hook is registered with 
+\verb+on.exit+. This ensures that it is run when the function is
+exited regardless of how. It might be nice (but this will take some
+time) to allow it to determine how the exit was achieved (is it an end
+or a next or an error or ...).
 
 Widgets are rendered by the \verb+renderWidget+ function.
-It returns the widget with
-the users changes recorded or NULL if the cancel button was pushed.
-Should we return an exit state indicator and the widget in all cases?
+It returns an object of the \verb+widgetClass+. If the exit is normal
+(ie via the {\em end} button) then the users changes will be contained
+in the return value. For all other forms of exit the input will be
+returned. We need to figure out a good mechanism for signalling the
+type of exit.
 The rendered widget has an \verb+end+ button and a \verb+cancel+
 button.
 
@@ -67,7 +73,19 @@ any exit from the widget?).
 If the user pushes \verb+cancel+ the whole thing exits (again, we need
 some decision about what gets returned). Here one might want to return
 both the exit status and the list of widgets actually visited.
+Duncan M. suggested that we want the exit status but not the list of
+widgets visited.
 
+He also proposed a paged control. In this type of widget the different
+controls are represented by tabs. They can be selected in any order
+and navigated as desired by the user.
+
+Duncan M. also suggested that widgets should know why they are
+exiting.
+
+Another suggestion is that there should be platform specific labels.
+I think that this could be done by using \verb+options+ and installing
+some package specific ones for {\em tkWidgets}.
 
 \section*{Some specifics}
 
