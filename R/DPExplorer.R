@@ -5,7 +5,8 @@
 # Copyrihgt, 2003, J. Zhang, all rights reserved
 #
 
-DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer"){
+DPExplorer <- function (pkgName = "",
+                        title = "BioC Data Package Explorer"){
     # Create a working environment
     workEnv <- new.env(hash = TRUE, parent = NULL)
     on.exit(destroy(base))
