@@ -8,7 +8,7 @@
 #Copyright 2002, J. Zhang, all rights reserved
 #
 
-objectBrowser<- function (env = parent.frame(1),
+objectBrowser<- function (env = .GlobalEnv,
                           fun = noAuto, textToShow = "Select object(s)",
                           nSelect = -1){
 
