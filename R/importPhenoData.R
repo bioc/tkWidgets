@@ -56,7 +56,7 @@ importPhenoData <- function(sampleNames = NULL){
             showIOError("data frame")
         }else{
             if(is.null(pdata)){
-                pdata <<- get(tclvalue(objName), env = .GlobalEnv)
+                pdata <<- .GlobalEnv[[tclvalue(objName)]]
             }
             pdata <<- sNames4rNames(pdata, sampleNames)
             if(!is.null(pdata)){
@@ -90,8 +90,7 @@ importPhenoData <- function(sampleNames = NULL){
         }else{
             if(is.null(phenodata)){
                 if(tclvalue(phenoName) != ""){
-                    phenodata <<- get(tclvalue(phenoName),
-                                      env = .GlobalEnv)
+                    phenodata <<- .GlobalEnv[[tclvalue(phenoName)]]
                     pdata <<- pData(phenodata)
                 }
             }else{
@@ -110,7 +109,7 @@ importPhenoData <- function(sampleNames = NULL){
     }
     browseObj <- function(){
         filter <- function(x, env = .GlobalEnv){
-            if(is.data.frame(get(x, env = env)))
+            if(is.data.frame(env[[x]]))
                 return(TRUE)
             else
                 return(FALSE)
@@ -123,7 +122,7 @@ importPhenoData <- function(sampleNames = NULL){
     }
     browsePheno <- function (){
         filter <- function(x, env = .GlobalEnv){
-            if(class(get(x, env = env)) == "phenoData")
+            if(class(env[[x]]) == "phenoData")
                 return(TRUE)
             else
                 return(FALSE)

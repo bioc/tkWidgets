@@ -32,6 +32,8 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
             writeList(fileText, readLines(filename))
             makeGuess(filename)
         }else{
+            writeList(boxes[["header"]], "")
+            writeList(boxes[["sep"]], "")
             tkconfigure(finishBut, state = "disabled")
         }
     }
@@ -39,8 +41,8 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
     brows <- function(){
         filename <<- tclvalue(tkcmd("tk_getOpenFile"))
         args$file <<- filename
-        writeEntry(fileText, readLines(filename))
-        writeEntry(nameEntry, args$file)
+        writeList(fileText, readLines(filename))
+        writeList(nameEntry, args$file)
         makeGuess(args$file)
         tkconfigure(finishBut, state = "normal")
     }
@@ -50,10 +52,10 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
         args$header <<- headerNSep$header
         args$sep <<- headerNSep$separator
         if(is.element("header", basic)){
-            writeEntry(boxes[["header"]], args$header)
+            writeList(boxes[["header"]], ifelse(args$header, "TRUE", "FALSE"))
         }
         if(is.element("sep", basic)){
-            writeEntry(boxes[["sep"]], .sep2Entry(args$sep))
+            writeList(boxes[["sep"]], .sep2Entry(args$sep))
         }
     }
     # View the file after setting some of the arguments. Willl be
@@ -78,7 +80,7 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
     }
     # Not for this release yet
     showMore <- function(){
-        writeEntry(restList, rest)
+        writeList(restList, rest)
     }
     # Not for this release yet
     update <- function(){
@@ -88,7 +90,7 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
     argSelected <- function(){
         selectedArg <<-
             tclvalue(tkget(restList,(tkcurselection(restList))))
-        writeEntry(restEntry, args[[selectedArg]])
+        writeList(restEntry, args[[selectedArg]])
         tkconfigure(restUp, state = "normal")
     }
     # Set up the interface
@@ -122,8 +124,8 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
             tkgrid(frame1, frame2, padx = 10)
             tkgrid.configure(frame1, sticky = "w")
             tkgrid.configure(frame2, sticky = "e")
-            writeEntry(boxes[[basic[i]]], args[[basic[i]]])
-            writeEntry(boxes[[basic[i + 1]]], args[[basic[i + 1]]])
+            writeList(boxes[[basic[i]]], args[[basic[i]]])
+            writeList(boxes[[basic[i + 1]]], args[[basic[i + 1]]])
         }else{
             # Write the one that is left if the total is an odd number
             frame1 <- tkframe(argFrame)
@@ -136,7 +138,7 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
             frame2 <- tkframe(argFrame)
             frame2 <- tkframe(argFrame)
             tkgrid(frame1, frame2, padx = 10)
-            writeEntry(boxes[[basic[i]]], args[[basic[i]]])
+            writeList(boxes[[basic[i]]], args[[basic[i]]])
         }
         i <- (i + 2)
     }
