@@ -141,7 +141,7 @@ importPhenoData <- function(sampleNames = NULL){
                               "\n Type/browse in the name of the data frame.",
                               "\n.Edit/Creat: Edit an existing phenoData",
                               "(name needed) in .GlobalEnv or create",
-                              "\n a new phenoData (name optional)."),
+                              "\n a new phenoData (name not needed)."),
                    justify = "left"),
                   side = "top", expand = FALSE, pady = 5)
     tkpack(noteFrame, side = "top", expand = FALSE, pady = 5, padx = 5)
