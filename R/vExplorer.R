@@ -199,6 +199,16 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
         }
         tkconfigure(execButton, state = "normal")
         tkconfigure(clearButton, state = "normal")
+        tkconfigure(expoButton, state = "normal")
+    }
+    # Export code chunk to the R session
+    export <- function(){
+        temp <- nameNCode[[selectedChunk]]
+        for(i in temp){
+            out <- eval(parse(text = i), env = parent.frame(2))
+            print(out)
+            return(NULL)
+        }
     }
     # Executes whatever that is in the text box for code chunk
     execute <- function(){
@@ -250,6 +260,7 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
         }
         tkconfigure(buts[[1]], state = "normal")
         tkconfigure(execButton, state = "disabled")
+        tkconfigure(expoButton, state = "disabled")
         tkconfigure(clearButton, state = "disabled")
         executed <<- NULL
         codeVersion[[1]] <<- chunkList
@@ -332,13 +343,13 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     execButton <- tkbutton(butFrame, text = "Execute Code", width = 12,
                            command = execute)
     tkconfigure(execButton, state = "disabled")
-#    backButton <- tkbutton(butFrame, text = "<Back", width = 12,
-#                           command = back)
-#    tkconfigure(backButton, state = "disabled")
+    expoButton <- tkbutton(butFrame, text = "Export to R", width = 12,
+                           command = export)
+    tkconfigure(expoButton, state = "disabled")
     clearButton <- tkbutton(butFrame, text = "Clear", width = 12,
                             command = clear)
     tkconfigure(clearButton, state = "disabled")
-    tkpack(pdfButton, execButton, clearButton, side = "left")
+    tkpack(pdfButton, execButton, expoButton, clearButton, side = "left")
     tkgrid(butFrame, columnspan = 2, pady = 10)
     # Put end button separately to avoid accidents
     endButton <- tkbutton(base, text = "End", width = 12,
