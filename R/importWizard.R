@@ -490,12 +490,14 @@ setState3TFrame <- function(frame, env){
     moreClicked <- function(){
         moreArgs(env)
     }
-    label <- tklabel(frame, text = paste("Data type of a column is shown",
-                            " by the entry box on top of each column.\n",
-                            "Click the check box on top of a clumn to",
-                            " drop the column.\nClik 'More Args' button",
+    label <- tklabel(frame, text = paste("Editable column names are",
+                            "shown in the first entry box on top of data",
+                            "columns.\nEditable data type of columns is",
+                            " shown in the entry box following coloumn",
+                            "names\nClick the check box on top of a column",
+                            " to drop the column.\nClik 'More Args' button",
                             " for more arguments.", sep = ""),
-                       width = 80, height = 3, justify = "left")
+                       width = 80, height = 4, justify = "left")
     tkpack(label, anchor = "w", pady = 5, side = "left", padx = 5)
     moreBut <- tkbutton(frame, text = "More Args...", width = 10,
                                                  command = moreClicked)
@@ -515,6 +517,7 @@ moreArgs <- function(env){
 setState3BFrame <- function(frame, env){
     typeEntry <- list()
     dropCheck <- list()
+    nameEntry <- list()
     colList <- list()
     rCanv <-  makeViewer(frame, vWidth = 700, vHeight = 280,
                        vScroll = TRUE, hScroll = TRUE,
@@ -538,6 +541,9 @@ setState3BFrame <- function(frame, env){
         dropCheck[[i]] <- tkcheckbutton(colFrame, text = "Drop",
                                                          variable = var)
         tkpack(dropCheck[[i]], side = "top")
+        nameEntry[[i]] <- tkentry(colFrame, width = colWidth)
+        writeList(nameEntry[[i]], colnames(dataFile)[1])
+        tkpack(nameEntry[[i]], side = "top")
         typeEntry[[i]] <- tkentry(colFrame, width = colWidth)
         writeList(typeEntry[[i]], getType(env)[i])
         tkpack(typeEntry[[i]], side = "top")
