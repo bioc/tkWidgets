@@ -21,7 +21,6 @@
 \alias{setState3BFrame}
 \alias{getName4Data}
 \alias{writeCol4Matrix}
-\alias{writeCol4Lines}
 \title{A widget for importing data to R}
 \description{
   Functions constructs a widget that allows users to inport data
@@ -50,8 +49,7 @@ getState3Frame(base, env)
 setState3TFrame(frame, env)
 setState3BFrame(frame, env)
 getName4Data(filename)
-writeCol4Matrix(tempFrame, dataFile, colInfos, columnLength, env)
-writeCol4Lines(tempFrame, dataFile)
+writeCol4Matrix(tempFrame, dataFile, colInfos, env)
 }
 
 \arguments{
@@ -80,8 +78,6 @@ writeCol4Lines(tempFrame, dataFile)
     displayed}
   \item{colInfos}{\code{colInfos} an object of class colInfo with a
     name, type, and drop slot}
-  \item{columnLength}{\code{columnLength} a numeric vector indicating
-    the length of characters for columns of a data matrix}
 }
 \details{
   \code{\link{importWizard}} mimics the interface of MS Excel and
@@ -160,10 +156,6 @@ writeCol4Lines(tempFrame, dataFile)
 
   \code{\link{writeCol4Matrix}} Creates a tcltk frame with list boxes as
   columns displaying data of a data matrix.
-  
-  \code{\link{writeCol4Lines}} Creates a tcltk frame with one list box
-  showing data as lines.
-  
 }
 \value{
 

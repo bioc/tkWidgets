@@ -224,37 +224,33 @@ finish <- function(env){
            "state2" = args <- getArgs(env)[["state2"]],
            "state3" = args <- getArgs(env)[["state3"]])
     dataName <- getName4Data(args[["file"]])
-    if(is.null(args$sep)){
-        dataFile <- readLines(args$file)
-    }else{
-        dataFile <- do.call("read.table", args)
-        colInfos <- getColInfo(env)
-        colNames <- NULL
-        colToDrop <- NULL
-        for(i in 1:length(colInfos)){
-            if(dropOrNot(colInfos[[i]])){
-                colToDrop <- c(colToDrop, i)
-            }else{
-                switch(type(colInfos[[i]]),
-                  "Character" = dataFile[, i] <- as.character(dataFile[, i]),
-                  "Numeric" = dataFile[, i] <- as.numeric(dataFile[, i]))
-                colNames <- c(colNames, name(colInfos[[i]]))
-            }
-        }
-        # Drop the columns
-        if(!is.null(colToDrop)){
-            dataFile <- dataFile[, -colToDrop]
-        }
-        # In case there is only one column left
-        if(is.null(ncol(dataFile))){
-            dataFile <- data.frame(matrix(dataFile, ncol = 1))
-            names(dataFile) <- colNames
+    dataFile <- do.call("read.table", args)
+    colInfos <- getColInfo(env)
+    colNames <- NULL
+    colToDrop <- NULL
+    for(i in 1:length(colInfos)){
+        if(dropOrNot(colInfos[[i]])){
+            colToDrop <- c(colToDrop, i)
         }else{
-            names(dataFile) <- colNames
+            switch(type(colInfos[[i]]),
+                   "Character" = dataFile[, i] <- as.character(dataFile[, i]),
+                   "Numeric" = dataFile[, i] <- as.numeric(dataFile[, i]))
+            colNames <- c(colNames, name(colInfos[[i]]))
         }
-        if(!is.null(dataName)){
-            assign(dataName, dataFile, env = .GlobalEnv)
-        }
+    }
+    # Drop the columns
+    if(!is.null(colToDrop)){
+        dataFile <- dataFile[, -colToDrop]
+    }
+    # In case there is only one column left
+    if(is.null(ncol(dataFile))){
+        dataFile <- data.frame(matrix(dataFile, ncol = 1))
+        names(dataFile) <- colNames
+    }else{
+        names(dataFile) <- colNames
+    }
+    if(!is.null(dataName)){
+        assign(dataName, dataFile, env = .GlobalEnv)
     }
     return(list(args = args, data = dataFile))
 }
@@ -302,7 +298,7 @@ setState1TFrame <- function(frame, viewer, delims, env){
         writeList(nameEntry, filename, clear = TRUE)
         setArgsList(filename, env)
         showData4State1(viewer, env)
-        if(length(getArgs(env)[["state1"]][["sep"]]) != 0){
+        if(!is.null(getArgs(env)[["state1"]][["sep"]])){
             tkselect(delims[["delimit"]])
         }
     }
@@ -354,7 +350,7 @@ setState1MFrame <- function(frame, env){
     delimit <- tclVar()
     delimitRadio <- tkradiobutton(leftPan, text = paste("Delimited",
                                   " - Files are separated by a character",
-                                  " such as a comma or tab", sep =""),
+                                  " such as a comma, tab ...", sep =""),
                                   value = "delim", variable = delimit,
                                   anchor = "nw")
     tkpack(delimitRadio, anchor = "w", expand = TRUE, fill = "x")
@@ -457,10 +453,15 @@ setSepRadios <- function(frame, env, state = "state2"){
                               variable = sepVar, value = ",",
                               width = 9, anchor = "nw",
                                         command = sepButFun)
-    # Puts the buttons in two rows. First row now
-    tkgrid(sepButs[["tab"]], sepButs[["semi"]], sepButs[["comma"]])
     sepButs[["space"]] <- tkradiobutton(sepFrame, text = "Space",
                               variable = sepVar, value = "\"\"",
+                              width = 9, anchor = "nw",
+                                        command = sepButFun)
+    # Puts the buttons in two rows. First row now
+    tkgrid(sepButs[["tab"]], sepButs[["semi"]], sepButs[["comma"]],
+           sepButs[["space"]])
+    sepButs[["newline"]] <- tkradiobutton(sepFrame, text = "Newline",
+                              variable = sepVar, value = "\n",
                               width = 9, anchor = "nw",
                                         command = sepButFun)
     sepButs[["other"]] <- tkradiobutton(sepFrame, text = "Other:",
@@ -470,7 +471,7 @@ setSepRadios <- function(frame, env, state = "state2"){
     otherEntry <- tkentry(sepFrame, width = 11, state = "disabled")
     tkbind(otherEntry, "<KeyRelease>", sepEntered)
     # Second row with an entry box for delimiters other those given here
-    tkgrid(sepButs[["space"]], sepButs[["other"]], otherEntry)
+    tkgrid(sepButs[["newline"]], sepButs[["other"]], otherEntry)
     tkpack(sepFrame, side = "left", anchor = "ne", fill = "x",
            expand = TRUE)
     if(!is.null(getArgs(env)[[state]][["sep"]])){
@@ -521,29 +522,16 @@ showData4State2 <- function(canvas, env, state = "state2"){
     # Only show the number of rows defined
     temp <- getArgs(env)[[state]]
     tempFrame <- tkframe(canvas)
-    # If there is no sep, just read the lines
-    if(is.null(getArgs(env)[[state]][["sep"]])){
-        dataFile <- readLines(temp$file)
-        if(length(dataFile) > getShowNum(env)){
-            # Cut to right size of file is longer than maxRow
-            dataFile <- dataFile[1:getShowNum(env)]
-        }
+    dataFile <- as.matrix(do.call("read.table", temp))
+    if(nrow(dataFile) > getShowNum(env)){
+        # Cut to right size of file is longer than maxRow
+        dataFile <- dataFile[1:getShowNum(env),]
+    }
+    for(i in 1:ncol(dataFile)){
         tempList <- tklistbox(tempFrame, height = 0, width = 0,
-                                  background = "white")
-        tkinsert(tempList, "end", dataFile)
+                              background = "white")
+        tkinsert(tempList, "end", dataFile[,i])
         tkpack(tempList, side = "left", fill = "both", expand = TRUE)
-    }else{
-        dataFile <- as.matrix(do.call("read.table", temp))
-        if(nrow(dataFile) > getShowNum(env)){
-            # Cut to right size of file is longer than maxRow
-            dataFile <- dataFile[1:getShowNum(env),]
-        }
-        for(i in 1:ncol(dataFile)){
-            tempList <- tklistbox(tempFrame, height = 0, width = 0,
-                                  background = "white")
-            tkinsert(tempList, "end", dataFile[,i])
-            tkpack(tempList, side = "left", fill = "both", expand = TRUE)
-        }
     }
     tkcreate(canvas, "window", 0, 0, anchor = "nw", window = tempFrame)
 }
@@ -603,32 +591,20 @@ setState3BFrame <- function(frame, env){
                        what = "canvas", side = "top")
     tempFrame <- tkframe(rCanv)
     argsList <- getArgs(env)[["state3"]]
-    if(is.null(argsList[["sep"]])){
-        dataFile <- readLines(argsList[["file"]])
-        # Cut to right size of file if longer than maxRow
-        if(length(dataFile) > getShowNum(env)){
-            dataFile <- dataFile[1:getShowNum(env)]
-        }
-        writeCol4Lines(tempFrame, dataFile)
-    }else{
-        dataFile <- do.call("read.table", argsList)
-        # Cut to right size of file if longer than maxRow
-        if(nrow(dataFile) > getShowNum(env)){
-            dataFile <- dataFile[1:getShowNum(env),]
-        }
-        # Finds the data type for columns
-        colInfos <- getColInfo(env)
-        # Finds the maximum number of characters for each column
-        columnLength <- numberChar(dataFile)
-        writeCol4Matrix(tempFrame, dataFile, colInfos,
-                        columnLength, env)
+    dataFile <- do.call("read.table", argsList)
+    # Cut to right size of file if longer than maxRow
+    if(nrow(dataFile) > getShowNum(env)){
+        dataFile <- dataFile[1:getShowNum(env),]
     }
+    # Finds the data type for columns
+    colInfos <- getColInfo(env)
+    writeCol4Matrix(tempFrame, dataFile, colInfos, env)
+
     tkcreate(rCanv, "window", 0, 0, anchor = "nw", window = tempFrame)
 }
 # Create a group of list boxes with entry boxes and a radio button on
 # top to allow for user inputs.
-writeCol4Matrix <- function(tempFrame, dataFile, colInfos,
-                            columnLength, env){
+writeCol4Matrix <- function(tempFrame, dataFile, colInfos, env){
     typeEntry <- list()
     dropCheck <- list()
     nameEntry <- list()
@@ -640,8 +616,6 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos,
     colList <- list()
     for(i in 1:ncol(dataFile)){
         colFrame <- tkframe(tempFrame)
-        colWidth <- max(columnLength[i], nchar(name(colInfos[[i]])),
-                        nchar(type(colInfos[[i]])))
         dropCMD[[i]] <- function(){}
         body <- list(as.name("{"),
                      substitute(eval(dropColumn(j, env)), list(j = i)))
@@ -650,7 +624,7 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos,
         dropCheck[[i]] <- tkcheckbutton(colFrame, text = "Drop",
                                    variable = var, command = dropCMD[[i]])
         tkpack(dropCheck[[i]], side = "top", fill = "x", expand = TRUE)
-        nameEntry[[i]] <- tkentry(colFrame, width = colWidth)
+        nameEntry[[i]] <- tkentry(colFrame, width = 0)
         writeList(nameEntry[[i]], colnames(dataFile)[i])
         # Also updates the value of colInfos
         temp <- colInfos[[i]]
@@ -662,7 +636,7 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos,
         body(nameCMD[[i]]) <- as.call(body)
             tkbind(nameEntry[[i]], "<KeyRelease>", nameCMD[[i]])
         tkpack(nameEntry[[i]], side = "top", fill = "x", expand = TRUE)
-        typeEntry[[i]] <- tkentry(colFrame, width = colWidth)
+        typeEntry[[i]] <- tkentry(colFrame, width = 0)
         writeList(typeEntry[[i]], type(colInfos[[i]]))
         typeCMD[[i]] <- function(){}
         body <- list(as.name("{"), substitute(eval(setColType(j,
@@ -670,7 +644,7 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos,
         body(typeCMD[[i]]) <- as.call(body)
         tkbind(typeEntry[[i]], "<KeyRelease>", typeCMD[[i]])
         tkpack(typeEntry[[i]], side = "top", fill = "x", expand = TRUE)
-        colList[[i]] <- tklistbox(colFrame, width = (colWidth),
+        colList[[i]] <- tklistbox(colFrame, width = 0,
                                   height = 0, background = "white")
         tkinsert(colList[[i]], "end", dataFile[,i])
         tkpack(colList[[i]], side = "top", fill = "x", expand = TRUE)
@@ -678,15 +652,6 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos,
     }
     # Sets values for colInfo object
     assignColInfo(colInfos, env)
-}
-# Create a list box with data written in
-writeCol4Lines <- function(tempFrame, dataFile){
-    colFrame <- tkframe(tempFrame)
-    colList <- tklistbox(colFrame, width = 0, height = 0,
-                                         background = "white")
-    tkinsert(colList, "end", dataFile)
-    tkpack(colList, side = "top", fill = "x", expand = TRUE)
-    tkpack(colFrame, side = "left", fill = "both", expand = TRUE)
 }
 
 # Set the value of slot 'drop' of a colInfo object
@@ -727,16 +692,8 @@ whatDeli <- function(delimiter){
            ";" = return("semi"),
            " " = return("space"),
            "," = return("comma"),
+           "\n" = return("newline"),
            stop("Unknown delimiter"))
-}
-# Given a matrix of characters, figures out the maximum number of
-#characters for each column
-numberChar <- function(matr){
-    nchars <- NULL
-    for(i in 1:ncol(matr)){
-        nchars <- c(nchars, max(nchar(matr[,i])))
-    }
-    return(nchars)
 }
 # This function generates a widget using widgetTools to collect all
 # the arguments for read.table that are not yet collected by importWizard

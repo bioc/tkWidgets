@@ -41,8 +41,8 @@ guess.sep <- function(file.name, n = 5, seps = ""){
         type <- find.type(toCheck[2:length(toCheck)],separator, header)
         return(list(header = header, separator = separator, type = type))
     }else{
-#        warning("I could not detect any delimiter")
-        return(list(header = FALSE, separator = NULL,
+        # New line is always the separator
+        return(list(header = FALSE, separator = "\n",
                     type = find.type(toCheck[2:length(toCheck)],
                     header = FALSE)))
     }

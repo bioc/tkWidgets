@@ -1,7 +1,6 @@
 \name{setArgsList}
 \alias{setArgsList}
 \alias{whatDeli}
-\alias{numberChar}
 \alias{getMoreArgs}
 \alias{assignArgs}
 \alias{getArgs}
@@ -29,7 +28,6 @@
 \usage{
 setArgsList(filename, env)
 whatDeli(delimiter)
-numberChar(matr)
 getMoreArgs()
 assignArgs(value, env)
 getArgs(env)
@@ -57,8 +55,6 @@ setColType(index, entryBox, env)
   \item{env}{\code{env} an R environment object for storing information}
   \item{delimiter}{\code{delimiter} a character string for the delimiter
     whose letter representation is sought}
-  \item{matr}{\code{matr} a matrix the number of characters of each
-    element of which is going to be figured out}
   \item{value}{\code{value} a character or numerical value to be
     assigned to a variable}
   \item{backBut}{\code{backBut} a tkwin object for the button that
@@ -84,9 +80,6 @@ setColType(index, entryBox, env)
 
   \code{\link{whatDeli}} gets the word representation of delimiters
   (e.g. tab for "\t").
-
-  \code{\link{numberChar}} figures out the maximum number of characters
-  for each column of a matrix.
 
   \code{\link{getMoreArgs}} generates a widget using widgetTools to
   collect some of the arguments for read.table.
@@ -145,9 +138,6 @@ setColType(index, entryBox, env)
 }
 \value{
   \code{\link{whatDeli}} returns a character string.
-
-  \code{\link{numberChar}} returns a vector of integers for the number
-  of maximum number of characters for each colum of a matrix.
 
   \code{\link{getMoreArgs}} returns a list of arguments.
 
