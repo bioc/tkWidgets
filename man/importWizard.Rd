@@ -6,8 +6,9 @@
 
 \title{A widget for importing data to R}
 \description{
-  This function constructs a widget that allows users to inport data
+  Functions constructs a widget that allows users to inport data
   file to R. The imported data will be returned as an R data frame
+  together with the argument list used to import the data using read.table
 }
 \usage{
 importWizard(filename = "", maxRow = 200)
@@ -35,6 +36,8 @@ getMoreArgs()
 }
 \value{
   A data frame containing the data to be imported will be returned
+  \item{args}{a list of arguments used to imnport the data}
+  \item{data}{a data frame for the imorted data}
 }
 
 \author{Jianhua Zhang}
