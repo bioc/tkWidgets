@@ -173,7 +173,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     tkpack(tklabel(leftFrame, text = "Contents"), side = "top",
            expand = FALSE, fill = "x")
     dirLFrame <- tkframe(leftFrame)
-    listView <- makeViewer(dirLFrame, vWidth = 15, vHeight = 20,
+    listView <- makeViewer(dirLFrame, vWidth = 15, vHeight = 10,
                            hScroll = TRUE)
     tkpack(dirLFrame, side = "top", expand = TRUE, fill = "y")
     upBut <- tkbutton(leftFrame, text = "Back", width = 10,

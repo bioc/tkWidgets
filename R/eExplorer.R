@@ -141,7 +141,7 @@ eExplorer <- function(pkgName, font = "arial 13"){
     editFrame <- tkframe(codeNRelFrame)
     tkpack(tklabel(editFrame, text = "R Source Code", font = font))
     eViewerFrame <- tkframe(editFrame)
-    editViewer <- makeViewer(eViewerFrame, vWidth = 50, vHeight = 10,
+    editViewer <- makeViewer(eViewerFrame, vWidth = 50, vHeight = 5,
                       hScroll = TRUE, vScroll = TRUE, what = "text")
     tkconfigure(editViewer, font = font)
     tkconfigure(editViewer, state = "disabled")
@@ -149,7 +149,7 @@ eExplorer <- function(pkgName, font = "arial 13"){
     tkpack(eViewerFrame, expand = TRUE, fill = "both")
     tkpack(tklabel(editFrame, text = "Display window", font = font))
     rViewerFrame <- tkframe(editFrame)
-    resultViewer <-  makeViewer(rViewerFrame, vWidth = 50, vHeight = 10,
+    resultViewer <-  makeViewer(rViewerFrame, vWidth = 50, vHeight = 5,
                       hScroll = TRUE, vScroll = TRUE, what = "text")
     tkconfigure(resultViewer, font = font)
     tkpack(rViewerFrame, expand = TRUE, fill = "both")
