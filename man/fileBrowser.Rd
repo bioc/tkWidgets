@@ -1,35 +1,46 @@
 \name{fileBrowser}
 \alias{fileBrowser}
 
-\title{ ~~function to do ... ~~ }
+\title{An simple interface to view files and pick one as the return.}
 \description{
-  A concise 
+  This function provides the GUI for users to go up and down a path and
+  view the files. When a file shown is selected, the function will
+  return the full path for that file. 
 }
 \usage{
 fileBrowser(path="")
 }
 
 \arguments{
-  \item{path}{ ~~Describe \code{path} here~~ }
+  \item{path}{A character string for the full path to be view. Defaults
+    to the current working directory if no path is provided.}
 }
 \details{
-  If necessary, more details than 
+  When a path is viewed, files will be displayed as they are and
+  directories will be displayed with a system file separacter appended
+  (e.g. "/" for the Unix system). Click on a file name will make a
+  selection and the full path for the selected file will be
+  returned. The GUI is modal and has to be closed before doing any other
+  operations. 
 }
 \value{
-  ~Describe the value returned
-  If it is a LIST, use
-  \item{comp1 }{Description of `comp1'}
-  \item{comp2 }{Description of `comp2'}
+  \item{fileSelected}{A character string for the full path for the file
+    selected.}
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ }
+\references{tcltk, R News Vol. 1/3, 2001. A Primer on the R-Tcl/Tk Package.}
+\author{Jianhua (John) Zhang}
+\note{This funciton is part of the Bioconductor project at Dana-Farber
+  Cancer Institute to provide Bioinformatics funcitons through R.}
 
- ~Make other sections like WARNING with \section{WARNING }{....} ~
-
-\seealso{ ~~objects to SEE ALSO as \code{\link{~~fun~~}}, ~~~ }
+\seealso{\code{\link{makeView}},\code{\link{writeDir}}}
 
 \examples{
-#
+# Call the function to view the current directory
+fileBrowser()
+
+# To call the function with a path do
+# fileBrowser(path = "yourPath")
+
+# Please click on the "End" button to end the demon session.
 }
 \keyword{interface}
