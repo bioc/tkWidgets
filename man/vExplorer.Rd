@@ -10,7 +10,7 @@
 \usage{
 vExplorer(title = "BioC Vignettes Explorer", pkgName = "", font =
 ifelse(.Platform$OS.type == "unix", "arial 14", "arial 11"))
-viewVignette(title, packName, vigPath, pdfPath, font = "arial 11")
+viewVignette(title, packName, vigPath, font = "arial 11")
 }
 
 \arguments{
@@ -22,8 +22,6 @@ viewVignette(title, packName, vigPath, pdfPath, font = "arial 11")
   \item{packName}{same as pkgName}
   \item{vigPath}{character string for the full qualified name of a
     vignette to be explored.}
-  \item{pdfPath}{character string for the full path of a pdf file (if
-    any) associated with a vignette.}
   \item{font}{a character string for the name and size of the font to be
     used for text rendered on the widgets (e. g. "arial 11")}
 }
@@ -47,9 +45,8 @@ if(interactive()){
     require("widgetTools", character.only = TRUE)
     vExplorer()
     path <- .path.package("widgetTools")
-    vigList <- getPkgVigList(path)
-    viewVignette("BioC VignetteBrowser", "widgetTools", vigList[[1]]$VigPath,
-     file.path(path, "doc"))
+    vigList <- pkgVignettes("widgetTools")
+    viewVignette("BioC VignetteBrowser", "widgetTools", vigList$docs)
 }
 }
 \keyword{interface}

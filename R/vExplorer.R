@@ -26,8 +26,11 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     packSelected <- function(){
          selectedPkg <<-
              tclvalue(tkget(packViewer,(tkcurselection(packViewer))))
-
+         writeList(statusBar, paste("Getting vignette names"), TRUE)
+         # Make sure widget gets redrawn
+         Sys.sleep(1)
          write2VigList(selectedPkg)
+         writeList(statusBar, "Done", TRUE)
     }
     # Writes vignette names to the list box for vignettes
     write2VigList <- function(selectedPkg){
@@ -37,12 +40,13 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
                      message = paste("Package", selectedPkg,
                      "has no vignette"))
          }else{
-             vigList <<- vignette(selectedPkg)
+             vigList <<- pkgVignettes(selectedPkg)$docs
+             names(vigList) <<- basename(vigList)
              tkdelete(vigViewer, 0, "end")
              for(i in names(vigList)){
-                 if(!inherits(chunkList, "try-error")){
+                 #if(!inherits(chunkList, "try-error")){
                      tkinsert(vigViewer, "end", i)
-                 }
+                 #}
              }
          }
     }
@@ -54,8 +58,7 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
         writeList(statusBar, paste("Loading", selectedVig), TRUE)
         # Make sure widget gets redrawn
         Sys.sleep(1)
-        viewVignette(title, selectedPkg, vigList[[selectedVig]]$VigPath,
-                     vigList[[selectedVig]]$PDFpath, font)
+        viewVignette(title, selectedPkg, vigList[[selectedVig]], font)
         writeList(statusBar, "", TRUE)
 #        tkconfigure(vButton, state = "normal")
     }
@@ -160,8 +163,7 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
 
 # This window is called by vExplorer for interacting with the code
 # chunks of a vignette
-viewVignette <- function(title, packName, vigPath, pdfPath,
-                         font = "arial 11"){
+viewVignette <- function(title, packName, vigPath, font = "arial 11"){
 
     on.exit(end)
 
@@ -207,7 +209,16 @@ viewVignette <- function(title, packName, vigPath, pdfPath,
 
     # Executed when a user clicks the view PDF button
     viewPDF <- function(){
-        openPDF(pdfPath)
+        options(show.error.messages = FALSE)
+        temp <- try(vignette(gsub("\\..*", "", basename(vigPath))))
+        options(show.error.message = TRUE)
+        if(inherits(temp, "try-error")){
+            tkMessageBox(title = "PDF File Error",
+                         message = paste("No PDF files available for",
+                                   basename(vigPath)),
+                         icon = "",
+                         type = "ok")
+        }
     }
     # Shows the code chunk in a text box that allows the user to
     # editor the code chunk in the box but not to the actual code chunk
@@ -331,9 +342,7 @@ viewVignette <- function(title, packName, vigPath, pdfPath,
     base <- tktoplevel()
     tktitle(base) <- title
     # Write package and vignette names
-    pNvNames <- paste("Package:", packName, "   Vignette:",
-                      gsub(paste(".*", .Platform$file.sep, "(.*)",
-                                 sep = ""), "\\1", vigPath))
+    pNvNames <- paste("Package:", packName, "   Vignette:", basename(vigPath))
     tkpack(tklabel(base, text = pNvNames, font = font), pady = 4)
 
     listFrame <- tkframe(base)
@@ -389,9 +398,9 @@ viewVignette <- function(title, packName, vigPath, pdfPath,
                           font = font, command = end)
     tkpack(endButton)
 
-    if(is.null(pdfPath) || is.na(pdfPath) || length(pdfPath) == 0){
-        tkconfigure(pdfButton, state = "disabled")
-    }
+#    if(is.null(pdfPath) || is.na(pdfPath) || length(pdfPath) == 0){
+#        tkconfigure(pdfButton, state = "disabled")
+#    }
 #    tkconfigure(resultViewer, state = "disabled")
 
 #    tkwait.window(base)
