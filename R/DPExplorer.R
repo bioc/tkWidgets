@@ -10,17 +10,37 @@ DPExplorer <- function (title = "BioC Data Package Explorer", pkgName = ""){
     workEnv <- new.env(hash = TRUE, parent = NULL)
     on.exit(destroy(base))
     base <- getTopLevel(title)
-    assignBase(base, workEnv)
     createDPExplorer(base, workEnv)
+
+    # Initialize some of the variables
+    assignSelected(NULL, workEnv)
+    assignQuit(FALSE, workEnv)
+
     tkwait.window(base)
+
+    if(getQuitFromEnv(workEnv)){
+        return(NULL)
+    }else{
+        if(is.null(getSelectedFromEnv(workEnv))){
+            return(NULL)
+        }else{
+            keys <- getSelectedFromEnv(workEnv)
+            where <- grep(getPkgNameFromEnv(workEnv), search())
+            if(length(keys) == 1){
+                return(get(keys, get(getDataNameFromEnv(workEnv), pos = where)))
+            }else{
+                return(multiget(keys,
+                                 get(getDataNameFromEnv(workEnv), pos = where)))
+            }
+        }
+    }
 }
 
-assignBase <- function(base, env){
-    assign("topWin", base, env)
+assignQuit <- function(quit, env){
+    assign("quit", quit, env)
 }
-
-getBaseFromEnv <- function(env){
-    return(get("topWin", env))
+getQuitFromEnv <- function(env){
+    return(get("quit", env))
 }
 
 assignDataList <- function(winID, env){
@@ -50,8 +70,36 @@ getValueListFromEnv <- function(env){
 assignSelectionList <- function(selectionList, env){
     assign("selectionList", selectionList, env)
 }
-getSelectionList <- function(env){
+getSelectionListFromEnv <- function(env){
     return(get("selectionList", env))
+}
+
+assignPkgName <- function(pkgName, env){
+    assign("pkgName", pkgName, env)
+}
+getPkgNameFromEnv <- function(env){
+    return(get("pkgName", env))
+}
+
+assignDataName <- function(dataName, env){
+    assign("dataName", dataName, env)
+}
+getDataNameFromEnv <- function(env){
+    return(get("dataName", env))
+}
+
+assignKey <- function(key, env){
+    assign("key", key, env)
+}
+getKeyFromEnv <- function(env){
+    return(get("key", env))
+}
+
+assignSelected <- function(selected, env){
+    assign("selected", selected, env)
+}
+getSelectedFromEnv <- function(env){
+    return(get("selected", env))
 }
 
 createDPExplorer <- function(base, env){
@@ -70,9 +118,9 @@ createDPExplorer <- function(base, env){
     # The button frame contains a cancel and finish button
     butFrame <- getButFrame(base, env)
 
-    tkpack(nameFrame, expand = TRUE, fill = "x")
-    tkpack(dataFrame, expand = TRUE, fill = "both")
-    tkpack(butFrame, expand = TRUE, fill = "x")
+    tkpack(nameFrame, expand = TRUE, fill = "x", pady = 5, padx = 5)
+    tkpack(dataFrame, expand = TRUE, fill = "both", padx = 5)
+    tkpack(butFrame, expand = TRUE, fill = "x", pady = 5)
 }
 
 destroy <- function(base){
@@ -100,10 +148,14 @@ getDataFrame <- function(base, env){
 }
 
 packDataNameList <- function(base, env){
+
     dataSelected <- function(){
-        dataName <- tkget(dataNameList,(tkcurselection(dataNameList)))
-        keys <- ls(dataName)
-        showKeys(keys, getKeyListFromEnv(env))
+        dataName <- as.character(tkget(dataNameList,
+                                       tkcurselection(dataNameList)))
+        where <- grep(getPkgNameFromEnv(env), search())
+        keys <- ls(get(dataName, pos = where))
+        writeList(getKeyListFromEnv(env), keys)
+        assignDataName(dataName, env)
     }
     dataListFrame <- tkframe(base)
     dataLabel <- tklabel(dataListFrame, text = "Data Set:")
@@ -111,22 +163,30 @@ packDataNameList <- function(base, env){
     dataNameList <- makeViewer(tempFrame, vWidth = NULL, vHeight = NULL,
                         hScroll = FALSE, vScroll = TRUE,
                         what = "list", side = "bottom")
+    tkbind(dataNameList, "<B1-ButtonRelease>", dataSelected)
     tkpack(dataLabel, side = "top")
     tkpack(tempFrame, side = "bottom", expand = TRUE, fill ="both")
     tkpack(dataListFrame, side = "left", expand = TRUE, fill = "both")
     assignDataList(dataNameList, env)
 }
 
-showKeys <- function(keys, base){
-
-}
 packKeyList <- function(base, env){
+
+    keySelected <- function(){
+        keyName <- as.character(tkget(keyList,
+                                       tkcurselection(keyList)))
+        where <- grep(getPkgNameFromEnv(env), search())
+        values <- get(keyName, get(getDataNameFromEnv(env), pos = where))
+        writeList(getValueListFromEnv(env), values)
+        assignKey(keyName, env)
+    }
     keyListFrame <- tkframe(base)
     keyLabel <- tklabel(keyListFrame, text = "Keys:")
     tempFrame <- tkframe(keyListFrame)
     keyList <- makeViewer(tempFrame, vWidth = NULL, vHeight = NULL,
                         hScroll = FALSE, vScroll = TRUE,
                         what = "list", side = "bottom")
+    tkbind(keyList, "<B1-ButtonRelease>", keySelected)
     tkpack(keyLabel, side = "top")
     tkpack(tempFrame, side = "bottom", expand = TRUE, fill = "both")
     tkpack(keyListFrame, side = "left", expand = TRUE, fill = "both")
@@ -135,10 +195,19 @@ packKeyList <- function(base, env){
 
 packValueNBut <-function(base, env){
     select <- function(){
+        selected <- unique(c(getSelectedFromEnv(env), getKeyFromEnv(env)))
+        writeList(getSelectionListFromEnv(env), selected)
+        assignSelected(selected, env)
     }
     drop <- function(){
+        selected <- getSelectedFromEnv(env)[getSelectedFromEnv(env)
+                                            != getKeyFromEnv(env)]
+        writeList(getSelectionListFromEnv(env), selected)
+        assignSelected(selected, env)
     }
     clear <- function(){
+        assignSelected(NULL, env)
+        writeList(getSelectionListFromEnv(env), NULL)
     }
     tempFrame <- tkframe(base)
     valueLabel <- tklabel(tempFrame, text = "Value(s)")
@@ -162,12 +231,20 @@ packValueNBut <-function(base, env){
 }
 
 packSeletionList <- function(base, env){
+
+    keySelected <- function(){
+        keyName <- as.character(tkget(selectionList,
+                                       tkcurselection(selectionList)))
+        assignKey(keyName, env)
+    }
+
     selectionListFrame <- tkframe(base)
     selectionLabel <- tklabel(selectionListFrame, text = "Selected keys:")
     tempFrame <- tkframe(selectionListFrame)
     selectionList <- makeViewer(tempFrame, vWidth = NULL, vHeight = NULL,
                         hScroll = FALSE, vScroll = TRUE,
                         what = "list", side = "bottom")
+    tkbind(selectionList, "<B1-ButtonRelease>", keySelected)
     tkpack(selectionLabel, side = "top")
     tkpack(tempFrame, side = "bottom", expand = TRUE, fill = "both")
     tkpack(selectionListFrame, side = "left", expand = TRUE, fill = "both")
@@ -176,6 +253,7 @@ packSeletionList <- function(base, env){
 
 getButFrame <- function (base, env){
     cancel <- function(){
+        assignQuit(TRUE, env)
         destroy(base)
     }
     finish <- function(){
@@ -203,7 +281,7 @@ getNameFrame <- function(base, env){
                          icon = "error",
                          type = "ok")
         }else{
-            rdas <- loadDataPkg(pkgName)
+            rdas <- loadDataPkg(pkgName, env)
             writeList(getDataListFromEnv(env), rdas)
         }
     }
@@ -220,7 +298,7 @@ getNameFrame <- function(base, env){
     return(tempFrame)
 }
 
-loadDataPkg <- function(pkgName){
+loadDataPkg <- function(pkgName, env){
 
     options(show.error.messages = FALSE)
     tryMe <- try(do.call("library", list(package = pkgName)))
@@ -231,6 +309,7 @@ loadDataPkg <- function(pkgName){
                      icon = "error",
                      type = "ok")
     }else{
+        assignPkgName(pkgName, env)
         return(gsub("\\.rda$", "",
                     list.files(file.path(.path.package(pkgName),
                                          "data"), pattern = ".rda")))
