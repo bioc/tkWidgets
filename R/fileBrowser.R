@@ -83,19 +83,17 @@ fileBrowser <- function (path = ""){
         doList(item)
     }
 
-    doChar <- function (item){
-        fileOrObj <<- "character"
+    doObj <- function (item, objType){
+        fileOrObj <<- objType
 
-        if(length(objLevel) > 1){
-            writeObj(listView,
-                     get(item, env = get(objLevel[length(objLevel)])),
-                     check = FALSE)
-            obj <<- get(item, env = get(objLevel[length(objLevel)]))
-        }else{
-            writeObj(listView, get(item), check = FALSE)
-            obj <<- get(item)
-        }
-        writeCap("Object View: Character")
+        toWrite <- c(paste("Type:", objType),
+                         paste("Number of columns:", ncol(get(item))),
+                         paste("Number of row(s):", nrow(get(item))),
+                         paste("Column Name(s):"),names(get(item)))
+
+        writeObj(listView, toWrite)
+        writeCap(paste("Object View:", item))
+
     }
 
     showFiles <- function(){
@@ -122,12 +120,12 @@ fileBrowser <- function (path = ""){
 print(objType)
             switch(objType,
                    "environment" = doEnv(selectedObj),
-                   "data.frame" = doDF(selectedObj),
-                   "vector" = doVec(selectedObj),
-                   "list" = doList(selectedObj),
-                   "matrix" = doMat(selectedObj),
-                   "integer" = ,
-                   "character" = doChar(selectedObj)
+                   "data.frame" = doObj(selectedObj, "data.frame"),
+                   "vector" = doObj(selectedObj, "vector"),
+                   "list" = doObj(selectedObj, "list"),
+                   "matrix" = doObj(selectedObj, "matrix"),
+                   "integer" = doObj(selectedObj, "integer"),
+                   "character" = doObj(selectedObj, "character")
                    )
             if(length(objLevel) >= 2)
                 tkconfigure(upBut, state = "normal")
@@ -138,9 +136,7 @@ print(objType)
         num <- as.numeric(tkcurselection(listView))+1
         switch(fileOrObj,
                "file" = showFiles(),
-               "obj" = showObj(),
-               "list" = writeObj(listView,
-               get(selectedObj)[num], check = FALSE)
+               "obj" = showObj()
            )
     }
 
@@ -179,7 +175,6 @@ print(objType)
         switch(fileOrObj,
                "file" = fileUP(),
                "obj" = objUP(),
-               "list" = doList(selectedObj),
                viewObj())
     }
 
