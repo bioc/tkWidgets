@@ -35,9 +35,9 @@ importPhenoData <- function(sampleNames = NULL, from = NULL){
                 return(invisible())
             }
             #colnames(pdata) <- paste("Covar", 1:ncol(pdata), sep = "")
-            if(is.null(sampleNames)){
-                rownames(pdata) <- paste("Sample", 1:nrow(pdata), sep = "")
-            }
+            #if(is.null(sampleNames)){
+                #rownames(pdata) <- paste("Sample", 1:nrow(pdata), sep = "")
+            #}
             varList <- list()
             varList[colnames(pdata)] <- ""
         }else if (what == "df"){
