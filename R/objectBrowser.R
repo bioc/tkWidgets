@@ -1,16 +1,17 @@
-##FIXME: this is not a good description --
-
-# This function provides the interface to view the objects in the
-# work place. fun = a function that filters objects; textToShow = text
-# to be shown on the widget, nSelect = number of selection can be
-# made (default to no limit).
+# This function provides the interface to browse objects in the work
+# place and allows users to pick given number of objects to be
+# returned.
+# fun = a function that filters objects to be shown;
+# textToShow = text to be shown as the title of the widget;
+# nSelect = number of selection can be made (default to no limit).
+#
+#Copyright 2002, J. Zhang, all rights reserved
+#
 
 objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
                           nSelect = -1){
 
-##FIXME: please read the documentation for on.exit to see why this is wrong.
-    on.exit(options(show.error.messages = TRUE))
-    on.exit(end())
+    on.exit(end(), add = TRUE)
 
     LABELFONT1 <- "Helvetica 12 bold"
     LABELFONT2 <- "Helvetica 11"
@@ -25,14 +26,13 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
     objsInSel <- NULL
     tempObj <- NULL
 
-#please document each of these functions -- describe what it is supposed to
-#do - by the way, I don't think that this does what you think it does
-#there is no way that this can change the value of returnList
-#
+    # Executed when a user clicks the end button. returnList that
+    # contains names of selected objects will be updated before the
+    # window closes.
     end <- function(){
         if(length(objsInSel) != 0){
             if(nSelect == -1){
-                returnList <<- nameToObjList(objsInSel)
+                returnList <<- objNameToList(objsInSel)
                 tkdestroy(base)
             }else{
                 if(nSelect != length(objsInSel)){
@@ -40,7 +40,7 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
                        paste("You can only select", nSelect, "object(s)"),
                        icon = "warning", type = "ok")
                 }else{
-                    returnList <<- nameToObjList(objsInSel)
+                    returnList <<- objNameToList(objsInSel)
                     tkdestroy(base)
                 }
             }
@@ -50,12 +50,16 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         }
     }
 
+    # Write the content of the global environment to the list box for
+    # object names
     viewGlobalEnv <- function(){
         writeObj(listView, pickObjs(objNames = ls(env = .GlobalEnv,
                                     all = TRUE), fun = fun))
         writeCap(".GlobalEnv")
     }
-
+    # Executed when a user double clicks an object that is an R
+    # environment. List object names in an enviroment to the list
+    # boxes for objects.
     doEnv <- function (item){
         writeObj(listView,  pickObjs(objNames = ls(env = get(item)),
                                       fun = fun))
@@ -63,7 +67,8 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         if(!is.null(parent.env(get(item))))
             tkconfigure(upBut, state = "normal")
     }
-
+    # Executed when a user couble clicks an object that is an R
+    # package. List all object names in the list box for objects.
     doPack <- function (index, pack){
         whichOne <- as.numeric(index) + 1
         writeObj(listView, ls(pos = whichOne))
@@ -71,11 +76,12 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         writeCap(pack, asis = TRUE)
         tkconfigure(upBut, state = "normal")
     }
-
+    # Will be done for other objects
     doElse <- function(){
         # This a temp function for now. More checking will be implemented
     }
-
+    # Executed when a user double clicks an ojbect that is a
+    # list. Shows the number of columns, number of rows and column names.
     doList <- function (aList){
 
         if(is.null(ncol(get(aList))))
@@ -92,12 +98,16 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         writeCap(aList)
     }
 
+    # Executed when a user double clicks an object name in a list box.
+    # Shows the content of the object if there is any
     dClick <- function (){
         selectedObj <<- as.character(tkget(listView,
                                            tkcurselection(listView)))
         goin()
     }
 
+    # Determines the type of an object that is double clicked to
+    # decide what to do
     goin <- function (){
         if(!is.null(selectedObj)){
             if(regexpr("^package", selectedObj) > 0){
@@ -116,12 +126,12 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         }
     }
 
-
+    # Response to a single click to an object name in the list box for
+    # object names
     sClick <- function () {
         selectedObj <<- NULL
         tkconfigure(selectBut, state = "normal")
         selIndex <<- unlist(strsplit(tkcurselection(listView), " "))
-
         if(length(selIndex) == 1){
             tempObj <<- as.character(tkget(listView, selIndex))
         }else{
@@ -133,13 +143,13 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         }
     }
 
-
+    # When the global environment is clicked and shows the content
     getAct <- function(){
         selectedObj <<- ".GlobalEnv"
         goin()
     }
 
-
+    # Moves one step back the path of objects browsered
     up <- function(){
         options(show.error.messages = FALSE)
         tryMe <- try(parent.env(get(selectedObj)))
@@ -160,7 +170,8 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         }
         tkconfigure(selectBut, state = "disabled")
     }
-
+    # Writes the name of an object in the list box for object names to
+    # the list box for selected objects.
     selectObj <- function (){
         objsInSel <<- c(objsInSel, tempObj)
         objsInSel <<- unique(objsInSel)
@@ -168,7 +179,7 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         tkconfigure(clearBut, state = "normal")
         tkconfigure(selectBut, state = "disabled")
     }
-
+    # Removes everything from the list box for selected ojbects
     clearSelection <- function(){
         objsInSel <<- NULL
         tkdelete(selectView, 0, "end")
@@ -176,12 +187,12 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         tkconfigure(removeBut, state = "disabled")
         tkconfigure(selectBut, state = "disabled")
     }
-
+    # Destroy the widow and returns NULL
     cancel <- function (){
         objsInSel <<- NULL
         end()
     }
-
+    # Removes items from the list box for selected objects
     removeSelection <- function (){
         toRemove <- NULL
         if(length(objIndex) > 0){
@@ -193,20 +204,21 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         }
         tkconfigure(removeBut, state = "disabled")
     }
-
+    # When an object in the box for selected objects is clicked, the
+    # index of the object name is remembered
     selClick <- function (){
         objIndex <<- NULL
         tkconfigure(removeBut, state = "normal")
         objIndex <<- unlist(strsplit(tkcurselection(selectView), " "))
     }
-
+    # Write to the list box for selected objects
     writeSelection <- function (toWrite){
         tkdelete(selectView, 0, "end")
         for(i in toWrite)
             tkinsert(selectView, "end", i)
         fileIndex <<- NULL
     }
-
+    # Writes to the top of the widget to indicate the current environment
     writeCap <- function(objName, asis = FALSE){
         if(asis){
             tkconfigure(labl1, text = objName)
@@ -219,13 +231,10 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         }
     }
 
-##FIXME: please try to document what is being done here
-##there should be a number of logical steps and you should put in
-##some information on each one about what it does
-
+    ## This portion sets up the interface
     base <- tktoplevel()
     tktitle(base) <- paste("Bioconductor Object Browser")
-
+    # Set up the labels for list boxes of objects
     capFrame <- tkframe(base)
     noteLabel <- tklabel(capFrame, text = textToShow, font = LABELFONT1)
     labl1 <- tklabel(capFrame, text = " ", font = LABELFONT2)
@@ -234,16 +243,15 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
     tkgrid(noteLabel, columnspan = 3)
     tkgrid(labl1, dummyLabel, labl2)
     tkgrid(capFrame, columnspan = 2, padx = 10)
-
+    # Sets up the list boxes. One for objects to browse and one for selected
     leftFrame <- tkframe(base)
-
     listFrame <- tkframe(leftFrame)
     listView <- makeViewer(listFrame)
     tkgrid(listFrame, columnspan = 2)
     tkconfigure(listView, selectmode = "extended", font = LABELFONT2)
     tkbind(listView, "<Double-Button-1>", dClick)
     tkbind(listView, "<B1-ButtonRelease>", sClick)
-
+    # Puts in the buttons for the list box for object names
     butFrame <- tkframe(leftFrame)
     upBut <- tkbutton(butFrame, text = "Up", width = BUTWIDTH,
 		      command = up)
@@ -254,7 +262,7 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
     tkgrid(upBut, selectBut)
     tkgrid(activeBut, columnspan = 2)
     tkgrid(butFrame)
-
+    # puts in the buttons for list box for selected objects
     rightFrame <- tkframe(base)
     selectFrame <- tkframe(rightFrame)
     selectView <- makeViewer(selectFrame)

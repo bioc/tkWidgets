@@ -1,10 +1,13 @@
-# This function provides the interface to browse files under a
-# given path.
+# This function provides the interface to browse files in the system
+# and returns all or a given number of selected file names.
+#
 
 fileBrowser <- function (path = "", testFun = function(x) TRUE,
                          prefix = NULL, suffix = NULL,
                          textToShow = "Select file(s)", nSelect = -1)
 {
+    on.exit(end())
+
     LABELFONT1 <- "Helvetica 12 bold"
     LABELFONT2 <- "Helvetica 11"
     BUTWIDTH <- 8
@@ -37,7 +40,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
             }
         }
     }
-
+    #
     inList <- function(){
         selectedObj <- as.character(tkget(listView,(tkcurselection(listView))))
         if(regexpr(.Platform$file.sep, selectedObj) >= 1){
@@ -48,7 +51,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                            sep = "")
             doPath()
             writeDir(listView,
-                     pickFiles(dirsNFiles(path), testFun,
+                     pickFiles(appendSepDir(path), testFun,
                                prefix, suffix))
             writeCap(path)
             if(currentNode >= 1)
@@ -114,7 +117,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 			  sep = "", collapse = .Platform$file.sep)
         if(currentNode == 2)
             path <<- .Platform$file.sep
-        writeDir(listView, pickFiles(dirsNFiles(path), testFun,
+        writeDir(listView, pickFiles(appendSepDir(path), testFun,
                                          prefix, suffix))
         writeCap(path)
         currentNode <<- currentNode - 1
@@ -129,7 +132,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 			  sep = "", collapse = .Platform$file.sep)
         if(currentNode == 2)
             path <<- .Platform$file.sep
-        writeDir(listView, pickFiles(dirsNFiles(path), testFun,
+        writeDir(listView, pickFiles(appendSepDir(path), testFun,
                                          prefix, suffix))
         writeCap(path)
         currentNode <<- currentNode - 1
@@ -164,9 +167,11 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         path <- getwd()
     doPath()
 
+
+    ## Set up the interface
     base <- tktoplevel()
     tktitle(base) <- paste("File Browser")
-
+    # Writes the directory name
     topFrame <- tkframe(base)
     instruct <- tklabel(topFrame, text = textToShow, font = LABELFONT1)
     dir <- tklabel(topFrame, text = "Directory: ", font = LABELFONT2)
@@ -174,7 +179,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid(instruct, columnspan = 2)
     tkgrid(dir, caption)
     tkgrid(topFrame, columnspan = 2, padx = 10)
-
+    # Put the list box for file names in a directory and the
+    # associated buttons
     leftFrame <- tkframe(base)
     dirLabel <- tklabel(leftFrame, text = "Files in directory",
                         font = "Helvetica 11")
@@ -194,9 +200,9 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkconfigure(listView, selectmode = "extended", font = LABELFONT2)
     tkbind(listView, "<Double-Button-1>", inList)
     tkbind(listView, "<B1-ButtonRelease>", selInDir)
-    writeDir(listView, pickFiles(dirsNFiles(path), testFun,
+    writeDir(listView, pickFiles(appendSepDir(path), testFun,
                                  prefix, suffix))
-
+    # Put the list box for selected file names and the associated buttons
     rightFrame <- tkframe(base)
     selLabel <- tklabel(rightFrame, text = "Files selected",
                         font = "Helvetica 11")
@@ -216,7 +222,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid.configure(clearBut, sticky = "w")
 
     tkgrid(leftFrame, rightFrame)
-
+    # Put the end button
     endBut <- tkbutton(base, text = "Finish", width = BUTWIDTH,
 		       command = end)
     tkgrid(endBut, columnspan = 2)
