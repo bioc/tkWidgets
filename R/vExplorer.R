@@ -203,11 +203,9 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     }
     # Export code chunk to the R session
     export <- function(){
-        temp <- nameNCode[[selectedChunk]]
-        for(i in temp){
-            out <- eval(parse(text = i), env = parent.frame(2))
-            print(out)
-            return(NULL)
+        temp <- objectBrowser(evalEnv(chunkList))
+        for(i in names(temp)){
+            assign(i, temp[[i]], env = parent.frame(2))
         }
     }
     # Executes whatever that is in the text box for code chunk
@@ -330,7 +328,7 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     tkpack(eViewerFrame)
     tkpack(tklabel(editFrame, text = "Results of Execution"))
     rViewerFrame <- tkframe(editFrame)
-    resultViewer <-  makeViewer(rViewerFrame, vWidth = 50, vHeight = 12,
+    resultViewer <-  makeViewer(rViewerFrame, vWidth = 50, vHeight = 15,
                       hScroll = TRUE, vScroll = TRUE, what = "text")
     tkpack(rViewerFrame)
 
@@ -363,7 +361,7 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     }
 #    tkconfigure(resultViewer, state = "disabled")
 
-    tkwait.window(base)
+#    tkwait.window(base)
 }
 
 .getNameNCode <- function(chunkList){

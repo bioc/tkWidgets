@@ -5,18 +5,16 @@
 #
 # J. Zhang, copyright 2002, all rights reserved.
 #
-objNameToList <- function (objNames){
-    returnList <- NULL
+objNameToList <- function (objNames, env){
+    returnList <- list()
     for(i in 1:length(objNames)){
         # if it is a package, the list contains the contents of
         # the package
-        if(regexpr("^package", objNames[i])){
-            returnList[[i]] <- list("name" = objNames[i], "obj" =
-                                    package.contents(gsub("(^package:)",
-                                                          "\\", objNames[i])))
+        if(regexpr("^package", objNames[i]) > 0){
+            returnList[[objNames[i]]] <- package.contents(gsub("(^package:)",
+                                                          "\\", objNames[i]))
         }else{
-            returnList[[i]] <- list("name" = objNames[i],
-                                    "obj" = get(objNames[i]))
+            returnList[[objNames[i]]] <- get(objNames[i], env = env)
         }
     }
     return(returnList)

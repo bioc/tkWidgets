@@ -7,9 +7,8 @@
 
 pickObjs <- function (objNames, fun = noAuto){
 
-    if(is.null(objNames) || is.na(objNames) ||
-                      !is.character(objNames)){
-        stop("Invalid objNames! Must be character")
+    if(length(objNames) == 0){
+        return(objNames)
     }
 
     whichOnes <- NULL

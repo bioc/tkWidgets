@@ -8,7 +8,8 @@
 #Copyright 2002, J. Zhang, all rights reserved
 #
 
-objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
+objectBrowser<- function (env = parent.frame(1),
+                          fun = noAuto, textToShow = "Select object(s)",
                           nSelect = -1){
 
     on.exit(end(), add = TRUE)
@@ -25,6 +26,7 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
     objIndex <- NULL
     objsInSel <- NULL
     tempObj <- NULL
+    currentEnv <- env
 
     # close window
     end <- function(){
@@ -37,7 +39,7 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
     finish <- function(){
         if(length(objsInSel) != 0){
             if(nSelect == -1){
-                returnList <<- objNameToList(objsInSel)
+                returnList <<- objNameToList(objsInSel, currentEnv)
                 end()
             }else{
                 if(nSelect != length(objsInSel)){
@@ -45,7 +47,7 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
                        paste("You can only select", nSelect, "object(s)"),
                        icon = "warning", type = "ok")
                 }else{
-                    returnList <<- objNameToList(objsInSel)
+                    returnList <<- objNameToList(objsInSel, currentEnv)
                     end()
                 }
             }
@@ -57,8 +59,8 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
 
     # Write the content of the global environment to the list box for
     # object names
-    viewGlobalEnv <- function(){
-        writeObj(listView, pickObjs(objNames = ls(env = .GlobalEnv,
+    viewEnv <- function(env){
+        writeObj(listView, pickObjs(objNames = ls(env = env,
                                     all = TRUE), fun = fun))
         writeCap(".GlobalEnv")
     }
@@ -290,7 +292,7 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
 
     tkgrid(leftFrame, rightFrame)
 
-    viewGlobalEnv()
+    viewEnv(env)
 
     tkwait.window(base)
 
