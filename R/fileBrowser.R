@@ -160,7 +160,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     topFrame <- tkframe(canvas)
     dir <- tklabel(topFrame, text = "Directory: ", font = LABELFONT)
     caption <- tkbutton(topFrame, text = path, width = 50)
-    instruct <- tklabel(topFrame, text = textToShow, font = "Helvetica 11")
+    instruct <- tklabel(topFrame, text = textToShow, font = LABELFONT)
     tkgrid(dir, caption)
     tkgrid(instruct, columnspan = 2)
     tkcreate(canvas, "window", (CANWIDTH/2), (2 * OFFSET + LABELHEIGHT/2),
@@ -168,7 +168,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 
     leftFrame <- tkframe(canvas)
     dirLabel <- tklabel(leftFrame, text = "Files in directory",
-                        font = "Helvetica 10")
+                        font = "Helvetica 11")
     tkgrid(dirLabel, columnspan = 2)
     viewFrame <- tkframe(leftFrame)
     listView <- makeView(viewFrame, vWidth = BOXWIDTH,
@@ -191,7 +191,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 
     rightFrame <- tkframe(canvas)
     selLabel <- tklabel(rightFrame, text = "Files selected",
-                        font = "Helvetica 10")
+                        font = "Helvetica 11")
     tkgrid(selLabel, columnspan = 2)
     sViewFrame <- tkframe(rightFrame)
     selectView <- makeView(sViewFrame, vWidth = BOXWIDTH,
