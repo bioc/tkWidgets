@@ -14,9 +14,9 @@ dataViewer <- function(data, height = 20, width = 35, save = TRUE){
     boxFrame <- tkframe(base)
 
     # Insert data into the canvas
-    innerFrame <- makeViewer(boxFrame, vWidth = width,
+    innerFrame <- makeViewer(boxFrame,
                              vScroll = TRUE, side = "top",
-                             hScroll = TRUE, what = "text")
+                             hScroll = TRUE, what = "canvas")
 
     dataFrame <- tkframe(innerFrame)
     for(i in 1:ncol(data)){
@@ -28,7 +28,9 @@ dataViewer <- function(data, height = 20, width = 35, save = TRUE){
 
     }
 #    tkpack(dataFrame)
-    tkwindow.create(innerFrame, "0.0", window = dataFrame)
+#    tkwindow.create(innerFrame, "0.0", window = dataFrame)
+
+    tkcreate(innerFrame, "window", 0, 0, anchor = "nw", window = dataFrame)
 
     tkpack(boxFrame, side = "top")
 
