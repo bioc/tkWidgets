@@ -11,8 +11,6 @@
 \evensidemargin=.1in
 \headheight=-.3in
 
-\documentclass{article}
-
 \begin{document}
 \author{Jianhua Zhang}
 
