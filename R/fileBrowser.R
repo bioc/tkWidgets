@@ -183,10 +183,10 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                         font = "Helvetica 11")
     tkgrid(dirLabel, columnspan = 2)
     dirLFrame <- tkframe(leftFrame)
+
     listView <- makeView(dirLFrame, vWidth = BOXWIDTH,
                          vHeight = BOXHEIGHT)
     tkgrid(dirLFrame, columnspan = 2)
-
     upBut <- tkbutton(leftFrame, text = "Up", width = BUTWIDTH,
 		      command = up)
     selectBut <- tkbutton(leftFrame, text = "Select >>", width = BUTWIDTH,
@@ -196,8 +196,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid.configure(selectBut, sticky = "w")
     tkconfigure(listView, selectmode = "extended", font = LABELFONT2)
     tkbind(listView, "<Double-Button-1>", inList)
-#    tkbind(listView, "<B1-ButtonRelease>", selInDir)
-    tkbind(listView, "<Single-Button-1>", inList)
+    tkbind(listView, "<B1-ButtonRelease>", selInDir)
     writeDir(listView, pickFiles(dirsNFiles(path), testFun,
                                  prefix, suffix))
 
