@@ -10,7 +10,6 @@ objectBrowser <- function (){
     BUTWIDTH <- 8
 
     objLevel <- c("Top Level")
-#    obj <- NULL
     selectedObj <- NULL
     isPack <- FALSE
     returnObj <- NULL
@@ -40,10 +39,11 @@ objectBrowser <- function (){
     }
 
     doPack <- function (index, pack){
-        print(paste("index = ", index))
-        writeObj(listView, ls(pos = (as.numeric(index) + 1)))
+        whichOne <- as.numeric(index) + 1
+        writeObj(listView, ls(pos = whichOne))
         isPack <<- TRUE
         writeCap(pack, asis = TRUE)
+        tkconfigure(upBut, state = "normal")
     }
 
     doElse <- function(){
@@ -98,8 +98,8 @@ objectBrowser <- function (){
             selectedObj <<- tkget(listView,
                                       tkcurselection(listView))
             if(regexpr("^package", selectedObj) > 0)
-                doElse()
-                # Find a way to grab the whole package
+                returnObj <<- package.contents(gsub("(^package:)",
+                                                    "\\", selectedObj))
             else
                 returnObj <<- get(selectedObj)
         }
@@ -107,9 +107,13 @@ objectBrowser <- function (){
 
     up <- function(){
         if(isPack){
-            writeObj(listView,
-                     ls(env = get(objLevel[length(objLevle)])))
-            writeCap(objLevel[length(objLevle)])
+            if(length(objLevel) > 1){
+                writeObj(listView,
+                     ls(env = get(objLevel[length(objLevel)])))
+                writeCap(objLevel[length(objLevle)])
+            }else{
+                viewObj()
+            }
         }else{
             if(length(objLevel) > 2){
                 writeObj(listView,
