@@ -22,7 +22,9 @@ DPExplorer <- function (pkgName = "",
                          type = "ok")
         }else{
             rdas <- loadDataPkg(pkgName)
-            writeList(dataNameList, rdas)
+            if(!is.null(rdas)){
+                writeList(dataNameList, rdas)
+            }
         }
     }
     activeLoadBut <- function(){
@@ -195,8 +197,12 @@ loadDataPkg <- function(pkgName){
                          "is not valid or has not been loaded yet!"),
                      icon = "error",
                      type = "ok")
+        return(NULL)
     }else{
-        return(gsub("\\.rda$", "", ls(where)))
+        rdas <- gsub("\\.rda$", "", ls(where))
+        rdas <- setdiff(rdas, c(pkgName,
+                                     paste(pkgName, "QC", sep = "")))
+        return(rdas)
     }
 }
 
