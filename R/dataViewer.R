@@ -31,14 +31,14 @@ dataViewer <- function(data, caption = "", save = TRUE){
             colWidth <- max(columnLength[i], nchar(colnames(data)[i]))
             tempName <- tkbutton(tempFrame, text = colnames(data)[i],
                                  width = colWidth)
-            tkpack(tempName)
+            tkpack(tempName, expand = TRUE, fill = "x")
         }else{
             colWidth <- columnLength[i]
         }
-        tempList <- tklistbox(tempFrame, width = colWidth, height = 0,
-                                             background = "white")
+        tempList <- tklistbox(tempFrame, width = colWidth,
+                              height = 0, background = "white")
         writeList(tempList, data[,i])
-        tkpack(tempList, side = "left", expand = TRUE, fill = "both")
+        tkpack(tempList, side = "left", expand = TRUE, fill = "y")
         tkpack(tempFrame, side = "left")
     }
 #    tkpack(dataFrame)
