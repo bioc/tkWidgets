@@ -77,7 +77,7 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
     }
 
     top <- tktoplevel()
-    tktitle(top) <- "BioC Text Import Wizard"
+    tktitle(top) <- "BioC Data Import Wizard"
 
     nameFrame <- tkframe(top)
     nameLabel <- tklabel(nameFrame, text = "File name:", font = NORMAL11)
