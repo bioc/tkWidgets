@@ -66,7 +66,7 @@ objectBrowser<- function (env = .GlobalEnv,
     viewEnv <- function(env){
         writeList(listView, pickObjs(objNames = ls(env = env,
                                     all = TRUE), fun = fun), clear = TRUE)
-        writeCap(".GlobalEnv")
+        writeCap(substitute(env))
     }
     # Executed when a user double clicks an object that is an R
     # environment. List object names in an enviroment to the list

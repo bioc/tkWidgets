@@ -31,7 +31,7 @@ pickFiles(fileNames, fun = function(x) TRUE,
   Character vector of file names satisfying the conditions.}
 }
 
-\author(Jianhua (John) Zhang}
+\author{Jianhua Zhang}
 \note{This function is part of the Bioconductor project at Dana-Farber
   Cancer Institute to provide Bioinformatics functionalities through R.}
 
