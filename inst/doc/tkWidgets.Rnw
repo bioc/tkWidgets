@@ -11,6 +11,9 @@
 \evensidemargin=.1in
 \headheight=-.3in
 
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
 
 \begin{document}
 \author{Jianhua Zhang}
@@ -24,7 +27,7 @@
 \section{Introduction}
 
 This package contains several widgets built by using {\texttt{tcltk}}
-or package {\texttt{widgetTools}} to provide interfaces to perform
+or package \Rpackage{widgetTools} to provide interfaces to perform
 different tasks. Available widgets include:
 
 \begin{itemize}
