@@ -7,7 +7,7 @@
 }
 \usage{
 fileWizard(filename = "", fun = read.table, file = "file",
-baseic = c("header", "sep"))
+basic = c("header", "sep"))
 }
 
 \arguments{

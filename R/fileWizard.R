@@ -1,5 +1,4 @@
-# This function reads a defined file and allows users to perform the
-# functions related to impoting a file into R
+# This function provides preliminary visual data inport.
 #
 # Copyright 2002, J. Zhang, all rights reserved.
 

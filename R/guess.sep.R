@@ -19,7 +19,7 @@ guess.sep <- function(file.name, n = 5, seps = ""){
     toCheck <- readLines(file.name, n = n)
 
     w<-NULL
-    for(i in seps) { w[[i]] <- strsplit(x, i)}
+    for(i in seps) { w[[i]] <- strsplit(toCheck[2:length(toCheck)], i)}
     v <- lapply(w, function(x) sapply(x, length))
     good <- function(x) all(x==x[1]) && x[1] > 1
     found <- sapply(v, good)
@@ -27,26 +27,18 @@ guess.sep <- function(file.name, n = 5, seps = ""){
     if(length(sep) == 1){
         separator <- sep
     }
-#    for(i in seps){
-#        temp <- length(unlist(strsplit(toCheck[1], i)))
-#        if(temp > 1){
-#            for(j in 2:length(toCheck)){
-#                temp2 <- length(unlist(strsplit(toCheck[j], i)))
-#                if(temp == temp2){
-#                    separator <- i
-#                    break
-#                }
-#            }
-#        }
-#    }
 
-    if(separator != "Not detected"){
-       header <- guess.header(toCheck[1:2], separator)
+    if(length(unlist(strsplit(toCheck[1], separator)))
+                                      == v[[separator]][1] - 1){
+        header <- TRUE
     }else{
-       header <- guess.header(toCheck[1:2], NULL)
+        header <- guess.header(toCheck[1:2],
+                               ifelse(separator == "Not detected",
+                                      NULL, separator))
     }
-    type <- find.type(toCheck[length(toCheck)], separator)
 
+    type <- find.type(toCheck[2:length(toCheck)],
+                      ifelse(separator == "Not detected", NULL, separator))
     return(list(header = header, separator = separator, type = type))
 }
 
@@ -76,19 +68,26 @@ guess.header <- function(twoLines, sep){
         if(any(!is.na(firstLine))){
             return(FALSE)
         }
-        return("Not detectable")
+        return("Not detected")
     }
 }
 
 find.type <- function(line, sep){
 
-     line <- unlist(strsplit(line, sep))
-     options(warn = -1)
-     line <- as.numeric(line)
-     options(warn = 1)
+     types <- NULL
+     for(i in line){
+         temp <- unlist(strsplit(i, sep))
+         options(warn = -1)
+         temp <- as.numeric(temp)
+         options(warn = 1)
 
-     line[is.na(line)] <- "character"
-     line[!is.na(line) & line != "character"] <- "numeric"
-
-     return(line)
+         temp[is.na(temp)] <- "character"
+         temp[!is.na(temp) & temp != "character"] <- "numeric"
+         types <- rbind(types, temp)
+     }
+     if(nrow(unique(types)) == 1){
+         return(types[1,])
+     }else{
+         return("Not detected")
+     }
 }
