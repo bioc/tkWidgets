@@ -19,14 +19,18 @@ importWizard <- function(filename = ""){
     state <- "state1"
     # A tk id that will be associated with a frame for a given state
     stateID <- NULL
-    # Two argument lists to keep the state specific argument information
+    # Three argument lists to keep the state specific argument information
     args1 <- list()
     args2 <- list()
+    args3 <- list()
+    # A vector to keep the data type guessed by funtion guess.sep
     columnType <- NULL
     # Keeps track which of the data coloumns is on focus for state 3
     currentCol <- NULL
     #  A list for data columns of state 3
     colList <- list()
+    # A list of buttons for data folumn types of state3
+    typeButs <- list()
 
     # Destroy the window
     end <- function(){
@@ -74,6 +78,15 @@ importWizard <- function(filename = ""){
             tkconfigure(backBut, state = "normal")
             showData(state, dataView2, args2)
         }else if(state == "state2"){
+            args3 <- args2
+            # Figures out whether there are quoptes
+            options(show.error.messages = FALSE)
+            quote <- try(as.character(tkget(quoteList,
+                                            tkcurselection(quoteList))))
+            options(show.error.messages = TRUE)
+            if(inherits(quote, "try-error")){
+                args3[["quote"]] <<- quote
+            }
             tkdelete(midCanv, stateID)
             stateID <<- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
                           anchor = "nw", window = stateFrame[["state3"]])
@@ -95,7 +108,8 @@ importWizard <- function(filename = ""){
             dataFile <- as.matrix(do.call("read.table", argsList))
             tempFrame <- tkframe(widget)
             for(i in 1:ncol(dataFile)){
-                tempList <- tklistbox(tempFrame, width = 0, height = 0)
+                tempList <- tklistbox(tempFrame, width = 0, height = 0,
+                                      background = "white")
                 tkinsert(tempList, "end", dataFile[,i])
                 tkpack(tempList, side = "left")
             }
@@ -108,7 +122,6 @@ importWizard <- function(filename = ""){
             colLength <- numberChar(dataFile)
             # Puts buttons on top of each data column for data type
             tempFrame <- tkframe(widget)
-            typeButs <- list()
             cmds <- list()
             for(i in 1:ncol(dataFile)){
                 colFrame <- tkframe(tempFrame)
@@ -117,13 +130,11 @@ importWizard <- function(filename = ""){
                 body <- list(as.name("{"),
                            substitute(eval(typeButFun(j)), list(j = i)))
                 body(cmds[[i]]) <- as.call(body)
-                typeButs[[i]] <- tkbutton(colFrame, text = columnType[i],
+                typeButs[[i]] <<- tkbutton(colFrame, text = columnType[i],
                                      width = colWidth, command = cmds[[i]])
                 tkpack(typeButs[[i]], side = "top")
-                colList[[i]] <<- tklistbox(colFrame,
-                                          width = (colWidth + 3),
-                                          height = 0)
-                tkconfigure(colList[[i]], background = "white")
+                colList[[i]] <<- tklistbox(colFrame, width = (colWidth + 3),
+                                          height = 0, background = "white")
                 tkinsert(colList[[i]], "end", dataFile[,i])
                 tkpack(colList[[i]], side = "top")
                 tkpack(colFrame, side = "left")
@@ -158,6 +169,11 @@ importWizard <- function(filename = ""){
     # Closes the top window then the cancel button is clicked
     cancel <- function(){
         end()
+    }
+    # Ends the process and returns a data frame containing the
+    # imported data
+    finish <- function(){
+
     }
     ## Set up the interface
     top <- tktoplevel()
@@ -194,42 +210,35 @@ importWizard <- function(filename = ""){
                "Choose the file type that best describes your data")
     tkpack(paraLabel1, anchor = "w")
     midFrame <- tkframe(stateFrame[["state1"]])
-    layer1 <- tkframe(midFrame)
+    leftPan <- tkframe(midFrame)
     delimit <- tclVar()
-    delimitRadio <- tkradiobutton(layer1, text = paste("Delimited",
+    delimitRadio <- tkradiobutton(leftPan, text = paste("Delimited",
                                   " - Files are separated by a character",
                                   " such as a comma or tab", sep =""),
                                   value = 1, variable = delimit,
                                   width = 71, anchor = "nw")
     tkpack(delimitRadio, anchor = "w")
-    fixedRadio <- tkradiobutton(layer1, text = paste("Fixed",
+    fixedRadio <- tkradiobutton(leftPan, text = paste("Fixed",
                                 " width - Fields are aligned in columns",
                                 " with spaces between fields", sep = ""),
                                 value = 2, variable = delimit,
                                 width = 71, anchor = "nw")
     tkpack(fixedRadio, anchor = "w")
-    tkpack(layer1, side = "top", anchor = "w")
-    layer2 <- tkframe(midFrame)
-    paraLabel2 <- tklabel(layer2, text = "Start import at row:")
+    tkpack(leftPan, side = "left", anchor = "w")
+    rightPan <- tkframe(midFrame)
+    paraLabel2 <- tklabel(rightPan, text = "Start import at row:")
     tkpack(paraLabel2, side = "left", anchor = "ne")
-    startFrame <- tkframe(layer2)
+    startFrame <- tkframe(rightPan)
     startList <- makeViewer(startFrame, vWidth = 2, vHeight = 1,
                             what  = "list", side = "top")
     writeList(startList, 1:99, clear = TRUE)
 #    tkselect(startList, 1)
     tkpack(startFrame, anchor = "w", side = "left")
-    paraLabel3 <- tklabel(layer2, text = "     File origin:")
-    tkpack(paraLabel3, side = "left", anchor = "ne")
-    originFrame <- tkframe(layer2)
-    originList <- makeViewer(originFrame, vWidth = 8, vHeight = 1,
-                            what  = "list", side = "top")
-    tkpack(originFrame, side = "left")
-    writeList(originList, fileType, clear = TRUE)
-    tkpack(layer2, side = "top", pady = 5)
+    tkpack(rightPan, side = "left", padx = 7)
     tkpack(midFrame, anchor = "w")
     # A list box to show the original data
     viewFrame <- tkframe(stateFrame[["state1"]])
-    dataView1 <- makeViewer(viewFrame, vWidth = 99, vHeight = 8,
+    dataView1 <- makeViewer(viewFrame, vWidth = 99, vHeight = 11,
                            vScroll = TRUE, hScroll = TRUE,
                            what = "list", side = "top")
     tkpack(viewFrame, anchor = "w", pady = 10)
@@ -275,13 +284,13 @@ importWizard <- function(filename = ""){
     tkgrid(checkButs[["space"]], checkButs[["other"]], otherEntry)
     tkpack(leftFrame, side = "left", anchor = "w")
     rightFrame <- tkframe(midFrame)
-    paraLabel22 <- tklabel(rightFrame, text = "        Text qualifier:")
+    paraLabel22 <- tklabel(rightFrame, text = "        Quote:")
     tkpack(paraLabel22, side = "left", anchor = "ne")
-    qualifFrame <- tkframe(rightFrame)
-    qualifList <- makeViewer(qualifFrame, vWidth = 8, vHeight = 1,
+    quoteFrame <- tkframe(rightFrame)
+    quoteList <- makeViewer(quoteFrame, vWidth = 8, vHeight = 1,
                             what  = "list", side = "top")
-    writeList(qualifList, c("\"", "'"), clear = TRUE)
-    tkpack(qualifFrame, anchor = "w")
+    writeList(quoteList, c("\"", "'"), clear = TRUE)
+    tkpack(quoteFrame, anchor = "w")
     tkpack(rightFrame, side = "left", padx = 5)
     tkpack(midFrame, anchor = "w")
     # A text box to show the original data
@@ -300,22 +309,34 @@ importWizard <- function(filename = ""){
     tkpack(label31, anchor = "w")
     midFrame <- tkframe(stateFrame[["state3"]])
     leftFrame <- tkframe(midFrame)
-    dataType <- tclVar(1)
+    dataType <- tclVar()
+    textRCmd <- function(){
+        tkconfigure(typeButs[[currentCol]], text = "Character")
+    }
     textRadio <- tkradiobutton(leftFrame, text = "Character",
-                                  value = 1, variable = dataType,
-                                  width = 13, anchor = "nw")
+                               value = 1, variable = dataType,
+                               width = 13, anchor = "nw",
+                               command = textRCmd)
     tkpack(textRadio, anchor = "w")
+    numRCmd <- function(){
+        tkconfigure(typeButs[[currentCol]], text = "Numeric")
+    }
     numRadio <- tkradiobutton(leftFrame, text = "Numeric",
-                                  value = 2, variable = dataType,
-                                  width = 13, anchor = "nw")
+                              value = 2, variable = dataType,
+                              width = 13, anchor = "nw",
+                              command = numRCmd)
     tkpack(numRadio, anchor = "w")
-    dateRadio <- tkradiobutton(leftFrame, text = "Date",
-                                  value = 3, variable = dataType,
-                                  width = 13, anchor = "nw")
-    tkpack(dateRadio, anchor = "w")
+#    dateRadio <- tkradiobutton(leftFrame, text = "Date",
+#                                  value = 3, variable = dataType,
+#                                  width = 13, anchor = "nw")
+#    tkpack(dateRadio, anchor = "w")
+    skipRCmd <- function(){
+        tkconfigure(typeButs[[currentCol]], text = "Skip")
+    }
     skipRadio <- tkradiobutton(leftFrame, text = "Drop column",
-                                  value = 4, variable = dataType,
-                                  width = 13, anchor = "nw")
+                               value = 4, variable = dataType,
+                               width = 13, anchor = "nw",
+                               command = skipRCmd)
     tkpack(skipRadio, anchor = "w")
     tkpack(leftFrame, side = "left", anchor = "w")
     rightFrame <- tkframe(midFrame)
@@ -345,7 +366,8 @@ importWizard <- function(filename = ""){
                         state = "disabled", command = back)
     nextBut <- tkbutton(butFrame, text = "Next >", width = 8,
                         command = nextState)
-    endBut <- tkbutton(butFrame, text = "Finish", width = 8)
+    endBut <- tkbutton(butFrame, text = "Finish", width = 8,
+                       command = finish)
     tkpack(canBut, backBut, nextBut, endBut, side = "left")
     tkpack(butFrame, pady = 10)
 
