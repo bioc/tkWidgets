@@ -18,6 +18,7 @@ R:
 
 I have some doubts about the real usefulness of several of the provided
 utility functions:
+<<RG: I agree there is something not right in here >>
 
 o as.character.function(fun) returns the function, not a character
 o as.character.formula(fo) is complicated way of using
@@ -25,19 +26,32 @@ o as.character.formula(fo) is complicated way of using
     - It does *not* work as a method for "as.character"; since  standard R
       has already defined as.character for formula objects {*differently*}.
     - just wrong concept.
+
+<<RG: I agree - Jianhua we need to fix this stuff up >>
+
 o getContent() for almost all kind of objects returns the object itself
   instead of ``a representation of ..'' (as the help page states).
+<<RG: I agree -- I doubt that it is needed in anyway >>
 
 o  hasPrefix() and hasSuffix() seem wrong to me :
    why does
        (hasPrefix("xx"))("Dir/abc")
    give TRUE {it does because there's one "/" in the string}
+<<RG: it should not! >>
+<<why is the line "length(grep(exclude, x)) > 0 )" there at all?
+  just because the string has a file separator does not mean that 
+  it has "aPrefix"; this is either wrong or you are confusing two
+  concepts >>
 
 o  isCharacter() returns TRUE for an environment {why ??}
 		 at least the function name is wrongly designed.
    - also it allows non-character arguments {giving FALSE},
      but most probably should signal an error instead!
+<<why is this called isCharacter? why is there a try error? why not 
+  simply do the sensible thing of checking to see if you have an 
+  environment? >>
 
+<<what is the point of stdType and stdView???? >>>
 
 man:
 ====
@@ -72,6 +86,7 @@ man:
 
       - writeDir() really is a general useful utility nothing inherently to
 		   do with "Dir"ectory -- hence has wrong name...
+  <<RG: I agree -- not sure what it is doing but it is not named correctly>>
 
 
       - it seems that

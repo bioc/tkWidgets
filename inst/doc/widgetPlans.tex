@@ -34,25 +34,27 @@ A widget can have two hooks, these are not rendered. One is a
 pre--rendering hook (a function that takes no arguments) and if
 present is run before the widget is rendered.
 A post--rendering hook which is run when the widget is closed.
-The pre--hook is run on entry and the post--hook is registered with 
+The pre--rendering hook is run on entry and the post--hook is registered with 
 \verb+on.exit+. This ensures that it is run when the function is
-exited regardless of how. It might be nice (but this will take some
-time) to allow it to determine how the exit was achieved (is it an end
+exited regardless of how. 
+It might be nice (but this will take some time) to allow it to
+determine how the exit was achieved (is it an end
 or a next or an error or ...).
 
 Widgets are rendered by the \verb+widgetRender+ function.
 It returns an object of the \verb+iWidget+ which is a list of
 lists. If the exit is normal (ie via the {\em end} button) then the
 users changes will be contained in the return value and an element
-"end" whose value will be "END". For all other forms of exit the input
+{\tt end} whose value will be {\tt "END"}. 
+For all other forms of exit the input
 will be returned. The rendered widget by default will have a
 \verb+cancel+ button and an \verb+end+ button if there is no
 definition for an end button in the controlbuttons list. 
 
 In the not too distant future the pwidgets will be implemented as S4
-classes. This will give them more structure. In the first
-implementation they will be lists. However, we will attempt to use an
-abstract data type implementation that should let us reuse much of the
+classes. This will give them more structure. In this preliminary
+implementation they will be lists. However, we have used
+abstract data types and that should let us reuse much of the
 code when the methods and classes are implemented.
 
 Next we introduce the concept of {\em chained widgets},
@@ -64,7 +66,7 @@ cWidgets who will have a \verb+next+ (first) or \verb+previous+
 (last). The last widget will also have an \verb+end+ button. A counter
 to indicate state is maintained and used for navigation.  
 
-The buttons will be defined by a list named controlbuttons that has a
+The buttons will be defined by a list named control buttons that has a
 bottonText and buttonFun defining the label and behavior of the button
 respectively.  
 

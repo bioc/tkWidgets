@@ -41,7 +41,10 @@ objectBrowser<- function (fun = function(x) TRUE,
             tkdestroy(base)
         }
     }
-
+##FIXME: this makes no sense -- pickObjs is doing stuff that it has
+##no business doing; if we are listing an environment we do not
+##need to see if get works on the output of ls on that environment!
+##and you are not even doing ls(all=TRUE)!!!
     viewGlobalEnv <- function(){
         writeObj(listView, pickObjs(objNames = ls(env = get(".GlobalEnv")),
                                              fun = fun))
@@ -65,7 +68,7 @@ objectBrowser<- function (fun = function(x) TRUE,
     }
 
     doElse <- function(){
-        # This a temp function for now. More checking will be inplemented
+        # This a temp function for now. More checking will be implemented
     }
 
     doList <- function (aList){
@@ -92,6 +95,8 @@ objectBrowser<- function (fun = function(x) TRUE,
 #        }
     }
 
+##please use mode or type or ask specific questions do not invent
+##functions like findObjType -- this is really a bad idea
     goin <- function (){
         if(!is.null(selectedObj)){
             objType <- findObjType(selectedObj)
