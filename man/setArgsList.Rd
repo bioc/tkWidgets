@@ -20,13 +20,15 @@
 \alias{dropColumn}
 \alias{setColName}
 \alias{setColType}
+\alias{assignLineData}
+\alias{getLineData}
 \title{Functions to support importWizard}
 \description{
   The functions are to support importWizard and may not have much
   practical use otherwise.
 }
 \usage{
-setArgsList(filename, env)
+setArgsList(filename, env, isFile = TRUE, init = TRUE)
 whatDeli(delimiter)
 getMoreArgs()
 assignArgs(value, env)
@@ -38,8 +40,8 @@ getCState(env)
 assignColInfo(value, env)
 getColInfo(env)
 setColInfos(types, env)
-changeState(canvas, backBut, nextBut, env, forward = TRUE)
-setNewState(env, backBut, nextBut, forward = TRUE)
+changeState(canvas, backBut, nextBut, env, forward = TRUE, endBut, viewBut)
+setNewState(env, backBut, nextBut, forward = TRUE, endBut, viewBut)
 addArgs(env)
 dropArgs(env)
 setSkip(widget, env, state = "state1")
@@ -47,6 +49,8 @@ moreArgs(env)
 dropColumn(index, env)
 setColName(index, entryBox, env)
 setColType(index, entryBox, env)
+assignLineData(lineData, env)
+getLineData(env)
 }
 
 \arguments{
@@ -72,6 +76,16 @@ setColType(index, entryBox, env)
   \item{canvas}{\code{canvas} a tcltk canvas}
   \item{types}{\code{types} a vecter of string indicating the types of
     data columns}
+  \item{lineData}{\code{lineData} a vector of character strings read in
+    using \code{\link{readLines}}}
+  \item{endBut}{\code{endBut} a tkwin object for the button that ends
+    the process when pressed}
+  \item{viewBut}{\code{viewBut} a tkwin object for the button that
+    refresh the window when pressed}
+  \item{init}{\code{init} a boolean that is TRUE when the widget is
+    first set up and FALSE otherwise}
+  \item{isFile}{\code{isFile} a boolean that is TRUE if \code{fileName}
+    is a file}
 }
 \details{
   \code{\link{setArgsList}} calls function \code{\link{guess.sep}} to

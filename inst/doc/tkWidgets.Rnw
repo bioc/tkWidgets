@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{tkWidgets}
+% \VignetteIndexEntry{tkWidgets contents}
 % \VignetteDepends{tkWidgets}
 % \VignetteKeywords{Interface}
 % \VignettePackage{tkWidgets}

@@ -37,8 +37,8 @@ getState1Frame(base, env)
 setState1BFrame(frame, env)
 setState1TFrame(frame, viewer, delims, env)
 showData4State1(widget, env)
-setState1MFrame(frame, env)
-getState2Frame(base, env, state = "state2")
+setState1MFrame(frame, env, dataViewer)
+getState2Frame(base, env, state = "state2", reset = FALSE)
 setState2MFrame(frame,env)
 setSepRadios(frame, env, state = "state2")
 setQuoteList(frame, env)
@@ -78,6 +78,9 @@ writeCol4Matrix(tempFrame, dataFile, colInfos, env)
     displayed}
   \item{colInfos}{\code{colInfos} an object of class colInfo with a
     name, type, and drop slot}
+  \item{reset}{\code{reset} a boolean that is TRUE when the window needs
+    to be reset}
+  \item{dataViewer}{\code{dataViewer} a tkwin object for a list box}
 }
 \details{
   \code{\link{importWizard}} mimics the interface of MS Excel and

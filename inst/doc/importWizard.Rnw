@@ -1,6 +1,15 @@
 %\VignetteIndexEntry{tkWidgets importWizard}
 %\VignettePackage{tkWidgets}
 %\VignetteKeyword{interface}
+% \VignettePackage{tkWidgets}
+\documentclass[12pt]{article}
+\usepackage{hyperref}
+\textwidth=6.2in
+\textheight=8.5in
+%\parskip=.3cm
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in
 
 \documentclass{article}
 

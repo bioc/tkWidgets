@@ -12,7 +12,7 @@
   column is for a given file.
 }
 \usage{
-guess.sep(file.name, n = 5, seps = "")
+guess.sep(file.name, numLine = 5, seps = "", isFile = TRUE)
 guess.header(twoLines, sep)
 find.type(line, sep, header = FALSE)
 charOrNum(vect)
@@ -21,7 +21,7 @@ charOrNum(vect)
 \arguments{
   \item{file.name}{\code{file.name} a character string for the name of
     the file of interests}
-  \item{n}{\code{n} an integer or character indicating the total number
+  \item{numLine}{\code{n} an integer or character indicating the total number
     of lines to be read from the file for making the determination}
   \item{seps}{\code{seps} a vector of characters of potential delimiters
     to be used to make the determination. Default delimiters include " ",
@@ -38,6 +38,8 @@ charOrNum(vect)
   \item{vect}{\code{vect} a vector of character or numeric string}
   \item{header}{\code{header} a boolean indicating whether a file has
     headers}
+  \item{isFile}{\code{isFile} a boolean that is TRUE when
+    \code{file.name} is a file or FALSE an object}
 }
 \details{
   guess.sep calls \code{\link{guess.sep}} and \code{\link{find.type}} to
