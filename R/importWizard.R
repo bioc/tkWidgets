@@ -110,12 +110,12 @@ initImportWizard <- function(env){
         tkdestroy(top)
     }
     nextState <- function(){
-        currentFrame <<- changeState(currentFrame, canvas,
-                                              backBut, nextBut, env, TRUE)
+        tkdestroy(currentFrame)
+        currentFrame <<- changeState(canvas, backBut, nextBut, env, TRUE)
     }
     preState <- function(){
-        currentFrame <<- changeState(currentFrame, canvas,
-                                              backBut, nextBut, env, FALSE)
+        tkdestroy(currentFrame)
+        currentFrame <<- changeState(canvas, backBut, nextBut, env, FALSE)
     }
     finishClicked <- function(){
         dataList <<- finish(env)
@@ -129,7 +129,8 @@ initImportWizard <- function(env){
     canvas <- getTopCan(top, env)
     # Sets current frame to state1 now
     currentFrame <- getAFrame(canvas, env)
-    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = currentFrame)
+    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = currentFrame,
+             expand = TRUE)
     ## The bottom frame contains the buttons that allow users to
     ## navigate the importing process
     butFrame <- tkframe(top)
@@ -157,11 +158,11 @@ getTopCan <- function(base, env){
     canvas <- makeViewer(base, vWidth = WIDTH, vHeight = HEIGHT,
                            vScroll = FALSE, hScroll = FALSE,
                            what = "canvas", side = "top")
+
     return(canvas)
 }
 # Changes the state and thus the interface
-changeState <- function(oldFrame, canvas, backBut,
-                                            nextBut, env, forward = TRUE){
+changeState <- function(canvas, backBut, nextBut, env, forward = TRUE){
     # Sets the current state
     setNewState(env, backBut, nextBut, forward)
     if(forward){
@@ -170,8 +171,6 @@ changeState <- function(oldFrame, canvas, backBut,
         dropArgs(env)
     }
     newFrame <- getAFrame(canvas, env)
-    # Changes the interface accordingly
-    tkdestroy(oldFrame)
     tkcreate(canvas, "window", 0, 0, anchor = "nw", window = newFrame)
 
     return(newFrame)
@@ -276,10 +275,10 @@ getState1Frame <- function(base, env){
     # allows for browing directories for a file name
     topFrame <- tkframe(frame)
     setState1TFrame(topFrame, dataViewer, delims, env)
-    tkpack(topFrame, pady = 5)
-    tkpack(midFrame)
+    tkpack(topFrame, pady = 5, padx = 5)
+    tkpack(midFrame, padx = 5)
     # Pack the bottom frame last
-    tkpack(bottomFrame, pady = 5)
+    tkpack(bottomFrame, pady = 5, padx = 5)
     return(frame)
 }
 # Sets the botton frame for state1
