@@ -9,10 +9,10 @@ widgetRender <- function (iWidget, tkTitle) {
     if(is.null(wList) || is.na(wList) )
         stop("Either wList or/and funName is null or empty")
 
-    if(!is.null(iWidget$preFun))
-        iWidget$preFun()
-    if(!is.null(iWidget$postFun))
-        on.exit(iWidget$postFun())
+    if(!is.null(WpreFun(iWidget)))
+        WpreFun(iWidget)
+    if(!is.null(WpostFun(iWidget)))
+        on.exit(WpostFun(iWidget))
 
     require(tcltk) || stop("tcltk is not available.")
 
