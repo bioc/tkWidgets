@@ -25,13 +25,13 @@ dataViewer <- function(data, save = TRUE){
         if(!is.null(colnames(data))){
             colWidth <- max(columnLength[i], nchar(colnames(data)[i]))
             tempName <- tkbutton(tempFrame, text = colnames(data)[i],
-                                 width = colWidth - 3)
+                                 width = colWidth)
             tkpack(tempName)
         }
         tempList <- tklistbox(tempFrame, width = colWidth, height = 0,
                                              background = "white")
         writeList(tempList, data[,i])
-        tkpack(tempList, side = "left", expand = TRUE, fill = "y")
+        tkpack(tempList, side = "left", expand = TRUE, fill = "both")
         tkpack(tempFrame, side = "left")
     }
 #    tkpack(dataFrame)
