@@ -5,8 +5,7 @@
 # Copyright 2002, J. Zhang. All rights reserved.
 #
 pickFiles <- function (fileNames, fun, prefix, suffix,
-                       exclude = paste(".*", Platform()$file.sep,
-                       sep = "")){
+                       exclude = Platform()$file.sep){
     if(is.null(prefix) && is.null(suffix))
        whichOnes <- sapply(fileNames, fun)
     else

@@ -27,8 +27,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                                sep = "")
                 doPath()
                 writeDir(listView,
-                         pickFiles(list.files(path), testFun,
-                                   prefix, suffix), path)
+                         pickFiles(dirsNFiles(path), testFun,
+                                   prefix, suffix))
                 writeCap(path)
                 if(currentNode >= 2)
                     tkconfigure(upBut, state = "normal")
@@ -54,8 +54,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         if(currentNode > 2){
 	    path <<- paste(nodes[1:(currentNode - 1)],
 			  sep = "", collapse = Platform()$file.sep)
-            writeDir(listView, pickFiles(list.files(path), testFun,
-                                         prefix, suffix), path)
+            writeDir(listView, pickFiles(dirsNFiles(path), testFun,
+                                         prefix, suffix))
             writeCap(path)
             currentNode <<- currentNode - 1
             if(currentNode == 2)
@@ -68,8 +68,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         if(currentNode > 2){
 	    path <<- paste(nodes[1:(currentNode - 1)],
 			  sep = "", collapse = Platform()$file.sep)
-            writeDir(listView, pickFiles(list.files(path), testFun,
-                                         prefix, suffix), path)
+            writeDir(listView, pickFiles(dirsNFiles(path), testFun,
+                                         prefix, suffix))
             writeCap(path)
             currentNode <<- currentNode - 1
             if(currentNode == 2)
@@ -102,8 +102,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 
     tkbind(listView, "<Double-Button-1>", inList)
     tkbind(listView, "<B1-ButtonRelease>", selFile)
-    writeDir(listView, pickFiles(list.files(path), testFun,
-                                 prefix, suffix), path)
+    writeDir(listView, pickFiles(dirsNFiles(path), testFun,
+                                 prefix, suffix))
 
     butFrame <- tkframe(base)
     upBut <- tkbutton(butFrame, text = "Up", width = BUTWIDTH,
