@@ -4,15 +4,17 @@
 #
 # Copyright 2002, J. Zhang. All rights reserved.
 #
-pickFiles <- function (fileNames, fun, prefix, suffix){
+pickFiles <- function (fileNames, fun, prefix, suffix,
+                       exclude = paste(".*", Platform()$file.sep,
+                       sep = "")){
     if(is.null(prefix) && is.null(suffix))
        whichOnes <- sapply(fileNames, fun)
     else
        if(!is.null(prefix)){
-           tryMe <- hasPrefix(prefix)
+           tryMe <- hasPrefix(prefix, exclude)
            whichOnes <- sapply(fileNames, tryMe)
        }else{
-           tryMe <- hasSuffix(suffix)
+           tryMe <- hasSuffix(suffix, exclude)
            whichOnes <- sapply(fileNames, tryMe)
        }
    return(fileNames[whichOnes])

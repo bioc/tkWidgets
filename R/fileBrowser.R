@@ -6,9 +6,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                          prefix = NULL, suffix = NULL){
 
     require(tcltk) || stop("tcl/tk library not available")
-    require(tkUtil) || stop("tkUtil package not available!")
 
-    LABELFONT <- "Helvetica 10"
+    LABELFONT <- "Helvetica 12"
     BUTWIDTH <- 8
 
     currentNode <- NULL
@@ -84,7 +83,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
 
     writeCap <- function(toWrite)
-	tkconfigure(caption, text = toWrite)
+	tkconfigure(caption, text = paste("Current:", toWrite))
 
     if(path == "")
         path <- getwd()
@@ -93,8 +92,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     base <- tktoplevel()
     tktitle(base) <- paste("File Browser")
 
-    caption <- tklabel(base, text = path,font = LABELFONT,
-                       width = 60)
+    caption <- tklabel(base, text = paste("Current:", path),
+                       font = LABELFONT, width = 60)
     tkpack(caption, side = "top")
 
     listFrame <- tkframe(base, height = 40)
