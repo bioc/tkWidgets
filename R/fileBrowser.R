@@ -4,14 +4,15 @@
 
 fileBrowser <- function (path = "", testFun = function(x) TRUE,
                          prefix = NULL, suffix = NULL,
-                         textToShow = "Choose file(s) to be read in"){
+                         textToShow = "Select file(s)", nSelect = -1){
 
     require(tcltk) || stop("tcl/tk library not available")
 
-    LABELFONT <- "Helvetica 11"
+    LABELFONT1 <- "Helvetica 12 bold"
+    LABELFONT2 <- "Helvetica 11"
     BUTWIDTH <- 8
     CANWIDTH <- 500
-    CANHEIGHT <- 400
+    CANHEIGHT <- 420
     BOXHEIGHT <- 16
     BOXWIDTH <- 29
     OFFSET <- 10
@@ -27,7 +28,17 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     nextY <- NULL
 
     end <- function(){
-        tkdestroy(base)
+        if(nSelect == -1){
+            tkdestroy(base)
+        }else{
+            if(nSelect != length(fileSelected)){
+                tkmessageBox(title = "Wrong number", message =
+                       paste("You can only select", nSelect, "file(s)"),
+                       icon = "warning", type = "ok")
+            }else{
+                tkdestroy(base)
+            }
+        }
     }
 
     inList <- function(){
@@ -163,9 +174,9 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkpack(canvas, side = "top", fill = "both")
 
     topFrame <- tkframe(canvas)
-    instruct <- tkbutton(topFrame, text = textToShow, font = "Helvetica 12")
-    dir <- tklabel(topFrame, text = "Directory: ", font = LABELFONT)
-    caption <- tklabel(topFrame, text = path, font = LABELFONT)
+    instruct <- tklabel(topFrame, text = textToShow, font = LABELFONT1)
+    dir <- tklabel(topFrame, text = "Directory: ", font = LABELFONT2)
+    caption <- tklabel(topFrame, text = path, font = LABELFONT2)
     tkgrid(instruct, columnspan = 2)
     tkgrid(dir, caption)
     tkcreate(canvas, "window", (CANWIDTH/2), (2 * OFFSET + LABELHEIGHT/2),
@@ -186,7 +197,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid(upBut, selectBut)
     tkgrid.configure(upBut, sticky = "e")
     tkgrid.configure(selectBut, sticky = "w")
-    tkconfigure(listView, selectmode = "extended")
+    tkconfigure(listView, selectmode = "extended", font = LABELFONT2)
     tkbind(listView, "<Double-Button-1>", inList)
     tkbind(listView, "<B1-ButtonRelease>", selInDir)
     writeDir(listView, pickFiles(dirsNFiles(path), testFun,
@@ -202,7 +213,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     selectView <- makeView(sViewFrame, vWidth = BOXWIDTH,
                            vHeight = BOXHEIGHT)
     tkgrid(sViewFrame, columnspan = 2)
-    tkconfigure(selectView, selectmode = "extended")
+    tkconfigure(selectView, selectmode = "extended", font = LABELFONT2)
     tkbind(selectView, "<B1-ButtonRelease>", selInSelection)
     remBut <- tkbutton(rightFrame, text = "<< Remove", width = BUTWIDTH,
 		      state = "disabled", command = dropSelection)
@@ -220,7 +231,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 		       command = end)
     tkpack(endBut)
     tkcreate(canvas, "window", CANWIDTH/2,
-             (CANHEIGHT - OFFSET - LABELHEIGHT + 10),
+             (CANHEIGHT - OFFSET - LABELHEIGHT + 15),
 	     anchor = "center", window = botFrame)
 
     tkwait.window(base)

@@ -3,7 +3,8 @@
 #
 
 objectBrowser<- function (fun = function(x) TRUE,
-                           textToShow = "Select object(s)"){
+                          textToShow = "Select object(s)",
+                          nSelect = -1){
 
     require(tcltk) || stop("tcl/tk library not available")
     on.exit(options(show.error.messages = TRUE))
@@ -22,8 +23,19 @@ objectBrowser<- function (fun = function(x) TRUE,
     objsInSel <- NULL
 
     end <- function(){
-        returnList <<- nameToObjList(objsInSel)
-        tkdestroy(base)
+        if(nSelect == -1){
+            returnList <<- nameToObjList(objsInSel)
+            tkdestroy(base)
+        }else{
+            if(nSelect != length(objsInSel)){
+                tkmessageBox(title = "Wrong number", message =
+                       paste("You can only select", nSelect, "object(s)"),
+                       icon = "warning", type = "ok")
+            }else{
+                returnList <<- nameToObjList(objsInSel)
+                tkdestroy(base)
+            }
+        }
     }
 
     viewGlobalEnv <- function(){
