@@ -850,7 +850,8 @@ getMoreArgs <- function(){
     args <- formals(read.table)
 
     args <- args[setdiff(names(args),
-                         c("file", "header", "sep", "skip","quote"))]
+                         c("file", "header", "sep", "skip","quote",
+                           "row.names", "col.names"))]
 
     # Argument fill has to be defined using the value of
     # blank.lines.skip.
@@ -861,10 +862,13 @@ getMoreArgs <- function(){
 # save the imported data in the global environment
 getName4Data <- function(filename, getFocus = TRUE){
     # Gets ride of the separaters
-    temp <- gsub(paste("^.*", .Platform$file.sep,
+    if(missing(filename) || is.null(filename)){
+        temp <- ""
+    }else{
+        temp <- gsub(paste("^.*", .Platform$file.sep,
                                   "(.*)", sep = ""), "\\1", filename)
-    # Gets ride of the extensions
-    temp <- strsplit(temp, "\\.")[[1]][1]
+         temp <- strsplit(temp, "\\.")[[1]][1]
+    }
     var <- tclVar(temp)
     # Destroy the window
     end <- function(){

@@ -77,6 +77,10 @@ importPhenoData <- function(sampleNames = NULL){
         tempData <- createPData(pdata, varList)
         if(!is.null(tempData)){
             newPhenoData <<- tempData
+            filename <- getName4Data()
+            if(!is.null(filename)){
+                .GlobalEnv[[filename]] <<- newPhenoData
+            }
             end()
         }
         #if(!is.null(newPData)){
@@ -482,6 +486,7 @@ createPData <- function(pdata, varList){
 # Write data contained by pdata to the text widget containing the
 # table for user inputs
 writePhenoTable <- function(base, textWidget, pdata){
+    tkconfigure(textWidget, state = "normal")
     phenoMat <- makePhenoData(pdata)
     values <- list()
     tkdelete(textWidget, "0.0", "end")
@@ -507,6 +512,7 @@ writePhenoTable <- function(base, textWidget, pdata){
         tkinsert(textWidget, "end", "\n")
         values[[i]] <- tempList
     }
+    tkconfigure(textWidget, state = "disabled")
     return(values)
 }
 
@@ -616,6 +622,7 @@ getCovarDesc <- function(varList){
         tkwindow.create(dataText, "end", window = tempEntry)
         tkinsert(dataText, "end", "\n")
     }
+    tkconfigure(dataText, state = "disabled")
 
     tkgrab.set(base)
 
