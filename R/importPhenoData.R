@@ -56,7 +56,6 @@ importPhenoData <- function(sampleNames){
             if(is.null(pdata)){
                 pdata <<- get(tclvalue(objName), env = .GlobalEnv)
             }
-            #pdata <- sNames4rNames(pdata, sampleNames)
             if(!is.null(pdata)){
                 newPhenoData <<- createPhenoData(sNames4rNames(pdata,
                                       sampleNames), sampleNames)
@@ -84,7 +83,6 @@ importPhenoData <- function(sampleNames){
             }else{
                 pdata <<- pData(phenodata)
             }
-            #pdata <<- sNames4rNames(pdata, sampleNames)
             newPhenoData <<- createPhenoData(sNames4rNames(pdata,
                                         sampleNames), sampleNames)
             end()
@@ -236,7 +234,7 @@ createPhenoData <- function(pdata, sampleNames){
                         "the table below\n\nThe first column shows sample",
                          "names and the first row shows covariate names.",
                          "\nEmpty cells right below covariate names are for",
-                         "entries for desciptions \nof covariates."),
+                         "entries for desciptions nof covariates."),
                    justify = "left"),
                   side = "top", expand = FALSE, padx = 5, pady = 5)
     # Dropdown list for covariate numbers
@@ -244,7 +242,7 @@ createPhenoData <- function(pdata, sampleNames){
     tkpack(tklabel(covarDrop, text = "Number of covariate:"),
            side = "left", expand = FALSE)
     drop <- tkframe(covarDrop)
-    dropdownList(drop, 1:20, covarNum, 15,
+    dropdownList(drop, 1:20, covarNum, 10,
                  ifelse(tclvalue(covarNum) == "", 1,
                         tclvalue(covarNum)), TRUE)
     tkpack(drop, side = "left", expand = TRUE, fill = "x")
@@ -254,7 +252,7 @@ createPhenoData <- function(pdata, sampleNames){
 
     # A text widget to keep phenoData entries
     dataFrame <- tkframe(base)
-    dataText <- makeViewer(dataFrame, vWidth = 72, vHeight = 15,
+    dataText <- makeViewer(dataFrame, vWidth = 85, vHeight = 15,
                            hScroll = TRUE,
                            vScroll = TRUE, what = "text", side = "left")
     tkpack(dataText, side = "top", expand = TRUE, fill = "both")
