@@ -7,8 +7,8 @@
 
 guess.sep <- function(file.name, n = 5, seps = ""){
 
-    separator <- "Not detected"
-    header <- "Not detected"
+    separator <- ""
+    header <- FALSE
 
     if(seps == ""){
         seps <- c(" ", ",", ";", "\t")
@@ -32,13 +32,10 @@ guess.sep <- function(file.name, n = 5, seps = ""){
                                       == v[[separator]][1] - 1){
         header <- TRUE
     }else{
-        header <- guess.header(toCheck[1:2],
-                               ifelse(separator == "Not detected",
-                                      NULL, separator))
+        header <- guess.header(toCheck[1:2], separator)
     }
 
-    type <- find.type(toCheck[2:length(toCheck)],
-                      ifelse(separator == "Not detected", NULL, separator))
+    type <- find.type(toCheck[2:length(toCheck)],separator)
     return(list(header = header, separator = separator, type = type))
 }
 
@@ -68,7 +65,7 @@ guess.header <- function(twoLines, sep){
         if(any(!is.na(firstLine))){
             return(FALSE)
         }
-        return("Not detected")
+        return(FALSE)
     }
 }
 

@@ -52,12 +52,16 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
     }
 
     view <- function(){
+        fileRead <- read.table(file = args$file, head = args$header,
+                               sep = args$sep, as.is = TRUE)
+
         tkdelete(fileText, 0, "end")
-        text <- do.call(fun, (paste(names(args), "=", args, sep = ",",
-                                 collapse = "")))
-        for (i in 1:nrow(text)){
-            tkinsert(fileText, "end", paste(text[1,], sep = "\t"))
+#        tkinsert(fileText, "end", unlist(fileRead))
+        doFormat <- function(line){
+            temp <- paste(line, sep = "", collapse = "      ")
+            tkinsert(fileText, "end", temp)
         }
+        lapply(as.data.frame(fileRead), doFormat)
     }
 
     showMore <- function(){
@@ -184,11 +188,6 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
            "\n" = return("\\n"),
            return(sep))
 }
-
-
-
-
-
 
 
 

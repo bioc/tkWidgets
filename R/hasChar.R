@@ -1,30 +1,29 @@
-# This function checks to see if a given string assumed to be a file name has
-# a predefined prefix, suffix, or characters and returns TRUE if it
-# does or FALSE otherwise.
+# This function returns TRUE if a given prefix, suffix, or characters
+# matches a character string or FALSE otherwise.
 #
 # Copyright 2002, J. Zhang. All rights reserved.
 #
 
 hasPrefix <- function(aPrefix){
-    hasChar(aPrefix, "prefix")
+    got <- hasChar(aPrefix, "prefix")
 }
 
 hasSuffix <- function(aSuffix){
-    hasChar(aSuffix, "suffix")
+    got <- hasChar(aSuffix, "suffix")
 }
 
-hasChar <- function (tocheck, what = ""){
+hasChar <- function (toCheck, what = ""){
 
-    if(!is.character(tocheck) || nchar(tocheck)  < 1)
-        stop(paste("Bad value:", tocheck))
+    if(!is.character(toCheck) || nchar(toCheck)  < 1)
+        stop(paste("Bad value:", toCheck))
 
     function(x){
         if(what == "prefix"){
-            pattern <- paste("^", tocheck, sep = "")
+            pattern <- paste("^", toCheck, sep = "")
         }else if(what == "suffix"){
-            pattern <- paste(tocheck, "$", sep = "")
+            pattern <- paste(toCheck, "$", sep = "")
         }else{
-            pattern <- tocheck
+            pattern <- toCheck
         }
 
         if(regexpr(pattern, x) > 0 ){
