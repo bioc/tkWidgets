@@ -1,7 +1,7 @@
 # A function to create a light wight tk widget with a text.
 # x and y - the location for the left upper coner of the widget to
 #           appear on the screen
-getLightTW <- function(text, x, y){
+getLightTW <- function(x, y, text){
     on.exit(end())
 
     end <- function(){
