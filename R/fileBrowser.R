@@ -86,7 +86,8 @@ fileBrowser <- function (path = ""){
 
     tkwait.window(base)
 
-    return(invisible(fileSelected))
+    return(invisible(paste(path,  Platform()$file.sep,
+                           fileSelected, sep = "")))
 }
 
 
