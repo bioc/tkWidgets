@@ -95,7 +95,9 @@ importPhenoData <- function(sampleNames = NULL){
             if(is.null(phenodata)){
                 if(tclvalue(phenoName) != ""){
                     phenodata <<- .GlobalEnv[[tclvalue(phenoName)]]
-                    pdata <<- pData(phenodata)
+                    if(!is.null(phenodata)){
+                        pdata <<- pData(phenodata)
+                    }
                 }
             }else{
                 pdata <<- pData(phenodata)
@@ -103,6 +105,7 @@ importPhenoData <- function(sampleNames = NULL){
             pdata <<- sNames4rNames(pdata, sampleNames)
             newPhenoData <<- createPhenoData(pdata, sampleNames)
             if(!is.null(newPhenoData)){
+                .GlobalEnv[[phenoName]] <<- newPhenoData
                 end()
             }
         }
@@ -443,7 +446,6 @@ convert2PData <- function(phenoList){
     names(varlist) <- as.character(1:length(varlist))
 
     return(new("phenoData", pData=data.frame(pdata), varLabels=varlist))
-
 }
 
 # Function that add new rows/columns to pdata

@@ -76,7 +76,6 @@ getTrueNullNa(toFormat)
 \note{The functions are part of the Bioconductor project at Dana-Farber
   Cancer Institute to provide Bioinformatics functionalities through R}
 
-\seealso{\code{\link{basicPW-class}}}
 \examples{
   if(interactive()){
       argsWidget(list("Entry with default" = "default",
