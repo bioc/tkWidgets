@@ -18,18 +18,22 @@ argsWidget <- function(argsList){
     widget <- widget(wTitle = "BioC Arguments Widget", pWidgets,
                      funs = list(), preFun = function() {},
                      postFun = function() {}, env = PWEnv)
-
-    # Returns the input values
-    for(i in names(argsList)){
-        if(any(i == names(funcs))){
-            argsList[[i]] <- get(value(pWidgets(widget)[[i]][["entry"]])[[1]])
-        }else{
-            argsList[[i]] <-
-                formatArg(value(pWidgets(widget)[[i]][["entry"]])[[1]])
+    if(!is.null(widget)){
+        # Returns the input values
+        for(i in names(argsList)){
+            if(any(i == names(funcs))){
+                argsList[[i]] <-
+                    get(value(pWidgets(widget)[[i]][["entry"]])[[1]])
+            }else{
+                argsList[[i]] <-
+                    formatArg(value(pWidgets(widget)[[i]][["entry"]])[[1]])
+            }
         }
+        return(argsList)
+    }else{
+        return(widget)
     }
-
-    return(argsList)
+#    return(argsList)
 }
 # Creates the primary widget list for building the interface
 getPWidget <- function(argsList, PWEnv){
