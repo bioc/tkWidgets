@@ -1,12 +1,16 @@
 \name{importPhenoData}
 \alias{importPhenoData}
 \alias{createPhenoData}
-\alias{showIOError}
-\alias{sNames4rNames}
+\alias{writePDRowNames}
 \alias{writePhenoTable}
 \alias{makePhenoData}
 \alias{convert2PData}
-\alias{modPData}
+\alias{getPDFromFile}
+\alias{getPDFromObj}
+\alias{getNameWidget}
+\alias{objExists}
+\alias{readFileByUserArgs}
+\alias{getSNCNums}
 
 \title{Functions to input data for a phenoData object}
 \description{
@@ -15,13 +19,18 @@
 }
 \usage{
 importPhenoData(sampleNames)
-createPhenoData(pdata, sampleNames)
-showIOError(what)
-sNames4rNames(pdata, sampleNames)
-writePhenoTable(base, textWidget, pdata, sampleNames, covarNum)
-makePhenoData(pdata, sampleNames, covarNum)
+createPhenoData(pdata)
+writePDRowNames(pdata, sampleNames)
+writePhenoTable(base, textWidget, pdata)
+makePhenoData(pdata)
 convert2PData(phenoList)
-modPData(pdata, rowOrCol, addNum)
+getPDFromFile()
+getPDFromObj(type = c("data.frame", "phenoData"))
+getNameWidget(what = c("file", "object"), type = NULL)
+objExists(name, type = NULL)
+readFileByUserArgs(fileName, keep = c("file", "header", "sep", "nrows",
+"skip", "strip.white", "comment.char"))
+getSNCNums(sampleNames)
 }
 
 \arguments{
@@ -38,21 +47,30 @@ modPData(pdata, rowOrCol, addNum)
     resides}
   \item{textWidget}{\code{textWidget} an RTcl object for a text box
     widget}
-  \item{covarNum}{\code{covarNum} an integer for the number of
-    covariates a phenoData object will have}
   \item{phenoList}{\code{phenoList} a list of lists for tclVar()
     objects}
-  \item{rowOrCol}{\code{rowOrCol} a character string that can either be
-    "Samples" or "Covariates"}
-  \item{addNum}{\code{addNum} an integer for the number of columns or
-    rows to be added to \code{pdata}}
+  \item{type}{\code{type} a character string for the class of a object
+    e. g. data.frame, phenoData}
+  \item{name}{\code{name} a character string for the name of an object
+    in .GlobalEnv}
+  \item{fileName}{\code{fileName} a character string for the name of
+    file to be read using read.table}
+  \item{keep}{\code{keep} a vector of character strings for the formal
+    arguments of read.table that require user inputs through a widget}
 }
 
 \details{
   When import a data frame or phenoData object, the object to be
   imported should have been stored in .GlobelEnv. All
   the objects of data frame or phenoData will be made available through
-  a browser. 
+  a browser.
+
+  The main widget if \code{importPhenoData} that calls other
+  functions/widgets to have the job done.
+
+  Package Biobase is required for importPhenoData but the requirement id
+  not forced as it is the only time the package is used. Uers have to
+  make sure that Biobase is available.
 }
 \value{
   A phenoData object
