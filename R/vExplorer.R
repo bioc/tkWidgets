@@ -104,7 +104,8 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
 # for packages that have a vignette
 .popPackList <- function(packViewer){
     packs <- .packages(all = TRUE)
-    for(i in packs){
+    tkdelete(packViewer, 0, "end")
+    for(i in sort(packs)){
         if(!is.null(pkgVignettes(i)) &&
            length(pkgVignettes(i)$docs) > 0){
             tkinsert(packViewer, "end", i)
@@ -220,7 +221,7 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
                 }
 
             }
-            tkdelete(resultViewer, "1.0", "end")
+            tkdelete(resultViewer, "", "end")
             tkconfigure(resultViewer, state = "normal")
             tkinsert(resultViewer, "end", result)
             tkconfigure(resultViewer, state = "disabled")
@@ -320,7 +321,6 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     rViewerFrame <- tkframe(editFrame)
     resultViewer <-  makeViewer(rViewerFrame, vWidth = 50, vHeight = 12,
                       hScroll = TRUE, vScroll = TRUE, what = "text")
-    tkconfigure(resultViewer, state = "disabled")
     tkpack(rViewerFrame)
 
     tkgrid(chunkFrame, editFrame, pady = 10, padx = 10)
@@ -350,6 +350,7 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     if(is.null(pdfPath) || is.na(pdfPath)){
         tkconfigure(pdfButton, state = "disabled")
     }
+#    tkconfigure(resultViewer, state = "disabled")
 
     tkwait.window(base)
 }
