@@ -18,7 +18,13 @@ guess.sep <- function(file.name, numLine = 5, seps, isFile = TRUE){
     #}
 
     if(isFile){
-        toCheck <- readLines(file.name, n = numLine)
+        conn <- safeFileOpen(file.name)
+        if(inherits(conn, "connection")){
+            toCheck <- readLines(conn, n = numLine)
+            close(conn)
+        }else{
+            stop(paste("Can't read file because", conn))
+        }
     }else{
         toCheck <- file.name
     }

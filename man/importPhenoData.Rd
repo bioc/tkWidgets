@@ -17,7 +17,7 @@
   data frame object and use the data frame to construct a phenoData object
 }
 \usage{
-importPhenoData(sampleNames = NULL, from = NULL)
+importPhenoData(fileName, sampleNames = NULL, from = NULL)
 createPData(pdata, varList)
 writePDRowNames(pdata, sampleNames)
 writePhenoTable(base, textWidget, pdata)
@@ -31,6 +31,8 @@ getCovarDesc(varList)
 }
 
 \arguments{
+  \item{fileName}{\code{fileName} a character string for the name of a
+    file that is going to be used to build a phenoData object}
   \item{sampleNames}{\code{sampleNames} a vector of character strings
     for the names of samples. The length of \code{smapleNames} should be
     the same as the number of rows of an existing file or data frame if

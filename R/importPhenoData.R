@@ -1,7 +1,7 @@
 # Functions that guide users through the steps of inporting a
 # phenoData object. Used by the affy package.
 
-importPhenoData <- function(sampleNames = NULL, from = NULL){
+importPhenoData <- function(fileName = NULL, sampleNames = NULL, from = NULL){
 
     if(!require("Biobase", character.only = TRUE)){
         tkmessageBox(title = paste("Dependency error"),
@@ -30,7 +30,11 @@ importPhenoData <- function(sampleNames = NULL, from = NULL){
 
     getPData <- function(what, desc = NULL){
         if(what == "file"){
-            pdata <- importWizard()[["data"]]
+            if(!is.null(fileName)){
+                pdata <- importWizard(fileName)[["data"]]
+            }else{
+                pdata <- importWizard()[["data"]]
+            }
             if(is.null(pdata)){
                 return(invisible())
             }

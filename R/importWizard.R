@@ -8,15 +8,15 @@
 #
 # Copyright 2002, J. Zhang, all rights reserved.
 
-importWizard <- function(filename, maxRow = 400){
-
+importWizard <- function(filename = NULL, maxRow = 400){
+    argsSet <- FALSE
     # Creates an environment to make some variables available to all
     # related functions
     workEnv <- new.env(hash = TRUE, parent = NULL)
     # A string to keep track of the current state
     assignCState("state1", env = workEnv)
 
-    if(!missing(filename)){
+    if(!is.null(filename)){
         lineNums <- length(readFileByLines(filename))
         if(!is.null(lineNums)){
             argsSet <- setArgsList(filename, workEnv)
@@ -30,8 +30,8 @@ importWizard <- function(filename, maxRow = 400){
     }
     if(argsSet){
         # Number of row to be displayed
-        assignShowNum(ifelse(maxRow > lineNums, lineNums, maxRow),
-                      env = workEnv)
+        assignShowNum(ifelse(maxRow > lineNums, lineNums,
+                             maxRow), env = workEnv)
         # Initializes the interface
         initImportWizard(workEnv)
     }
@@ -45,7 +45,7 @@ readFileByLines <- function(filename){
         return(lines)
     }else{
         tkmessageBox(title = "IO Error",
-                     message = paste("File", filename, "may not be valid"),
+                     message = paste("can't open file because", conn),
                      icon = "error", type = "ok")
         return(NULL)
     }
@@ -320,48 +320,60 @@ finish <- function(env){
         args[["quote"]] <- "\"'"
     }
     dataName <- getName4Data(args[["file"]], "data frame")
-    options(show.error.messages = FALSE)
-    dataFile <- try(do.call("read.table", args))
-    options(show.error.messages = TRUE)
-    if(inherits(dataFile, "try-error")){
-        tkmessageBox(title = "Import Error",
+    conn <- safeFileOpen(args[["file"]])
+    if(inherits(conn, "connection")){
+        args[["file"]] <- conn
+        options(show.error.messages = FALSE)
+        dataFile <- try(do.call("read.table", args))
+        options(show.error.messages = TRUE)
+        #close(args[["file"]])
+        if(inherits(dataFile, "try-error")){
+            tkmessageBox(title = "Import Error",
                      message = paste("An error message:\n\n", dataFile,
                      "\nwas generated while reading file ",
                      args[["file"]], "."), icon = "error", type = "ok")
-    }else{
-        if(env$rowNameCol != 0){
-            rownames(dataFile) <- dataFile[, env$rowNameCol]
-            dataFile <- dataFile[, - env$rowNameCol]
-        }
-        colInfos <- getColInfo(env)
-        colNames <- NULL
-        colToDrop <- NULL
-        for(i in 1:length(colInfos)){
-            if(dropOrNot(colInfos[[i]])){
-                colToDrop <- c(colToDrop, i)
-            }else{
-                switch(colType(colInfos[[i]]),
-                   "Character" = dataFile[, i] <- as.character(dataFile[, i]),
-                   "Numeric" = dataFile[, i] <- as.numeric(dataFile[, i]))
-                colNames <- c(colNames, colName(colInfos[[i]]))
-            }
-        }
-        # Drop the columns
-        if(!is.null(colToDrop)){
-            dataFile <- dataFile[, -colToDrop]
-        }
-        # In case there is only one column left
-        if(is.null(ncol(dataFile))){
-            dataFile <- data.frame(matrix(dataFile, ncol = 1))
-            names(dataFile) <- colNames
         }else{
-            colnames(dataFile) <- colNames
+            if(env$rowNameCol != 0){
+                rownames(dataFile) <- dataFile[, env$rowNameCol]
+                dataFile <- dataFile[, - env$rowNameCol]
+            }
+            colInfos <- getColInfo(env)
+            colNames <- NULL
+            colToDrop <- NULL
+            for(i in 1:length(colInfos)){
+                if(dropOrNot(colInfos[[i]])){
+                    colToDrop <- c(colToDrop, i)
+                }else{
+                    switch(colType(colInfos[[i]]),
+                           "Character" = dataFile[, i] <-
+                           as.character(dataFile[, i]),
+                           "Numeric" = dataFile[, i] <-
+                           as.numeric(dataFile[, i]))
+                    colNames <- c(colNames, colName(colInfos[[i]]))
+                }
+            }
+            # Drop the columns
+            if(!is.null(colToDrop)){
+                dataFile <- dataFile[, -colToDrop]
+            }
+            # In case there is only one column left
+            if(is.null(ncol(dataFile))){
+                dataFile <- data.frame(matrix(dataFile, ncol = 1))
+                names(dataFile) <- colNames
+            }else{
+                colnames(dataFile) <- colNames
+            }
+            if(!is.null(dataName)){
+                assign(dataName, dataFile, env = .GlobalEnv)
+            }
+            return(list(args = args, data = dataFile))
         }
-        if(!is.null(dataName)){
-            assign(dataName, dataFile, env = .GlobalEnv)
-        }
-        return(list(args = args, data = dataFile))
+    }else{
+        tkmessageBox(title = "IO Error",
+                     message = paste("Can't open file because", conn),
+                     icon = "error", type = "ok")
     }
+    return(NULL)
 }
 # Gets the frame containing the interface for the top frame of
 # importWizard for state1
@@ -777,25 +789,33 @@ showData4State2 <- function(canvas, env, state = "state2"){
     tempFrame <- tkframe(canvas)
     # Puts n in temporaly
     temp[["nrows"]] = getShowNum(env)
-    options(show.error.messages = FALSE)
-    dataFile <- try(do.call("read.table", temp))
-    options(show.error.messages = TRUE)
-    if(inherits(dataFile, "try-error")){
-        tkmessageBox(title = "Import Error",
-                     message = paste("An error message:\n\n", dataFile,
-                     "\nwas generated while reading file ",
-                     args[["file"]], "."), icon = "error", type = "ok")
-    }else{
-        # For data without a separater
-        if(is.null(ncol(dataFile))){
-            writeColList(1)
-            env$numCols <- length(dataFile)
+    conn <- safeFileOpen(temp[["file"]])
+    if(inherits(conn, "connection")){
+        temp[["file"]] <- conn
+        options(show.error.messages = FALSE)
+        dataFile <- try(do.call("read.table", temp))
+        options(show.error.messages = TRUE)
+        if(inherits(dataFile, "try-error")){
+            tkmessageBox(title = "Import Error",
+                         message = paste("An error message:\n\n", dataFile,
+                         "\nwas generated while reading file ",
+                         args[["file"]], "."), icon = "error", type = "ok")
         }else{
-            for(i in 1:ncol(dataFile)){
-                writeColList(i)
+            # For data without a separater
+            if(is.null(ncol(dataFile))){
+                writeColList(1)
+                env$numCols <- length(dataFile)
+            }else{
+                for(i in 1:ncol(dataFile)){
+                    writeColList(i)
+                }
+                env$numCols <- ncol(dataFile)
             }
-            env$numCols <- ncol(dataFile)
         }
+    }else{
+        tkmessageBox(title = "IO Error",
+                     message = paste("Can't open file because", conn),
+                     icon = "error", type = "ok")
     }
     tkwindow.create(canvas, "end", window = tempFrame)
     #tkcreate(canvas, "window", 0, 0, anchor = "nw", window = tempFrame)
@@ -857,28 +877,36 @@ setState3BFrame <- function(frame, env){
     tempFrame <- tkframe(rCanv)
     argsList <- getArgs(env)[["state3"]]
     argsList[["nrows"]] <- getShowNum(env)
-    options(show.error.messages = FALSE)
-    dataFile <- try(do.call("read.table", argsList))
-    options(show.error.messages = TRUE)
-    if(inherits(dataFile, "try-error")){
-        tkmessageBox(title = "Import Error",
-                     message = paste("An error message:\n\n", dataFile,
-                     "\nwas generated while reading file ",
-                     args[["file"]], "."), icon = "error", type = "ok")
-    }else{
-        if(env$rowNameCol != 0){
-            # Take out the column that will be used for row names
-            dataFile <- dataFile[, -env$rowNameCol]
-        }
-        setColInfos(find.type(dataFile, argsList[["state3"]][["sep"]],
-                          isFile = FALSE), env)
+    conn <- safeFileOpen(argsList[["file"]])
+    if(inherits(conn, "connection")){
+        argsList[["file"]] <- conn
+        options(show.error.messages = FALSE)
+        dataFile <- try(do.call("read.table", argsList))
+        options(show.error.messages = TRUE)
+        if(inherits(dataFile, "try-error")){
+            tkmessageBox(title = "Import Error",
+                         message = paste("An error message:\n\n", dataFile,
+                         "\nwas generated while reading file ",
+                         args[["file"]], "."), icon = "error", type = "ok")
+        }else{
+            if(env$rowNameCol != 0){
+                # Take out the column that will be used for row names
+                dataFile <- dataFile[, -env$rowNameCol]
+            }
+            setColInfos(find.type(dataFile, argsList[["state3"]][["sep"]],
+                                  isFile = FALSE), env)
     # Cut to right size of file if longer than maxRow
 #    if(nrow(dataFile) > getShowNum(env)){
 #        dataFile <- dataFile[1:getShowNum(env),]
 #    }
     # Finds the data type for columns
-        colInfos <- getColInfo(env)
-        writeCol4Matrix(tempFrame, dataFile, colInfos, env)
+            colInfos <- getColInfo(env)
+            writeCol4Matrix(tempFrame, dataFile, colInfos, env)
+        }
+    }else{
+        tkmessageBox(title = "IO Error",
+                     message = paste("Can't open file because", conn),
+                     icon = "error", type = "ok")
     }
     tkcreate(rCanv, "window", 0, 0, anchor = "nw", window = tempFrame)
 }
