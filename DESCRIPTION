@@ -1,13 +1,15 @@
 Package: tkWidgets
-Version: 1.5.15
-Date: 2004-09-08
+Version: 1.5.16
+Date: 2004-09-13
 Title: R based tk widgets 
 Author: J. Zhang <jzhang@jimmy.harvard.edu>
 Maintainer: J. Zhang <jzhang@jimmy.harvard.edu>
-Depends: R (>= 1.8.1), widgetTools (>= 1.1.7), DynDoc (>= 1.3.0)
+Depends: R (>= 1.8.1), widgetTools (>= 1.1.7)
+Suggests: DynDoc (>= 1.3.0)
 Suggests: Biobase 
 Description: Widgets to provide user interfaces. 
-  tcltk should have been installed for the widgets to run. 
+  tcltk should have been installed for the widgets to run.
+LazyLoad: yes
 Keyword: graphics
 License: LGPL
 
