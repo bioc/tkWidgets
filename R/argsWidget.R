@@ -29,25 +29,43 @@ argsWidget <- function(argsList){
 
     # Returns the input values
     for(i in names(argsList)){
-        argsList[i] <- formatArg(value(pWidgets(widget)[[i]][["entry"]]))
+        argsList[i] <-
+                 formatArg(value(pWidgets(widget)[[i]][["entry"]])[[1]])
     }
 
     return(argsList)
 }
 
 # This function fomats the arguments obtained from a widget
-formatArg <- function(arg){
-    switch(tolower(arg),
-           "true" = return(TRUE),
-           "false" = return(FALSE),
-           "na" = return(NA),
-           "null" = return(NULL))
+formatArg <- function(toFormat){
+    # Turns off any warnings when checking for NULL, NA, and boolean
     options(warn = -1)
-    temp <- as.numeric(arg)
-    options(warn = 0)
-    if(is.na(temp)){
-        return(arg)
+    if(any(is.null(toFormat), is.na(toFormat), is.logical(toFormat))){
+        options(warn = 0)
+        return(toFormat)
     }else{
-        return(temp)
+        options(warn = 0)
+        if(toFormat == ""){
+            return(toFormat)
+        }
+        # expression and negative numbers can be "language"
+        if(is.language(toFormat)){
+            return(formula(toFormat))
+        }
+        options(warn = -1)
+        temp <- as.numeric(toFormat)
+        options(warn = 0)
+        if(is.na(temp)){
+            switch(tolower(toFormat),
+                   "t" = ,
+                   "true" = return(TRUE),
+                   "f" = ,
+                   "false" = return(FALSE),
+                   "na" = return(NA),
+                   "null" = return(NULL),
+                   return(toFormat))
+        }else{
+            return(temp)
+        }
     }
 }

@@ -17,10 +17,12 @@ importWizard <- function(filename, maxRow = 200){
     assignCState("state1", env = workEnv)
     # Number of row to be displayed
     assignShowNum(maxRow, env = workEnv)
-    # Do this if a file name is given
+
     if(!missing(filename)){
+        # Do this if a file name is given
         setArgsList(filename, workEnv)
     }else{
+        # Otherwise, assign an empty list to argsList and colInfo
         assignArgs(list(), workEnv)
         setColInfos(env = workEnv)
     }
@@ -87,6 +89,7 @@ setColInfos <- function(types, env){
     }else{
         temp <- list()
         for(i in 1:length(types)){
+            # name = "", type = types[i], drop = FALSE
             temp[[i]] <- colInfo("", types[i], FALSE)
         }
         assignColInfo(temp, env)
@@ -101,13 +104,13 @@ initImportWizard <- function(env){
     on.exit(end())
     # Destroy the window
     end <- function(){
-         tkdestroy(top)
+        tkdestroy(top)
     }
     nextState <- function(){
-        changeState(canvas, env, TRUE)
+        changeState(canvas, backBut, nextBut, env, TRUE)
     }
     preState <- function(){
-        changeState(canvas, env, FALSE)
+        changeState(canvas, backBut, nextBut, env, FALSE)
     }
     finishClicked <- function(){
         dataList <<- finish(env)
@@ -121,10 +124,10 @@ initImportWizard <- function(env){
     canvas <- getTopCan(top, env)
     stateID <- tkcreate(canvas, "window", 0, 0, anchor = "nw",
                                     window = getState1Frame(canvas, env))
+    # The ID is stored for later access
     assignSID(stateID, env)
-
-    ## The bottom frame contains the buttons that allow user to
-    ## navigate the importingprocess
+    ## The bottom frame contains the buttons that allow users to
+    ## navigate the importing process
     butFrame <- tkframe(top)
     canBut <- tkbutton(butFrame, text = "Cancel", width = 8,
                        command = end)
@@ -153,9 +156,9 @@ getTopCan <- function(base, env){
     return(canvas)
 }
 # Changes the state and thus the interface
-changeState <- function(canvas, env, forward = TRUE){
+changeState <- function(canvas, backBut, nextBut, env, forward = TRUE){
     # Sets the current state
-    setNewState(env, forward)
+    setNewState(env, backBut, nextBut, forward)
     if(forward){
         addArgs(env)
     }else{
@@ -168,16 +171,26 @@ changeState <- function(canvas, env, forward = TRUE){
                                     window = getAFrame(canvas, env))
     assignSID(stateID, env)
 }
-# Sets the strig for the new state (next or previous)
-setNewState <- function(env, forward = TRUE){
+# Sets the string for the new state (next or previous) and
+# actviates/inactivates buttons depending on the state
+setNewState <- function(env, backBut, nextBut, forward = TRUE){
     if(forward){
-        switch(getCState(env),
-               "state1" = assignCState("state2", env),
-               "state2" = assignCState("state3", env))
+        if(getCState(env) == "state1"){
+            assignCState("state2", env)
+            tkconfigure(backBut, state = "normal")
+        }else{
+            assignCState("state3", env)
+            tkconfigure(nextBut, state = "disabled")
+        }
     }else{
-        switch(getCState(env),
-               "state2" = assignCState("state1", env),
-               "state3" = assignCState("state2", env))
+        if(getCState(env) == "state2"){
+            assignCState("state1", env)
+            tkconfigure(nextBut, state = "normal")
+            tkconfigure(backBut, state = "disabled")
+        }else{
+            assignCState("state2", env)
+            tkconfigure(nextBut, state = "normal")
+        }
     }
 }
 # Add a new state arguments list to argsList
@@ -191,7 +204,7 @@ addArgs <- function(env){
         assignArgs(temp, env)
     }
 }
-# Drop a state arguments list from argsList
+# Drop a state arguments list from argsList when the back button is clicked
 dropArgs <- function(env){
     temp <- getArgs(env)
     if(length(temp) > 1){
@@ -228,7 +241,7 @@ finish <- function(env){
         }
     }
     # In case there is only one column left
-    if(is.null(ncol(data))){
+    if(is.null(ncol(dataFile))){
         dataFile <- data.frame(matrix(dataFile, ncol = 1))
         names(dataFile) <- colNames
     }else{
@@ -283,24 +296,39 @@ setState1TFrame <- function(frame, viewer, delims, env){
             tkselect(delims[["delimit"]])
         }
     }
-    if(!is.null(getArgs(env)[["state1"]][["file"]])){
-        showData4State1(viewer, env)
-        if(length(getArgs(env)[["state1"]][["sep"]]) != 0){
-            tkselect(delims[["delimit"]])
-        }
-    }
+
     # Frame to hole the widgets
     nameFrame <- tkframe(frame)
     label1 <- tklabel(nameFrame, text = "File name: ")
     tkpack(label1, side = "left")
     # An entry box to hold the result of fileBrowser
     nameEntry <- tkentry(nameFrame, width = 77)
+    # If a file name is given, fill the widget with data
+    if(!is.null(getArgs(env)[["state1"]][["file"]])){
+        writeList(nameEntry, filename, clear = TRUE)
+        showData4State1(viewer, env)
+        if(length(getArgs(env)[["state1"]][["sep"]]) != 0){
+            tkselect(delims[["delimit"]])
+        }
+    }
     tkpack(nameEntry, side = "left")
     # A button to envoke fileBrowser
     browseBut <- tkbutton(nameFrame, width = 8, text = "Browse",
                           command = browse)
     tkpack(browseBut)
     tkpack(nameFrame)
+}
+# Show the data read in using readLines for state1
+showData4State1 <- function(widget, env){
+     dataFile <- readLines(getArgs(env)[["state1"]][["file"]])
+     # determines how many lines to show
+     if(length(dataFile) > getShowNum(env)){
+         writeList(widget, paste(1:getShowNum(env), ": ",
+                             dataFile[1:getShowNum(env)], sep = ""), TRUE)
+     }else{
+         writeList(widget, paste(1:length(dataFile), ": ",
+                                                dataFile, sep = ""), TRUE)
+     }
 }
 # Sets the mid frame for state1
 setState1MFrame <- function(frame, env){
@@ -523,7 +551,6 @@ moreArgs <- function(env){
     }
     assignArgs(temp, env)
 }
-
 # Creates the right bottom portion of state3 frame
 setState3BFrame <- function(frame, env){
     typeEntry <- list()
@@ -562,7 +589,7 @@ setState3BFrame <- function(frame, env){
         writeList(nameEntry[[i]], colnames(dataFile)[i])
         nameCMD[[i]] <- function(){}
         body <- list(as.name("{"), substitute(eval(setColName(j,
-                                      nameEntry[[i]], env)), list(j = i)))
+                                      nameEntry[[j]], env)), list(j = i)))
         body(nameCMD[[i]]) <- as.call(body)
         tkbind(nameEntry[[i]], "<KeyRelease>", nameCMD[[i]])
         tkpack(nameEntry[[i]], side = "top")
@@ -570,7 +597,7 @@ setState3BFrame <- function(frame, env){
         writeList(typeEntry[[i]], type(colInfos[[i]]))
         typeCMD[[i]] <- function(){}
         body <- list(as.name("{"), substitute(eval(setColType(j,
-                                      typeEntry[[i]], env)), list(j = i)))
+                                      typeEntry[[j]], env)), list(j = i)))
         body(typeCMD[[i]]) <- as.call(body)
         tkbind(typeEntry[[i]], "<KeyRelease>", typeCMD[[i]])
         tkpack(typeEntry[[i]], side = "top")
@@ -612,12 +639,6 @@ setColType <- function(index, entryBox, env){
     type(temp) <- entry
     colInfos[[index]] <- temp
     assignColInfo(colInfos, env)
-}
-# Show the data read in using readLines for state1
-showData4State1 <- function(widget, env){
-     dataFile <- readLines(getArgs(env)[["state1"]][["file"]])
-     writeList(widget, paste(1:getShowNum(env), ": ",
-                             dataFile[1:getShowNum(env)], sep = ""), TRUE)
 }
 # Gets the word representation of delimiters
 whatDeli <- function(delimiter){
