@@ -56,6 +56,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
             writeCap(path)
             if(currentNode >= 1)
                 tkconfigure(upBut, state = "normal")
+            tkconfigure(selectBut, state = "disabled")
         }
     }
 
@@ -195,7 +196,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid.configure(selectBut, sticky = "w")
     tkconfigure(listView, selectmode = "extended", font = LABELFONT2)
     tkbind(listView, "<Double-Button-1>", inList)
-    tkbind(listView, "<B1-ButtonRelease>", selInDir)
+#    tkbind(listView, "<B1-ButtonRelease>", selInDir)
+    tkbind(listView, "<Single-Button-1>", inList)
     writeDir(listView, pickFiles(dirsNFiles(path), testFun,
                                  prefix, suffix))
 
