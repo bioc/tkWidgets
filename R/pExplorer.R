@@ -11,19 +11,28 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     if(pkgName == ""){
         pkgPath <- tclVar(pkgPaths[1])
         pkgName <- tclVar(list.files(tclvalue(pkgPath))[1])
-        pkgNames <- list.files(tclvalue(pkgPath))
     }else{
-        pkgPath <- tclVar(file.path(pkgPaths[1], pkgName))
+        pkgPath <- tclVar(pkgPaths[1])
         pkgName <- tclVar(pkgName)
-        pkgNames <- pkgName
     }
-
+    pkgNames <- list.files(tclvalue(pkgPath))
     curDir <- file.path(tclvalue(pkgPath), tclvalue(pkgName))
 
     end <- function(){
         tkdestroy(base)
     }
     on.exit(end())
+    pathEntered <- function(){
+        options(show.error.messages = FALSE)
+        pkgNames <<- try(list.files(tclvalue(pkgPath)))
+        options(show.error.messages = TRUE)
+        if(inherits(pkgNames, "try-error")){
+            warning(tclvalue(pkgPath), "is not a valid name")
+        }
+        tclvalue(pkgName) <<- pkgNames[1]
+        curDir <<- file.path(tclvalue(pkgPath), pkgNames[1])
+        writePkgDirs()
+    }
     upDatePath <- function(){
         options(show.error.messages = FALSE)
         opt <- try(getListOption(pathEntry, pkgPaths))
@@ -55,7 +64,9 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         opt <- try(getListOption(pkgEntry, pkgNames))
         options(show.error.messages = TRUE)
         if(!inherits(opt, "try-error")){
+            tkconfigure(pkgEntry, state = "normal")
             writeList(pkgEntry, opt, clear = TRUE)
+            tkconfigure(pkgEntry, state = "disabled")
             tclvalue(pkgName) <<- opt
             curDir <<- file.path(tclvalue(pkgPath), opt)
             writePkgDirs()
@@ -108,6 +119,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     dropFrame <- tkframe(pathFrame, borderwidth = 2, relief = "sunken")
     pathEntry <- tkentry(dropFrame, width = 40, textvariable = pkgPath,
                      borderwidth = 1)
+    tkbind(pathEntry, "<KeyPress-Return>", pathEntered)
     tkpack(pathEntry, side = "left", expand = TRUE, fill = "both")
     pathDropBut <- tkbutton(dropFrame, width = 1, text = "v", font = "bold",
                         command = upDatePath)
@@ -124,7 +136,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
            expand = FALSE)
     pkgDFrame <- tkframe(pkgFrame, borderwidth = 2, relief = "sunken")
     pkgEntry <- tkentry(pkgDFrame, width = 40, textvariable = pkgName,
-                     borderwidth = 1)
+                     borderwidth = 1, state = "disabled")
     tkpack(pkgEntry, side = "left", expand = TRUE, fill = "both")
     pkgDropBut <- tkbutton(pkgDFrame, width = 1, text = "v", font = "bold",
                         command = pkgSelect)
