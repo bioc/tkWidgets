@@ -1,6 +1,20 @@
 \name{colInfo-class}
 \docType{class}
 \alias{colInfo-class}
+\alias{colInfo}
+\alias{colName<-}
+\alias{colName}
+\alias{colType}
+\alias{colType<-}
+\alias{dropOrNot}
+\alias{dropOrNot<-}
+\alias{colInfo}
+\alias{colName<-,colInfo-method}
+\alias{colName,colInfo-method}
+\alias{colType,colInfo-method}
+\alias{colType<-,colInfo-method}
+\alias{dropOrNot,colInfo-method}
+\alias{dropOrNot<-,colInfo-method}
 \title{Class "colInfo" presents column information for a data frame}
 \description{This class is for keeping information about a data frame to
 be processed. The class is mainly for use by \code{\link{importWizard}}}
@@ -19,7 +33,20 @@ Objects can be created by calls of the form \code{new("colInfo", ...)}
   }
 }
 \section{Methods}{
-No methods defined with class "colInfo" in the signature.
+  \describe{
+    \item{colName}{\code{signature(object = "character")}: The get
+      method for slot "colName"}
+    \item{colName<-}{\code{signature(object = "character")}: The set
+      method for slot "colName"}
+    \item{colType}{\code{signature(object = "character")}: The get
+      method for slot "colType"}
+    \item{colType<-}{\code{signature(object = "character")}: The set
+      method for slot "colName"}
+    \item{dropOrNot}{\code{signature(object = "logical")}: The get
+      method for slot "dropOrNot"}
+    \item{dropOrNot}{\code{signature(object = "logical")}: The set
+      method for slot "dropOrNot"}
+  }
 }
 \author{Jianhua Zhang}
 \note{This class is part of the Bioconductor project at Dana-Farber
