@@ -21,13 +21,15 @@ argsWidget <- function(argsList){
                      value = c("TRUE" = TRUE,"FALSE" = FALSE),
                      env = PWEnv), list(j = i)))
         }else{
-            if(is.primitive(argsList[i])){
-                eval(substitute(j <- entryBox(name = j,
-                                 value = deparse(substitute(argsList[i])),
-                                 width = 15, env = PWEnv), list(j = i)))
-            }
-            eval(substitute(j <- entryBox(name = j, value = argsList[i],
-                                 width = 15, env = PWEnv), list(j = i)))
+            switch(typeof(argsList[i]),
+                   "symbol" = ,
+                   "builtin" = ,
+                   "closure" = eval(substitute(j <- entryBox(name = j,
+                                 value = deparse(substitute(argsList[j])),
+                                 width = 15, env = PWEnv), list(j = i))),
+                   eval(substitute(j <- entryBox(name = j,
+                                 value = argsList[j],
+                                 width = 15, env = PWEnv), list(j = i))))
         }
         label <- label(name = "label", value = i,
                                              width = lWidth, env = PWEnv)
@@ -51,6 +53,7 @@ argsWidget <- function(argsList){
 
 # This function fomats the arguments obtained from a widget
 formatArg <- function(toFormat){
+
     # Turns off any warnings when checking for NULL, NA, and boolean
     options(warn = -1)
     if(any(is.null(toFormat), is.na(toFormat), is.logical(toFormat))){
@@ -59,6 +62,10 @@ formatArg <- function(toFormat){
     }else{
         options(warn = 0)
         if(toFormat == ""){
+            return(toFormat)
+        }
+        # Handling functions
+        if(is.primitive(toFormat)){
             return(toFormat)
         }
         # expression and negative numbers can be "language"

@@ -9,21 +9,25 @@ dbArgsWidget <- function(){
     # Sets the working environment
     PWEnv <- new.env(hash = TRUE, parent = NULL)
     # Defines the widget components
-    label1 <- label(name = "label1", value = "Database: ", width = 10,
+    label1 <- label(name = "label1", value = "Database: ", width = 15,
                     env = PWEnv)
     db <- entryBox(name = "db", width = 20, env = PWEnv)
-    label2 <- label(name = "label2", value = "User name: ", width = 10,
+    label2 <- label(name = "label2", value = "User name: ", width = 15,
                     env = PWEnv)
     un <- entryBox(name = "un", width = 20, env = PWEnv)
-    label3 <- label(name = "label3", value = "Password: ", width = 10,
+    label3 <- label(name = "label3", value = "Password: ", width = 15,
                     env = PWEnv)
     pw <- entryBox(name = "pw", width = 20, env = PWEnv)
-    label4 <- label(name = "label4", value = "Host: ", width = 10,
+    label4 <- label(name = "label4", value = "Host: ", width = 15,
                     env = PWEnv)
     hs <- entryBox(name = "hs", value = "localhost", width = 20,
                    env = PWEnv)
+    label5 <- label(name = "label5", value = "Table name: ", width = 15,
+                    env = PWEnv)
+    tn <- entryBox(name = "tn", width = 20, env = PWEnv)
     # Makes a list with the layout defined
     pWidgets <- list(dbName = list(label1 = label1, db = db),
+                     tableName = list(lable5 = label5, tn = tn),
                      userName = list(label2 = label2, un = un),
                      password = list(label3 = label3, pw = pw),
                      host = list(label4 = label4, hs = hs))
@@ -43,6 +47,9 @@ dbArgsWidget <- function(){
     }
     if(value(pWidgets(widget)[["password"]][["pw"]]) != ""){
         inputs[["password"]] <- value(pWidgets(widget)[["password"]][["pw"]])
+    }
+    if(value(pWidgets(widget)[["tableName"]][["tn"]]) != ""){
+        inputs[["tableName"]] <- value(pWidgets(widget)[["tableName"]][["tn"]])
     }
 
     return(inputs)

@@ -120,7 +120,7 @@ pickItems <- function (items){
     writeList(colView, items)
 
     tkwait.window(base)
-
+    return(columns)
 }
 
 

@@ -35,7 +35,7 @@ obj1 <- c("aaa", "bbb", "ccc")
 env1 <- new.env(parent = NULL)
 
 # Get a list containing the two objects
-nl <- objNameToList(c("obj1", "env1"))
+nl <- objNameToList(c("obj1", "env1"), parent.frame())
 str(nl)
 
 }
