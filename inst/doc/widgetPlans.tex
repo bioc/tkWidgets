@@ -37,7 +37,33 @@ A primitive widget or {\em pWidget} is simply a set of linked interactive
 tools.
 Some examples:
 \begin{itemize}
-\item A text string, a type-in box and a button.
+\item A text string, a type-in box and a button.%% Grouping multiple
+  %% tk widgets may not work since we may have to associate multiple
+  %% functions with each of the tk widgets within a group. I suggest
+  %% to represent each tk widget as a pWidget object with the
+  %% following slots: parent - where the pWidget is going to be
+  %% packed; type - type of tk widget; name - name of the tk widget;
+  %% text - text feature of the tk widget; variable - tcl variable
+  %% associated with the tk widget (mainly for radio buttons and
+  %% selection box); width - only appliable to some widgets; length -
+  %% only appliable to some widgets; vScroll - only appliable to some;
+  %% hScroll - only apliable to some; funs - a list of functions to be
+  %% associated with widget; preFun - function to apply before
+  %% rendering; postFun - function to apply before existing. To make a
+  %% Widget, we will need a list of pWidgets. Each element of the list
+  %% can be single pWidget or a vector of pWidgets. Elements will be
+  %% rendered vertically in order and vectors will be rendered
+  %% horizontally in order so that grouping of pWidgets can still be
+  %% achieved. The widget object will have the following slot:
+  %% pWidgets - a list of pWidget as mentioned before; funs - a list
+  %% of buttons with associated functions; preFun - function to apply
+  %% before rendering; postFun - function to apply upon existing;
+  %% frames - a list(?) of frames containing the parent names of
+  %% pWidgets. Again, elements of the list can be a single name or a
+  %% vector of names. Frames corresponding to the names will be packed
+  %% vertically following the order in the list and frames will be
+  %% packed horizontally following the order in the vector. This gives
+  %% some sort of control of the layout of widgets.
 \item A set of linked radio buttons
 \item A set of linked check boxes
 \item A list-box
