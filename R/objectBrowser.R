@@ -54,21 +54,20 @@ objectBrowser <- function (fun = function(x) TRUE){
         # This a temp function for now. More checking will be inplemented
     }
 
-    doObj <- function (item, objType){
-        fileOrObj <<- objType
+    doFrame <- function (aFrame){
 
         if(is.null(ncol(get(item))))
-            towrite <- c(paste("Type:", objType),
-                         paste("Length:", length(get(item))))
+            towrite <- c("Type: data frame",
+                         paste("Length:", length(get(aFrame))))
 
 
-        toWrite <- c(paste("Type:", objType),
+        toWrite <- c("Type: data frame",
                      paste("Number of columns:", ncol(get(item))),
                      paste("Number of row(s):", nrow(get(item))),
                      paste("Column Name(s):"),names(get(item)))
 
-        writeObj(listView, pickObjs(toWrite, fun = fun))
-        writeCap(item)
+        writeObj(listView, toWrite)
+        writeCap(aFrame)
 
     }
 
@@ -101,7 +100,7 @@ objectBrowser <- function (fun = function(x) TRUE){
                 "environment" = doEnv(selectedObj),
                 "package" =  doPack(tkcurselection(listView), selectedObj),
                 doElse()
-#               "data.frame" = doObj(selectedObj, "data.frame"),
+#               "data.frame" = doFrame(selectedObj, "data.frame"),
             )
             if(length(objLevel) >= 2)
             tkconfigure(upBut, state = "normal")
