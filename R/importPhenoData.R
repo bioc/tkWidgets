@@ -43,7 +43,7 @@ importPhenoData <- function(sampleNames){
             }else{
                 pdata <<- sNames4rNames(tryMe, sampleNames)
                 if(!is.null(pdata)){
-                    newPhenodata <<- createPhenoData(pdata, sampleNames)
+                    newPhenoData <<- createPhenoData(pdata, sampleNames)
                     end()
                 }
             }
@@ -56,28 +56,41 @@ importPhenoData <- function(sampleNames){
             if(is.null(pdata)){
                 pdata <<- get(tclvalue(objName), env = .GlobalEnv)
             }
-            pdata <- sNames4rNames(pdata, sampleNames)
+            #pdata <- sNames4rNames(pdata, sampleNames)
             if(!is.null(pdata)){
-                newPhenodata <<- createPhenoData(pdata, sampleNames)
+                newPhenoData <<- createPhenoData(sNames4rNames(pdata,
+                                      sampleNames), sampleNames)
                 end()
             }
         }
     }
     editObj <- function(){
-        #if(tclvalue(phenoName) == ""){
-        #    showIOError("phenoData")
-        #}else{
+        if(tclvalue(phenoName) == ""){
+            yesno <- tkmessageBox(title = "New phenoData",
+                     message = "No name provided. Create new?",
+                     icon = "error",
+                     type = "yesno")
+            if(tclvalue(yesno) == "yes"){
+                newPhenoData <<- createPhenoData(pdata, sampleNames)
+                end()
+            }
+        }else{
             if(is.null(phenodata)){
                 if(tclvalue(phenoName) != ""){
-                    phenodata <<- get(tclvalue(phenoName), env = .GlobalEnv)
+                    phenodata <<- get(tclvalue(phenoName),
+                                      env = .GlobalEnv)
                     pdata <<- pData(phenodata)
                 }
             }else{
                 pdata <<- pData(phenodata)
             }
-            newPhenoData <<- createPhenoData(pdata, sampleNames)
-        #}
+            #pdata <<- sNames4rNames(pdata, sampleNames)
+            newPhenoData <<- createPhenoData(sNames4rNames(pdata,
+                                        sampleNames), sampleNames)
+            end()
+        }
     }
+
     brows <- function(){
         tclvalue(fileName) <<- tclvalue(tkcmd("tk_getOpenFile"))
     }
@@ -88,21 +101,23 @@ importPhenoData <- function(sampleNames){
             else
                 return(FALSE)
         }
-        pData <<- objectBrowser(nSelect = 1, fun = filter)
-        if(!is.null(pData)){
-            tclvalue(objName) <<- names(pData)
+        obj <- objectBrowser(nSelect = 1, fun = filter)
+        if(!is.null(obj)){
+            tclvalue(objName) <<- names(obj)
+            pdata <<- obj[[1]]
         }
     }
     browsePheno <- function (){
-        filter <- function(x){
-            if(class(get(x)) == "phenoData")
+        filter <- function(x, env = .GlobalEnv){
+            if(class(get(x, env = env)) == "phenoData")
                 return(TRUE)
             else
                 return(FALSE)
         }
-        phenodata <<- objectBrowser(nSelect = 1, fun = filter)
-        if(!is.null(phenodata)){
-            tclvalue(phenoName) <<- names(phenoData)
+        obj <- objectBrowser(nSelect = 1, fun = filter)
+        if(!is.null(obj)){
+            tclvalue(phenoName) <<- names(obj)
+            phenodata <<- obj[[1]]
         }
     }
 
@@ -119,8 +134,8 @@ importPhenoData <- function(sampleNames){
     fileBut <- tkbutton(readFrame, text = "Read From File", width = 16,
                     command = readFile)
     tkpack(fileBut, side = "left", expand = FALSE, padx = 5)
-    tkpack(tklabel(readFrame, text = "File name:", width = 12),
-           side = "left", expand = FALSE)
+    tkpack(tklabel(readFrame, text = "File name:", width = 14,
+                   justify = "left"), side = "left", expand = FALSE)
     tkpack(tkentry(readFrame, width = 50, textvariable = fileName),
            side = "left", expand = TRUE, fill = "x")
     tkpack(tkbutton(readFrame, text = "Browse", command = brows),
@@ -133,8 +148,8 @@ importPhenoData <- function(sampleNames){
     objBut <- tkbutton(objFrame, text = "Read From Object", width = 16,
                     command = readObj)
     tkpack(objBut, side = "left", expand = FALSE, padx = 5)
-    tkpack(tklabel(objFrame, text = "Object name:", width = 12),
-           side = "left", expand = FALSE)
+    tkpack(tklabel(objFrame, text = "Object name:", width = 14,
+                   justify = "left"), side = "left", expand = FALSE)
     tkpack(tkentry(objFrame, width = 50, textvariable = objName),
            side = "left", expand = TRUE, fill = "x")
     tkpack(tkbutton(objFrame, text = "Browse", command = browseObj),
@@ -147,15 +162,14 @@ importPhenoData <- function(sampleNames){
     editBut <- tkbutton(editFrame, text = "Edit/Create", width = 16,
                     command = editObj)
     tkpack(editBut, side = "left", expand = FALSE, padx = 5)
-    tkpack(tklabel(editFrame, text = "phenoData name:", width = 12),
-           side = "left", expand = FALSE)
+    tkpack(tklabel(editFrame, text = "phenoData name:", width = 14,
+                   justify = "left"), side = "left", expand = FALSE)
     tkpack(tkentry(editFrame, width = 50, textvariable = phenoName),
            side = "left", expand = TRUE, fill = "x")
     tkpack(tkbutton(editFrame, text = "Browse", command = browsePheno),
            side = "left", expand = FALSE)
     tkpack(editFrame, side = "top", padx = 5, expand = TRUE,
            fill = "x")
-
     tkpack(tkbutton(base, text = "Cancel", command = cancel, width = 15),
            side = "top", anchor = "center", expand = FALSE, pady = 10)
 
@@ -175,6 +189,9 @@ showIOError <- function(what){
 
 # Put sample names as row names of the data frame
 sNames4rNames <- function(pdata, sampleNames){
+    if(is.null(pdata)){
+        return(pdata)
+    }
     options(show.error.messages = FALSE)
     tryMe <- try(rownames(pdata) <- sampleNames)
     options(show.error.messages = TRUE)
@@ -186,14 +203,14 @@ sNames4rNames <- function(pdata, sampleNames){
                      type = "ok")
         return(NULL)
     }
-    return(tryMe)
+    return(pdata)
 }
 createPhenoData <- function(pdata, sampleNames){
     phenoObj <- NULL
     phenoList <- NULL
 
     if(is.null(pdata)){
-        covarNum <- tclVar()
+        covarNum <- tclVar(1)
     }else{
         covarNum <- tclVar(ncol(pdata))
     }
@@ -208,7 +225,7 @@ createPhenoData <- function(pdata, sampleNames){
         end()
     }
     changeCovar <- function(){
-        phenoList <- writePhenoTable(base, dataText, pdata, sampleNames,
+        phenoList <<- writePhenoTable(base, dataText, pdata, sampleNames,
                                  as.numeric(tclvalue(covarNum)))
     }
 
@@ -303,7 +320,7 @@ makePhenoData <- function(pdata, sampleNames, covarNum){
         }
     }else{
         temp <- rbind(c("", paste("Covar", 1:covarNum, sep = "")),
-                      rep("", nrow(pdata)),
+                      rep("", covarNum + 1),
                       as.matrix(cbind(sampleNames, matrix("",
                       ncol = covarNum, nrow = length(sampleNames)))))
     }
@@ -330,6 +347,9 @@ convert2PData <- function(phenoList){
     }
     rnames <- pdata[,1]
     pdata <- pdata[,2:ncol(pdata)]
+    if(is.null(nrow(pdata))){
+        pdata <- data.frame(matrix(pdata, ncol = 1))
+    }
     rownames(pdata) <- rnames
     colnames(pdata) <- cnames
     names(varlist) <- as.character(1:length(varlist))
