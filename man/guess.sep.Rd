@@ -14,7 +14,7 @@
 \usage{
 guess.sep(file.name, numLine = 5, seps = "", isFile = TRUE)
 guess.header(twoLines, sep)
-find.type(line, sep, header = FALSE)
+find.type(file.name, sep, header = FALSE, numLine = 5)
 charOrNum(vect)
 }
 
@@ -32,9 +32,6 @@ charOrNum(vect)
     the file has a header}
   \item{sep}{\code{sep} a character for the delimiter used to separate
     columns in a file}
-  \item{line}{\code{line} a vector of character strings including the
-    first few lines of file to be checked for data type of whose
-    columns}
   \item{vect}{\code{vect} a vector of character or numeric string}
   \item{header}{\code{header} a boolean indicating whether a file has
     headers}

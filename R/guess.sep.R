@@ -18,6 +18,10 @@ guess.sep <- function(file.name, numLine = 5, seps = "", isFile = TRUE){
 
     if(isFile){
         toCheck <- readLines(file.name, n = numLine)
+        for(i in seps[seps != " "]){
+            toCheck <- gsub(paste(" *", i, "| *", i, " *|", i, " *",
+                                  sep = ""), gsub(" *", "", i), toCheck)
+        }
     }else{
         toCheck <- file.name
     }
@@ -42,7 +46,7 @@ guess.sep <- function(file.name, numLine = 5, seps = "", isFile = TRUE){
             header <- guess.header(toCheck[1:2], separator)
         }
 
-        type <- find.type(toCheck[2:length(toCheck)],separator, header)
+        type <- find.type(file.name, separator, header, numLine)
         return(list(header = header, separator = separator, type = type))
     }else{
         # New line is always the separator
@@ -82,28 +86,19 @@ guess.header <- function(twoLines, sep){
     }
 }
 
-find.type <- function(line, sep, header = FALSE){
+find.type <- function(file.name, sep, header = FALSE, numLine = 5){
 
-     types <- NULL
-     if(!missing(sep)){
-         for(i in line){
-             temp <- unlist(strsplit(i, sep))
-             types <- rbind(types, charOrNum(temp))
-         }
-     }else{
-         for(i in line){
-             types <- rbind(types, charOrNum(i))
-         }
-     }
-     if(nrow(unique(types)) == 1){
-         if(header){
-             return(types[1,][2:length(types[1,])])
-         }else{
-             return(types[1,])
-         }
-     }else{
-         return("Not detected")
-     }
+    line <- read.table(file.name, sep = sep, header = header, nrows = numLine)
+
+    types <- NULL
+    for(i in 1:nrow(line)){
+        types <- rbind(types, charOrNum(line[i,]))
+    }
+    if(nrow(unique(types)) == 1){
+        return(types[1,])
+    }else{
+        return("Not detected")
+    }
 }
 
 charOrNum <- function(vect){
