@@ -223,6 +223,7 @@ finish <- function(env){
            "state1" = args <- getArgs(env)[["state1"]],
            "state2" = args <- getArgs(env)[["state2"]],
            "state3" = args <- getArgs(env)[["state3"]])
+    dataName <- getName4Data(args[["file"]])
     if(is.null(args$sep)){
         dataFile <- readLines(args$file)
     }else{
@@ -230,7 +231,6 @@ finish <- function(env){
         colInfos <- getColInfo(env)
         colNames <- NULL
         colToDrop <- NULL
-        dataName <- getName4Data(args[["file"]])
         for(i in 1:length(colInfos)){
             if(drop(colInfos[[i]])){
                 colToDrop <- c(colToDrop, i)
@@ -558,8 +558,10 @@ getState3Frame <- function(base, env){
                       font ="Helvetica 11 bold")
     tkpack(label1, pady = 5)
     topFrame <- tkframe(frame)
-    setState3TFrame(topFrame, env)
-    tkpack(topFrame, anchor = "nw", fill = "x", expand = TRUE)
+    if(!is.null(getArgs(env)[["state3"]][["sep"]])){
+        setState3TFrame(topFrame, env)
+        tkpack(topFrame, anchor = "nw", fill = "x", expand = TRUE)
+    }
     bottomFrame <- tkframe(frame)
     setState3BFrame(bottomFrame, env)
     tkpack(bottomFrame, padx = 5, pady = 5, fill = "both", expand = TRUE)
