@@ -20,7 +20,7 @@ pExplorer <- function (pkgName = "", pkgPath = "",
     baseDir <- file.path(tclvalue(pkgPath), tclvalue(pkgName))
     subDirs <- NULL
     end <- function(){
-        if(grtFocus){
+        if(getFocus){
             tkgrab.release(base)
         }
         tkdestroy(base)
