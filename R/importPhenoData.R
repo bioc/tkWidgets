@@ -44,7 +44,9 @@ importPhenoData <- function(sampleNames = NULL){
                 pdata <<- sNames4rNames(tryMe, sampleNames)
                 if(!is.null(pdata)){
                     newPhenoData <<- createPhenoData(pdata, sampleNames)
-                    end()
+                    if(!is.null(newPhenoData)){
+                        end()
+                    }
                 }
             }
         }
@@ -59,7 +61,9 @@ importPhenoData <- function(sampleNames = NULL){
             pdata <<- sNames4rNames(pdata, sampleNames)
             if(!is.null(pdata)){
                 newPhenoData <<- createPhenoData(pdata, sampleNames)
-                end()
+                if(!is.null(newPhenoData)){
+                    end()
+                }
             }
         }
     }
@@ -79,7 +83,9 @@ importPhenoData <- function(sampleNames = NULL){
                 }
                 colnames(pdata) <<- paste("Covar1")
                 newPhenoData <<- createPhenoData(pdata, sampleNames)
-                end()
+                if(!is.null(newPhenoData)){
+                    end()
+                }
             }
         }else{
             if(is.null(phenodata)){
@@ -93,7 +99,9 @@ importPhenoData <- function(sampleNames = NULL){
             }
             pdata <<- sNames4rNames(pdata, sampleNames)
             newPhenoData <<- createPhenoData(pdata, sampleNames)
-            end()
+            if(!is.null(newPhenoData)){
+                end()
+            }
         }
     }
 
@@ -242,7 +250,8 @@ createPhenoData <- function(pdata, sampleNames){
     }
 
     end <- function(){
-         tkdestroy(base)
+        tkgrab.release(base)
+        tkdestroy(base)
     }
     on.exit(end())
 
@@ -272,7 +281,7 @@ createPhenoData <- function(pdata, sampleNames){
                          "\n.The second row shows covariate names and",
                          "the second column shows sample names.",
                          "\n.Empty cells right below covariate names are for",
-                         "entries for desciptions nof covariates.",
+                         "entries for desciptions of covariates.",
                          "\n.Values in all cells are editable."),
                    justify = "left"),
                   side = "top", expand = FALSE, pady = 5)
@@ -309,6 +318,8 @@ createPhenoData <- function(pdata, sampleNames){
                     command = cont)
     tkgrid(backBut, contBut, padx = 20)
     tkpack(butFrame, expand = FALSE, fill = "x", padx = 5, pady = 5)
+
+    tkgrab.set(base)
 
     phenoList <- writePhenoTable(base, dataText, pdata, sampleNames,
                                  covarNum)
