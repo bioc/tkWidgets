@@ -5,6 +5,7 @@
 objectBrowser <- function (fun = function(x) TRUE){
 
     require(tcltk) || stop("tcl/tk library not available")
+    on.exit(options(show.error.messages = TRUE))
 
     LABELFONT <- "Helvetica 12"
     BUTWIDTH <- 8
@@ -61,11 +62,11 @@ objectBrowser <- function (fun = function(x) TRUE){
     }
 
     dClick <- function (){
-        if(tkcurselection(listView) != ""){
-            selectedObj <<- tkget(listView,
-                                      tkcurselection(listView))
+#        if(tkcurselection(listView) != ""){
+            selectedObj <<- as.character(tkget(listView,
+                                      tkcurselection(listView)))
             goin()
-        }
+#        }
     }
 
     goin <- function (){
@@ -84,9 +85,9 @@ objectBrowser <- function (fun = function(x) TRUE){
 
 
     sClick <- function () {
-        if(tkcurselection(listView) != ""){
-            selectedObj <<- tkget(listView,
-                                      tkcurselection(listView))
+#        if(tkcurselection(listView) != ""){
+            selectedObj <<- as.character(tkget(listView,
+                                      tkcurselection(listView)))
             objType <- findObjType(selectedObj)
             if(objType == "package"){
                 returnList <<- list("name" = gsub("(^package:)", "\\",
@@ -102,7 +103,7 @@ objectBrowser <- function (fun = function(x) TRUE){
                 returnList <<- list("name" = selectedObj,
                                     "obj" = get(selectedObj))
             }
-        }
+#        }
     }
 
     getAct <- function(){
@@ -111,8 +112,12 @@ objectBrowser <- function (fun = function(x) TRUE){
     }
 
     up <- function(){
+        options(show.error.messages = FALSE)
+        tryMe <- try(parent.env(get(selectedObj)))
+        options(show.error.messages = TRUE)
+
         if(isPack || selectedObj == ".GlobalEnv" ||
-            is.null (parent.env(selectedObj))){
+           inherits(tryMe, "try-error")){
             writeObj(listView, pickObjs(objNames = search(),
                                              fun = fun))
             writeCap("Top Level")

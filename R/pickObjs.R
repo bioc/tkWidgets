@@ -9,20 +9,20 @@ pickObjs <- function (objNames, fun = function(x) TRUE){
     on.exit(options(show.error.messages = TRUE))
 
     for(i in objNames){
-        if(regexpr("package:", i) > 0)
+        if(regexpr("package:", as.character(i)) > 0)
             whichOnes <- c(whichOnes, TRUE)
         else{
-            if(regexpr("^Autoloads", i) > 0)
+            if(regexpr("^Autoloads", as.character(i)) > 0)
                 whichOnes <- c(whichOnes, FALSE)
             else{
                 options(show.error.messages = FALSE)
-                tryMe <- try(get(i))
+                tryMe <- try(get(as.character(i)))
                 options(show.error.messages = TRUE)
 
                 if(is.environment(tryMe))
                     whichOnes <- c(whichOnes, TRUE)
                 else
-                    whichOnes <- c(whichOnes, fun(i))
+                    whichOnes <- c(whichOnes, fun(as.character(i)))
             }
         }
     }
