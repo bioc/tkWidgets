@@ -126,13 +126,15 @@ initImportWizard <- function(env){
         tkdestroy(top)
     }
     nextState <- function(){
-        tempFrame <- changeState(canvas, backBut, nextBut, env, TRUE)
+        tempFrame <- changeState(canvas, backBut, nextBut, env, TRUE,
+                                 endBut)
         tkdestroy(currentFrame)
         tkpack(tempFrame, fill = "both", expand = TRUE)
         currentFrame <<- tempFrame
     }
     preState <- function(){
-        tempFrame<- changeState(canvas, backBut, nextBut, env, FALSE)
+        tempFrame<- changeState(canvas, backBut, nextBut, env, FALSE,
+                                endBut)
         tkdestroy(currentFrame)
         tkpack(tempFrame, fill = "both", expand = TRUE)
         currentFrame <<- tempFrame
@@ -161,7 +163,7 @@ initImportWizard <- function(env){
     nextBut <- tkbutton(butFrame, text = "Next >", width = 8,
                         command = nextState)
     endBut <- tkbutton(butFrame, text = "Finish", width = 8,
-                       command = finishClicked)
+                       state = "disabled", command = finishClicked)
     tkpack(canBut, backBut, nextBut, endBut, side = "left")
     tkpack(butFrame, pady = 10, fill = "y", expand = TRUE)
 
@@ -182,9 +184,10 @@ getTopCan <- function(base, env){
     return(canvas)
 }
 # Changes the state and thus the interface
-changeState <- function(canvas, backBut, nextBut, env, forward = TRUE){
+changeState <- function(canvas, backBut, nextBut, env, forward = TRUE,
+                        endBut){
     # Sets the current state
-    setNewState(env, backBut, nextBut, forward)
+    setNewState(env, backBut, nextBut, forward, endBut)
     if(forward){
         addArgs(env)
     }else{
@@ -195,7 +198,7 @@ changeState <- function(canvas, backBut, nextBut, env, forward = TRUE){
 }
 # Sets the string for the new state (next or previous) and
 # actviates/inactivates buttons depending on the state
-setNewState <- function(env, backBut, nextBut, forward = TRUE){
+setNewState <- function(env, backBut, nextBut, forward = TRUE, endBut){
     if(forward){
         if(getCState(env) == "state1"){
             assignCState("state2", env)
@@ -203,6 +206,7 @@ setNewState <- function(env, backBut, nextBut, forward = TRUE){
         }else{
             assignCState("state3", env)
             tkconfigure(nextBut, state = "disabled")
+            tkconfigure(endBut, state = "normal")
         }
     }else{
         if(getCState(env) == "state2"){
@@ -212,6 +216,7 @@ setNewState <- function(env, backBut, nextBut, forward = TRUE){
         }else{
             assignCState("state2", env)
             tkconfigure(nextBut, state = "normal")
+            tkconfigure(endBut, state = "disabled")
         }
     }
 }
@@ -426,29 +431,29 @@ getState2Frame <- function(base, env, state = "state2", reset = FALSE){
                       getArgs(env)[[state]][["file"]]),
                       font = "Helvetica 11 bold")
     tkpack(label1, pady = 5, padx = 5)
+    midFrame <- tkframe(frame)
+    setState2MFrame(midFrame, env)
+    tkpack(midFrame, pady = 5, padx = 5, fill = "x", expand = TRUE)
     bottomFrame <- tkframe(frame)
     setState2BFrame(bottomFrame, env)
-    midFrame <- tkframe(frame)
-    setState2MFrame(midFrame, env, bottomFrame)
-    tkpack(midFrame, pady = 5, padx = 5, fill = "x", expand = TRUE)
     tkpack(bottomFrame, fill = "both", expand = TRUE)
     return(frame)
 }
 # Sets the state2 mid frame containing radio buttons for delimiters
 # and a list box for quote selection
-setState2MFrame <- function(frame, env, bottomFrame){
+setState2MFrame <- function(frame, env){
     # Radio buttons for delimiters
     leftFrame <- tkframe(frame)
-    setSepRadios(leftFrame, env, bottomFrame)
+    setSepRadios(leftFrame, env)
     # A list for quote selecttion (" or/and ')
     rightFrame <- tkframe(frame)
-    setQuoteList(rightFrame, env, bottomFrame)
+    setQuoteList(rightFrame, env)
     tkpack(leftFrame, side = "left", anchor = "w", fill = "x",
            expand  = TRUE)
     tkpack(rightFrame, side = "left", fill = "x", expand = TRUE)
 }
 # Sets the radio buttons for separators for state2 mid frame
-setSepRadios <- function(frame, env, base, state = "state2"){
+setSepRadios <- function(frame, env, state = "state2"){
     labelFrame <- tkframe(frame)
     label <- tklabel(labelFrame, text = "File Delimiter:")
     tkpack(label, side = "left", anchor = "nw")
@@ -512,7 +517,7 @@ setSepRadios <- function(frame, env, base, state = "state2"){
 }
 
 # Sets the list box for quotes for state2 mid frame
-setQuoteList <- function(frame, env, base){
+setQuoteList <- function(frame, env){
     quoteSelected <- function(){
         setQuote(quoteList, env)
     }
