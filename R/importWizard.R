@@ -73,7 +73,8 @@ setArgsList <- function(filename, env, isFile = TRUE, init = TRUE){
 }
 # Set the temp data read as lines with a maxmun number
 assignLineData <- function(lineData, env){
-    assign("lineData", lineData, env = env)
+    env[["lineData"]] <<- lineData
+    #assign("lineData", lineData, env = env)
 }
 # Get the temp data stroed as lines with a maxmun number
 getLineData <- function(env){
@@ -81,21 +82,24 @@ getLineData <- function(env){
 }
 # Set and get methods for argument list
 assignArgs <- function(value, env){
-    assign("argsList", value, env = env)
+    env[["argsList"]] <<- value
+    #assign("argsList", value, env = env)
 }
 getArgs <- function(env){
     env$argsList
 }
 # Set and get methods for number to show in the interface
 assignShowNum <- function(value, env){
-    assign("showNum", value, env)
+    env[["showNum"]] <<- value
+    #assign("showNum", value, env)
 }
 getShowNum <- function(env){
     env$showNum
 }
 # Set and get methods for current state to keep track of the state
 assignCState <- function(value, env){
-    assign("currentState", value, env)
+    env[["currentState"]] <<- value
+    #assign("currentState", value, env)
 }
 getCState <- function(env){
     env$currentState
@@ -103,7 +107,8 @@ getCState <- function(env){
 # Set and get methods for colInfo that is a list of colInfo objects to
 # keep column name, type, and drop info
 assignColInfo <- function(value, env){
-    assign("colInfos", value, env)
+    env[["colInfos"]] <<- value
+    #assign("colInfos", value, env)
 }
 getColInfo <- function(env){
     env$colInfos
@@ -324,7 +329,8 @@ finish <- function(env){
             names(dataFile) <- colNames
         }
         if(!is.null(dataName)){
-            assign(dataName, dataFile, env = .GlobalEnv)
+            .GlobalEnv[[dataName]] <<- dataFile
+            #assign(dataName, dataFile, env = .GlobalEnv)
         }
         return(list(args = args, data = dataFile))
     }

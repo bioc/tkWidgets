@@ -244,7 +244,7 @@ viewVignette <- function(title, packName, vigPath, font = "arial 11"){
     export <- function(){
         temp <- objectBrowser(evalEnv(chunkList))
         for(i in names(temp)){
-            assign(i, temp[[i]], env = parent.frame(2))
+            .GlobalEnv[[i]] <<- temp[[i]]
         }
     }
     # Executes whatever that is in the text box for code chunk

@@ -31,22 +31,26 @@ package or the \Rpackage{widgetTools} package to provide interfaces to
 perform different tasks. Available widgets include:
 
 \begin{itemize}
-\item \texttt{argsWidget} - an interface that allows users to input values for
+\item \Rfunction{argsWidget} - a widget that allows users to input values for
     an argument list passed to the widget as an argument
-\item \texttt{DPExplorer} - an interface that allows users to view a
+\item \Rfunction{DPExplorer} - a widget that allows users to view a
     {\texttt{Bioconductor}} data package and make selections
-\item \texttt{fileBrowser} - an interface that allows users to select a group of
-    files from a local directory
-\item \texttt{importWizard} - an interface that allows users to import a data file
-    into R, following an Excel style
-\item \texttt{objectBrowser} - an interface that allows users to browse R
+\item \Rfunction{fileBrowser} - a widget that allows users to select a
+  group of files from a local directory
+\item \Rfunction{importWizard} - a widget that allows users to import
+  a data file into R, following an Excel style
+\item \Rfunction{objectBrowser} - a widget that allows users to browse R
     objects and make a selection
-\item \texttt{vExplorer} - an interface that allows users to explore vignettes
+\item \Rfunction{vExplorer} - a widget that allows users to explore vignettes
     of available R packages
+\item \Rfunction{eExplorer} - a widget that allows users to explor the
+  executable examples contained by a given R package
+\item \Rfunction{pExplorer} - a widget that allows users to explor the
+  structure and contents of a given R package
 \end{itemize}
 
 The following code invokes a widget that contains clickable buttons
-that show the interfaces of the widgets.
+that brings up the widget when a button is clicked.
 
 <<>>=
 library(tkWidgets)
@@ -66,10 +70,16 @@ button5 <- button(wName = "button5", wValue = "objectBrowser",
                      wFuns = list(command = objectBrowser), wEnv = PWEnv)
 button6 <- button(wName = "button6", wValue = "vExplorer",
                      wFuns = list(command = vExplorer), wEnv = PWEnv)
+button7 <- button(wName = "button7", wValue = "pExplorer",
+                     wFuns = list(command = pExplorer), wEnv = PWEnv)
+fun <- function(){eExplorer("tkWidgets")}
+button8 <- button(wName = "button8", wValue = "eExplorer",
+                     wFuns = list(command = fun), wEnv = PWEnv)
 
 pWidgets <- list(A = list(button1 = button1, button2 = button2), C =
 list(button3 = button3, button4 = button4), D = list(button5 = button5,
-button6 = button6))
+button6 = button6), E = list(button7 = button7, button8 = button8))
+
 if(interactive()){
 viewWidget <- widget(wTitle = "tkWidgets Examples", pWidgets, funs = list(),
                  preFun = function() print("Hello"),
@@ -77,8 +87,20 @@ viewWidget <- widget(wTitle = "tkWidgets Examples", pWidgets, funs = list(),
 }
 @
 
+\begin{figure*}[tbp]
+   \begin{center}
+     \includegraphics{widgets}
+     \caption{A snapshot of the widget when the example code chunk is
+       executed}
+     \label{Figure 1}
+   \end{center}
+\end{figure*}
+
+
 There are other widgets that are used by specific packages that may
-not be of general interest. These widgets are thus not included in the examples.
+not be of general interest. These widgets are thus not included in the
+examples.
+
 \end{document}
 
 

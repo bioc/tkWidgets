@@ -63,7 +63,7 @@ eExplorer <- function(pkgName, font = "arial 13"){
     export <- function(){
         temp <- objectBrowser(evalEnv)
         for(i in names(temp)){
-            assign(i, temp[[i]], env = parent.frame(2))
+            .GlobalEnv[[i]] <<- temp[[i]]
         }
     }
 

@@ -6,8 +6,6 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                          prefix = NULL, suffix = NULL,
                          textToShow = "Select file(s)", nSelect = -1)
 {
-    on.exit(end())
-
     LABELFONT1 <- "Helvetica 12 bold"
     LABELFONT2 <- "Helvetica 11"
     BUTWIDTH <- 8
@@ -29,6 +27,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 
     # Close the window. Warn users if the number of selected files is wrong
     end <- function(){
+        tkgrab.release(base)
         if(nSelect == -1){
             tkdestroy(base)
         }else{
@@ -42,6 +41,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         }
         setwd(oldDir)
     }
+    on.exit(end())
     # When a user double clicks a file name in the list box for file names,
     # remembers the file name and path for that name and write the
     # contents to the list box if the name is a directory.
@@ -244,6 +244,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     endBut <- tkbutton(base, text = "Finish", width = BUTWIDTH,
            command = end)
     tkgrid(endBut, columnspan = 2)
+
+    tkgrab.set(base)
 
     tkwait.window(base)
 

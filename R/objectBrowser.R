@@ -12,8 +12,6 @@ objectBrowser<- function (env = .GlobalEnv,
                           fun = noAuto, textToShow = "Select object(s)",
                           nSelect = -1){
 
-    on.exit(end(), add = TRUE)
-
     LABELFONT1 <- "Helvetica 12 bold"
     LABELFONT2 <- "Helvetica 11"
     BUTWIDTH <- 8
@@ -30,9 +28,10 @@ objectBrowser<- function (env = .GlobalEnv,
 
     # close window
     end <- function(){
+        tkgrab.release(base)
         tkdestroy(base)
     }
-
+    on.exit(end(), add = TRUE)
     # Executed when a user clicks the end button. returnList that
     # contains names of selected objects will be updated before the
     # window closes.
@@ -296,6 +295,8 @@ objectBrowser<- function (env = .GlobalEnv,
     tkgrid(leftFrame, rightFrame)
 
     viewEnv(env)
+
+    tkgrab.set(base)
 
     tkwait.window(base)
 

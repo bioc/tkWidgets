@@ -335,7 +335,7 @@ procHTML <- function(fileName){
 }
 
 getExclude <- function(){
-    return(c("Meta/", "latex/", "INDEX", "CVS"))
+    return(c("Meta/", "latex/"))
 }
 
 getRPkgs <- function(pkgPath){
