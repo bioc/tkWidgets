@@ -122,7 +122,8 @@ tkphenoData <- function(sampleNames){
       tkgrid(array.name.lst, row = (i+2), column = 1)
 
 
-      array.entry.lst [[i]]<- tkentry(win.fr, width = 30, textvariable = get("var.lst",eerieEnv)[[i]])
+      array.entry.lst [[i]]<- tkentry(win.fr, width = 30, textvariable
+      = get("var.lst",eerieEnv)[[i]], state = "disabled")
       tkconfigure(array.entry.lst[[i]], background = "white")
       tkgrid(array.entry.lst[[i]], row = (i+2), column = 2)
       tkgrid.configure(array.entry.lst[[i]], sticky = "e")
@@ -133,15 +134,40 @@ tkphenoData <- function(sampleNames){
         tkgrid(cb.lst[[j]], row = (i+2), column =(j+3))
       }
     }
+    tkgrid(space.label3)
+#    tkgrid(space.label4)
+#    tkgrid(space.label5)
 
-    tkgrid(space.label3,row=(get("NumSamples",eerieEnv)+3))
-    tkgrid(space.label4,row=(get("NumSamples",eerieEnv)+4))
-    tkgrid(space.label5,row=(get("NumSamples",eerieEnv)+5))
-    back.but <- tkbutton(win.fr, width = 8, text ="Back", command = function(){
+#    tkgrid(space.label3,row=(get("NumSamples",eerieEnv)+3))
+#    tkgrid(space.label4,row=(get("NumSamples",eerieEnv)+4))
+#    tkgrid(space.label5,row=(get("NumSamples",eerieEnv)+5))
+
+    ###### JZ add this to save the phenoData object to .Global Env
+    saveFrame <- tkframe(win.fr, background = "white")
+#    pdFileName <- NULL
+#    browse <- function(){
+#        pdFileName <- tclvalue(tkgetSaveFile())
+#        tkdelete(pdNameEntry, 0, "end")
+#        tkinsert(pdNameEntry, "end", pdFileName)
+#    }
+    tkpack(tklabel(saveFrame, text = "Save as", background = "white"),
+           side = "left", expand = FALSE)
+    pdName <- tclVar()
+    pdNameEntry <- tkentry(saveFrame, width = 40, textvariable = pdName,
+                           background = "white")
+    tkpack(pdNameEntry, side = "left", expand = TRUE, fill = "x")
+#    tkpack(tkbutton(saveFrame, text = "Browse", width = 5, command = browse,
+#                    background = "white"), side = "left", expand = FALSE)
+    tkgrid(saveFrame, columnspan = j + 4)
+    ######
+
+    ## JZ modified the layout a little bit
+    butFrame <- tkframe(win.fr)
+    back.but <- tkbutton(butFrame, width = 8, text ="Back", command = function(){
       tkdestroy(tt3)
       hierarchy[[2]]()})
     tkconfigure(back.but, background = "white")
-    finish.but <- tkbutton(win.fr, text = "Finish", command = function(){
+    finish.but <- tkbutton(butFrame, text = "Continue", command = function(){
 
       for(i in 1:get("NumSamples",eerieEnv)){
         for(j in 1:get("NumCovar",eerieEnv)){
@@ -172,10 +198,14 @@ tkphenoData <- function(sampleNames){
     })
 
     tkconfigure(finish.but, background = "white")
-    tkgrid(back.but, row = (get("NumSamples",eerieEnv) + 6),column = 2)
-    tkgrid(finish.but, row = (get("NumSamples",eerieEnv) + 6), column = 3)
-    tkgrid.configure(back.but, sticky = "e")
-    tkgrid.configure(finish.but, sticky = "w")
+    tkpack(back.but, side = "left", expand = FALSE)
+    tkpack(finish.but, side = "left", expand = FALSE)
+
+#    tkgrid(back.but, row = (get("NumSamples",eerieEnv) + 7),column = 2)
+#    tkgrid(finish.but, row = (get("NumSamples",eerieEnv) + 7), column = 3)
+#    tkgrid.configure(back.but, sticky = "e")
+#    tkgrid.configure(finish.but, sticky = "w")
+    tkgrid(butFrame, columnspan = j + 4)
 
 
     tkwait.window(tt3)
@@ -201,7 +231,7 @@ tkphenoData <- function(sampleNames){
     names(pd.info) <- c("pData", "varLabels")
 
     assign("pd.info",pd.info,eerieEnv)
-
+    assign(tclvalue(pdName), pd.info, .GlobalEnv)
 }
 
 

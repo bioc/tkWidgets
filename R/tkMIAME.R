@@ -73,7 +73,7 @@ tkMIAME <- function(){
 
 
 
-  Exit.but <- tkbutton(win.fr, text = "Exit", command = function(){
+  Exit.but <- tkbutton(win.fr, text = "Finish", command = function(){
     tclvalue(Contact.var) <- tclvalue(tkget(Contact.txt,"0.0","end"))
     tclvalue(Desc.var) <- tclvalue(tkget(Desc.txt,"0.0","end"))
     tkdestroy(tt)

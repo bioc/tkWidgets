@@ -9,7 +9,7 @@ tkSampleNames <- function(...,filenames=character(0)){
   sample.names <- array("",NumSamples)
 
   for(i in 1:NumSamples){
-    s2 <-strsplit(strsplit(filenames[i],"/")[[1]][length(strsplit(filenames[i],"/")[[1]])],"\\.")[[1]]
+    s2 <-strsplit(strsplit(filenames[[i]],"/")[[1]][length(strsplit(filenames[[i]],"/")[[1]])],"\\.")[[1]]
     sample.names[i] <- s2[1]
   }
 
@@ -71,7 +71,8 @@ tkSampleNames <- function(...,filenames=character(0)){
     tkgrid(array.name.lst[[i]], row = (i+2), column = 1)
     tkgrid.configure(array.name.lst[[i]], sticky = "e")
 
-    array.entry.lst [[i]] <- tkentry(win.fr, width = 30, textvariable = var.lst[[i]])
+    array.entry.lst [[i]] <- tkentry(win.fr, width = 30, textvariable
+    = var.lst[[i]])
     tkconfigure(array.entry.lst[[i]], background = "white")
     tkgrid(array.entry.lst[[i]], row = (i+2), column = 2)
     tkgrid.configure(array.entry.lst[[i]], sticky = "e")
@@ -88,7 +89,7 @@ tkSampleNames <- function(...,filenames=character(0)){
 
 
   tkgrid(space.label3,row=(NumSamples+7))
-  finish.but <- tkbutton(win.fr, text = "Finish", command = function(){tkdestroy(tt)})
+  finish.but <- tkbutton(win.fr, text = "Continue", command = function(){tkdestroy(tt)})
   tkconfigure(finish.but, background = "white")
   tkgrid(finish.but, row = (NumSamples + 8), column = 2)
   tkgrid.configure(finish.but, sticky="e")
