@@ -218,9 +218,10 @@ getTopLevel <- function(title){
 }
 
 
+##fixme: surely this should do something smarter
 loadDataPkg <- function(pkgName){
-    where <- grep(pkgName, search())
-    if(length(where) == 0){
+    where <- do.call("require", list(pkgName, quietly=TRUE))
+    if(!where){
         tkmessageBox(title = "Invalid Package Name",
                          message = paste("Package", pkgName,
                          "is not valid or has not been loaded yet!"),
@@ -228,7 +229,7 @@ loadDataPkg <- function(pkgName){
                      type = "ok")
         return(NULL)
     }else{
-        rdas <- gsub("\\.rda$", "", ls(where))
+        rdas <- gsub("\\.rda$", "", ls(paste("package:", pkgName, sep="")))
         rdas <- setdiff(rdas, c(pkgName,
                                      paste(pkgName, "QC", sep = "")))
         return(rdas)
