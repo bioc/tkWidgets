@@ -4,7 +4,6 @@
 # Copyright 2002, J. Zhang, all rights reserved.
 
 fileWizard <- function(filename = ""){
-    require(tcltk) || stop("tcltk is not available.")
 
     BOLD12 <- "Helvetica 12 bold"
     NORMAL11 <- "Helvetica 11"
