@@ -20,8 +20,8 @@ guess.sep <- function(file.name, n = 5, seps = ""){
 
     w<-NULL
 
-    for(i in seps) 
-         w[[i]] <- strsplit(toCheck[2:length(toCheck)], i}
+    for(i in seps)
+         w[[i]] <- strsplit(toCheck[2:length(toCheck)], i)
 
     v <- lapply(w, function(x) sapply(x, length))
 
