@@ -380,6 +380,14 @@ setState1BFrame <- function(frame, env){
 # Sets the top frame for state1
 setState1TFrame <- function(frame, viewer, delims, env){
     fName <- tclVar()
+
+    # Populate the list box for data read in
+    popList <- function(){
+        showData4State1(viewer, env)
+        if(!is.null(getArgs(env)[["state1"]][["sep"]])){
+            tkselect(delims[["delimit"]])
+        }
+    }
     # Populate the entry box for file name when the brose button is
     # clicked
     browse <- function(){
@@ -388,10 +396,7 @@ setState1TFrame <- function(frame, viewer, delims, env){
             writeList(nameEntry, filename, clear = TRUE)
             argsSet <- setArgsList(filename, env)
             if(argsSet){
-                showData4State1(viewer, env)
-                if(!is.null(getArgs(env)[["state1"]][["sep"]])){
-                    tkselect(delims[["delimit"]])
-                }
+                popList()
             }
         }
     }
@@ -399,10 +404,7 @@ setState1TFrame <- function(frame, viewer, delims, env){
     getFile <- function(){
         argsSet <- setArgsList(tclvalue(fName), env)
         if(argsSet){
-            showData4State1(viewer, env)
-            if(!is.null(getArgs(env)[["state1"]][["sep"]])){
-                tkselect(delims[["delimit"]])
-            }
+            popList()
         }
     }
 
@@ -412,6 +414,7 @@ setState1TFrame <- function(frame, viewer, delims, env){
     tkpack(label1, side = "left")
     # An entry box to hold the result of fileBrowser
     nameEntry <- tkentry(nameFrame, width = 20, textvariable = fName)
+    #tkbind(nameEntry, "<KeyPress-Enter>", getFile)
     # If a file name is given, fill the widget with data
     if(!is.null(getArgs(env)[["state1"]][["file"]])){
         writeList(nameEntry, getArgs(env)[["state1"]][["file"]], clear = TRUE)
@@ -459,6 +462,7 @@ showData4State1 <- function(widget, env){
 }
 # Sets the mid frame for state1
 setState1MFrame <- function(frame, env, dataViewer){
+    #skipNum <- tclVar("0")
     # Executed when values in start at row list box is clicked
     startClicked <- function(){
         setSkip(startList, env)
@@ -472,7 +476,7 @@ setState1MFrame <- function(frame, env, dataViewer){
         }else{
             dataFile <- dataFile[(skip + 1):length(dataFile)]
         }
-        setArgsList(dataFile, env, FALSE, FALSE)
+        setArgsList(args[["state1"]][["file"]], env, FALSE, FALSE)
 #        showData4State1(dataViewer, env)
 
     }
@@ -490,13 +494,27 @@ setState1MFrame <- function(frame, env, dataViewer){
                                 value = "fixed", variable = delimit,
                                 anchor = "nw")
     tkpack(fixedRadio, anchor = "w", expand = TRUE, fill = "x")
-    tkpack(leftPan, side = "left", anchor = "w", fill = "x", expand = TRUE)
+    tkpack(leftPan, side = "top", anchor = "w", fill = "x", expand = TRUE)
+
+    #skipFrame <- tkframe(frame)
+    #dropFrame <- tkframe(skipFrame)
+    #dList <- dropdownList(dropFrame, as.character(1:20), skipNum, 3,
+    #             tclvalue(skipNum), TRUE)
+    #tkbind(dList, "<B1-ButtonRelease>", startClicked)
+    #skipLab <- tklabel(skipFrame, text = "Start import at line: ")
+    #tkpack(skipLab, side = "left", expand = FALSE)
+    #tkpack(dropFrame, side = "left", expand = TRUE, fill = "x")
+    #tkpack(tkbutton(dropFrame, text = "Apply", width = 15,
+    #                command = startClicked), side = "left", expand = FALSE)
+    #tkpack(skipFrame, side = "top", pady = 5, padx = 5, expand = FALSE)
+
     rightPan <- tkframe(frame)
     paraLabel2 <- tklabel(rightPan, text = "Start import at row:")
     tkpack(paraLabel2, side = "left", anchor = "ne")
     startFrame <- tkframe(rightPan)
     startList <- makeViewer(startFrame, vWidth = 2, vHeight = 1,
                             what  = "list", side = "top")
+    tkconfigure(startList, exportselection = FALSE)
     tkconfigure(startList, selectmode = "single")
     tkbind(startList, "<B1-ButtonRelease>", startClicked)
     writeList(startList, 1:99, clear = TRUE)
@@ -510,8 +528,8 @@ setState1MFrame <- function(frame, env, dataViewer){
 # state1
 setSkip <- function(widget, env, state = "state1"){
     temp <- getArgs(env)
-    temp[[state]][["skip"]] <-
-                    as.numeric(tkget(widget, tkcurselection(widget))) - 1
+    temp[[state]][["skip"]] <- as.numeric(as.character(tkget(widget,
+                                            tkcurselection(widget)))) - 1
     assignArgs(temp, env)
 }
 # Gets a frame for state2
