@@ -44,10 +44,11 @@ viewVignette(title, packName, vigPath, pdfPath, font = "arial 11")
 if(interactive()){
     library(Biobase)
     library(tools)
-    vExplorer(packNames = c("AnnBuilder", "annotate", "Biobase"))
+    vExplorer(pkgName = c("AnnBuilder"))
     path <- .path.package("Biobase")
     vigList <- getPkgVigList(path)
-    viewVignette("BioC VignetteBrowser", "Biobase", vigList[[1]]$VigPath)
+    viewVignette("BioC VignetteBrowser", "Biobase", vigList[[1]]$VigPath,
+     file.path(path, "doc"))
 }
 }
 \keyword{interface}
