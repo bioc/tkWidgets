@@ -43,7 +43,7 @@ modPData(pdata, rowOrCol, addNum)
   \item{phenoList}{\code{phenoList} a list of lists for tclVar()
     objects}
   \item{rowOrCol}{\code{rowOrCol} a character string that can either be
-    "Sample" or "Covariate"}
+    "Samples" or "Covariates"}
   \item{addNum}{\code{addNum} an integer for the number of columns or
     rows to be added to \code{pdata}}
 }
