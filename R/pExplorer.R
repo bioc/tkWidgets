@@ -3,32 +3,63 @@
 
 pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
 
-    pkgNames <- list.files(file.path(R.home(), "library"))
-
-    if(pkgName == ""){
-        selection <- tclVar(pkgNames[1])
-    }else{
-        selection <- tclVar(pkgName)
-    }
     if(pkgPath == ""){
-        pkgPath <- .libPaths()[1]
-        baseDir <- file.path(.libPaths()[1], tclvalue(selection))
+        pkgPaths <- .libPaths()
     }else{
-        baseDir <- file.path(pkgPath, tclvalue(selection))
+        pkgPaths <- c(pkgPath, .libPaths())
+    }
+    if(pkgName == ""){
+        pkgPath <- tclVar(pkgPaths[1])
+        pkgName <- tclVar(list.files(tclvalue(pkgPath))[1])
+        pkgNames <- list.files(tclvalue(pkgPath))
+    }else{
+        pkgPath <- tclVar(file.path(pkgPaths[1], pkgName))
+        pkgName <- tclVar(pkgName)
+        pkgNames <- pkgName
     }
 
-    curDir <- baseDir
+    curDir <- file.path(tclvalue(pkgPath), tclvalue(pkgName))
 
     end <- function(){
         tkdestroy(base)
     }
     on.exit(end())
+    upDatePath <- function(){
+        options(show.error.messages = FALSE)
+        opt <- try(getListOption(pathEntry, pkgPaths))
+        options(show.error.messages = TRUE)
+        if(!inherits(opt, "try-error")){
+            writeList(pathEntry, opt, clear = TRUE)
+            tclvalue(pkgPath) <<- opt
+            pkgNames <<- list.files(opt)
+            tclvalue(pkgName) <<- pkgNames[1]
+            curDir <<- file.path(opt, pkgNames[1])
+            writePkgDirs()
+        }
+    }
+    browse <- function(){
+        tclvalue(pkgPath) <<- tkchooseDirectory()
+        pkgNames <<- list.files(tclvalue(pkgPath))
+        tclvalue(pkgName) <<- pkgNames[1]
+        curDir <<- file.path(tclvalue(pkgPath), tclvalue(pkgName))
+        writePkgDirs()
+    }
     writePkgDirs <- function(){
-        writeList(listView, getPkgContents(pkgPath,
-                                           tclvalue(selection), exclude))
+        writeList(listView, getPkgContents(curDir, getExclude()))
         tkconfigure(contViewer, state = "normal")
         tkdelete(contViewer, "0.0", "end")
         tkconfigure(contViewer, state = "disabled")
+    }
+    pkgSelect <- function(){
+        options(show.error.messages = FALSE)
+        opt <- try(getListOption(pkgEntry, pkgNames))
+        options(show.error.messages = TRUE)
+        if(!inherits(opt, "try-error")){
+            writeList(pkgEntry, opt, clear = TRUE)
+            tclvalue(pkgName) <<- opt
+            curDir <<- file.path(tclvalue(pkgPath), opt)
+            writePkgDirs()
+        }
     }
     # When a user double clicks an item in the list box,
     # populate the list box with new files if the item is a directory
@@ -39,7 +70,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         if(regexpr(.Platform$file.sep, selectedObj) >= 1){
             curDir <<- file.path(curDir,
                                  gsub(.Platform$file.sep, "", selectedObj))
-            writeList(listView, appendSepDir(curDir))
+            writeList(listView, getPkgContents(curDir, getExclude()))
             tkconfigure(upBut, state = "normal")
         }else{
             popDisplay(getFileContents(file.path(curDir, selectedObj)))
@@ -51,28 +82,13 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         writeText(contViewer, contents, TRUE)
         tkconfigure(contViewer, state = "disabled")
     }
-    # When a single click is applied to an item in the list box, the
-    # content of a file will be displayed. The action will be ignored
-    # for directories
-    sClick <- function(){
-        selectedObj <- as.character(tkget(listView,
-                                          (tkcurselection(listView))))
-        if(regexpr(.Platform$file.sep, selectedObj) >= 1){
-            curDir <<- file.path(curDir,
-                                 gsub(.Platform$file.sep, "", selectedObj))
-            writeList(listView, appendSepDir(curDir))
-            tkconfigure(upBut, state = "normal")
-        }else{
-            popDisplay(getFileContents(file.path(curDir, selectedObj)))
-        }
-    }
 
     # Move the browser one level up the directory path
     goUp <- function(){
         curDir <<- gsub(paste(.Platform$file.sep,
                               basename(curDir), sep = ""), "", curDir)
-        writeList(listView, appendSepDir(curDir))
-        if(curDir == baseDir){
+        writeList(listView, getPkgContents(curDir, getExclude()))
+        if(curDir == file.path(tclvalue(pkgPath), tclvalue(pkgName))){
             tkconfigure(upBut, state = "disabled")
         }
         tkconfigure(contViewer, state = "normal")
@@ -80,37 +96,47 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         tkconfigure(contViewer, state = "disabled")
     }
     tryExp <- function(){
-        eExplorer(tclvalue(selection))
+        eExplorer(tclvalue(pkgName))
     }
 
     base <- tktoplevel()
     tktitle(base) <- paste("BioC Package Explorer")
-#    pathFrame <- tkframe(base)
-#    tkpack(tklabel(pathFrame, text = "Package path:"), side = "left",
-#           expand = FALSE)
-#    pathEntry <- tkentry(pathFrame, width = 20, textvariable = path)
-#    tkpack(pathEntry, side = "left", expand = TRUE, fill = "x")
-#    pathBut <- tkbutton(pathFrame, text = "Browse", width = 10,
-#                        command = setPath)
-#    tkpack(pathBut, side = "left", expand = FALSE)
-#    tkpack(pathFrame, side = "top", expand = FALSE, fill = "x",
-#           pady = 5, padx = 5)
     # A drop down list box that allows users to pick a package
-    topFrame <- tkframe(base)
-    tkpack(tklabel(topFrame, text = "Package to explore:"), side = "left",
+    pathFrame <- tkframe(base)
+    tkpack(tklabel(pathFrame, text = "Package path:"), side = "left",
            expand = FALSE)
-    dropFrame <- tkframe(topFrame)
-    dropdownList(dropFrame, pkgNames, selection, 20, tclvalue(selection))
+    dropFrame <- tkframe(pathFrame, borderwidth = 2, relief = "sunken")
+    pathEntry <- tkentry(dropFrame, width = 40, textvariable = pkgPath,
+                     borderwidth = 1)
+    tkpack(pathEntry, side = "left", expand = TRUE, fill = "both")
+    pathDropBut <- tkbutton(dropFrame, width = 1, text = "v", font = "bold",
+                        command = upDatePath)
+    tkpack(pathDropBut, side = "left", expand = FALSE)
     tkpack(dropFrame, side = "left", expand = TRUE, fill = "x")
-    exBut <- tkbutton(topFrame, text = "Explore", width = 10,
-                      command = writePkgDirs)
-    tkpack(exBut, side = "left", expand = FALSE)
-    tkpack(topFrame, side = "top", expand = FALSE, fill = "x",
+    browseBut <- tkbutton(pathFrame, text = "Browse", width = 6,
+                      command = browse)
+    tkpack(browseBut, side = "left", padx = 5, expand = FALSE)
+    tkpack(pathFrame, side = "top", expand = FALSE, fill = "x",
            pady = 5, padx = 5)
+
+    pkgFrame <- tkframe(base)
+    tkpack(tklabel(pkgFrame, text = "Package to explore:"), side = "left",
+           expand = FALSE)
+    pkgDFrame <- tkframe(pkgFrame, borderwidth = 2, relief = "sunken")
+    pkgEntry <- tkentry(pkgDFrame, width = 40, textvariable = pkgName,
+                     borderwidth = 1)
+    tkpack(pkgEntry, side = "left", expand = TRUE, fill = "both")
+    pkgDropBut <- tkbutton(pkgDFrame, width = 1, text = "v", font = "bold",
+                        command = pkgSelect)
+    tkpack(pkgDropBut, side = "left", expand = FALSE)
+    tkpack(pkgDFrame, side = "left", expand = TRUE, fill = "x")
+    tkpack(pkgFrame, side = "top", expand = FALSE, fill = "x",
+           pady = 5, padx = 5)
+
     # Put the list box for package contents and associated buttons
     midFrame <- tkframe(base)
     leftFrame <- tkframe(midFrame)
-    tkpack(tklabel(leftFrame, text = "Package contents"), side = "top",
+    tkpack(tklabel(leftFrame, text = "Contents"), side = "top",
            expand = FALSE, fill = "x")
     dirLFrame <- tkframe(leftFrame)
     listView <- makeViewer(dirLFrame, vWidth = 15, vHeight = 20,
@@ -143,23 +169,21 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     endBut <- tkbutton(butFrame, text = "Finish", width = 12, command = end)
     tkpack(endBut, side = "left", expand = FALSE, padx = 5)
     tkpack(butFrame, pady = 5)
-
-    if(pkgName != ""){
-        writePkgDirs()
-    }
+    writePkgDirs()
 
     tkwait.window(base)
 
     return(invisible())
 }
 
-getPkgContents <- function(pkgPath, pkgName, exclude = getExclude()){
-    pkgNames <- list.files(pkgPath, pkgName)
-    if(!any(pkgNames == pkgName)){
-        return(paste(pkgName, "is not in the R library"))
+getPkgContents <- function(pkgName, exclude = getExclude()){
+    options(show.error.messages = FALSE)
+    cont <- try(list.files(pkgName))
+    options(show.error.messages = TRUE)
+    if(inherits(cont, "try-error")){
+        return(paste(pkgName, "may not be a valid directory"))
     }else{
-        return(setdiff(appendSepDir(file.path(pkgPath, pkgName)),
-                       exclude))
+        return(setdiff(appendSepDir(file.path(pkgName)), exclude))
     }
 }
 

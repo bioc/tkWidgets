@@ -10,15 +10,15 @@
 }
 \usage{
 pExplorer(pkgName = "", pkgPath = "", exclude = getExclude())
-getPkgContents(pkgPath, pkgName, exclude = getExclude())
+getPkgContents(pkgName, exclude = getExclude())
 getFileContents(fileName)
 getExclude()
 }
 \arguments{
   \item{pkgPath}{\code{pkgPath} a character string for the path where R
     packages are loacted}
-  \item{pkgName}{\code{pkgName} a character string for name of an R
-    package to be explored}
+  \item{pkgName}{\code{pkgName} a character string for the name
+    (including path) of an R package to be explored}
   \item{fileName}{\code{fileName} a character string for the name
     (including path) of a file of interest}
   \item{exclude}{\code{exclude} a vector of character strings containing
