@@ -22,10 +22,10 @@ args2XML<- function(fun, xml.name = "", full.names = NULL,
     writeXML(paste("<tkWidgets:Arguments xmlns:AnnBuilder='http://",
                 "www.bioconductor.org/tkWidgets/'>", sep = ""))
 
-    for(i in names(args)){
+    for(i in 1:length(args)){
         writeXML("<tkWidgets:Argument>")
         writeXML(paste("<tkWidgets:ArgName value = \"",
-                       i, "\"/>", sep = ""))
+                       names(args[i]), "\"/>", sep = ""))
         writeXML(paste("<tkWidgets:ArgVal value = \"", args[i],
                        "\"/>", sep = ""))
         writeXML(paste("<tkWidgets:FullName value = \"",
@@ -38,4 +38,6 @@ args2XML<- function(fun, xml.name = "", full.names = NULL,
     }
 
     writeXML("</tkWidgets:Arguments>")
+
+    return(xml.name)
 }

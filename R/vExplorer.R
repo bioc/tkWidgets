@@ -189,7 +189,6 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
         for(i in nameNCode[[chunkName]]){
             tkinsert(editViewer, "end", paste(i, "\n", sep = ""))
         }
-        tkconfigure(buts[[chunkName]], state = "disabled")
         tkconfigure(buts[[chunkName]], state = "active")
         if(chunkName != 1){
             tkconfigure(buts[[chunkName - 1]], state = "normal")

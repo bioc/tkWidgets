@@ -23,11 +23,12 @@ basic = c("header", "sep"))
 }
 \details{
   This function is only partially finished and will be improved soon. It
-  currently allows uesrs to view a given file and arguments that are
-  going to be used to process the file.
+  currently allows uesrs to view a given file and change the settings
+  for header and sep arguments of read.table. A file will be read in
+  based on the values of the two arguments and return.
 }
 \value{
-  This function does not return any value
+  This function returns a data frame for the file read in.
 }
 \references{R News Vol. 1/3, September 2001}
 \author{Jianhua Zhang}
