@@ -559,7 +559,7 @@ setState3BFrame <- function(frame, env){
                                    variable = var, command = dropCMD[[i]])
         tkpack(dropCheck[[i]], side = "top")
         nameEntry[[i]] <- tkentry(colFrame, width = colWidth)
-        writeList(nameEntry[[i]], colnames(dataFile)[1])
+        writeList(nameEntry[[i]], colnames(dataFile)[i])
         nameCMD[[i]] <- function(){}
         body <- list(as.name("{"), substitute(eval(setColName(j,
                                       nameEntry[[i]], env)), list(j = i)))
