@@ -1,7 +1,8 @@
 # This widget allows users to explore an R package.
 #
 
-pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
+pExplorer <- function (pkgName = "", pkgPath = "",
+                       exclude = getExclude(), getFocus = TRUE){
 
     if(pkgPath == ""){
         pkgPaths <- .libPaths()
@@ -19,6 +20,9 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     baseDir <- file.path(tclvalue(pkgPath), tclvalue(pkgName))
     subDirs <- NULL
     end <- function(){
+        if(grtFocus){
+            tkgrab.release(base)
+        }
         tkdestroy(base)
     }
     on.exit(end())
@@ -205,6 +209,9 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     tkpack(butFrame, pady = 5)
     writePkgDirs()
 
+    if(grtFocus){
+        tkgrab.set(base)
+    }
     tkwait.window(base)
 
     return(invisible())

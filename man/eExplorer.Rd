@@ -14,7 +14,7 @@
   example code is for.
 }
 \usage{
-eExplorer(pkgName, font = "arial 13")
+eExplorer(pkgName, font = "arial 13", getFocus = TRUE)
 getExCode(pkgName)
 getHelpFile(pkgName, fileName)
 }
@@ -27,6 +27,8 @@ getHelpFile(pkgName, fileName)
     file in "R-ex" with the ".R" extension removed. The file contains a
     chunk of example code and may have a corrsponding help file in the
     "help" directory}
+   \item{getFocus}{\code{getFocus} a boolean indicating whether a widget
+    should grab the focus}
 }
 \details{
   \code{\link{getExCode}} and \code{\link{getHelpFile}} are called by

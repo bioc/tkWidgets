@@ -15,7 +15,8 @@
   try the example code.
 }
 \usage{
-pExplorer(pkgName = "", pkgPath = "", exclude = getExclude())
+pExplorer(pkgName = "", pkgPath = "", exclude = getExclude(), getFocus =
+TRUE)
 getPkgContents(pkgName, exclude = getExclude())
 getFileContents(path, fileName)
 getExclude()
@@ -38,6 +39,8 @@ procHTML(fileName)
     the directory or file names that will not be available for
     explorering. Package names have to have a system file separator
     appanded to the end (e. g. "/" under Unix)}
+   \item{getFocus}{\code{getFocus} a boolean indicating whether a widget
+    should grab the focus}
 }
 \details{
   With or without a package name, the widget will have all the installed

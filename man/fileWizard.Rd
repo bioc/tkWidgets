@@ -7,7 +7,7 @@
 }
 \usage{
 fileWizard(filename = "", fun = read.table, file = "file",
-basic = c("header", "sep"))
+basic = c("header", "sep"), getFocus = TRUE)
 }
 
 \arguments{
@@ -20,6 +20,8 @@ basic = c("header", "sep"))
   \item{basic}{A vector of character strings for names of the arguments
     to fun that will have separate entry boxes on the widget to be
     produced. Default to "header" and "sep"}
+  \item{getFocus}{\code{getFocus} a boolean indicating whether a widget
+    should grab the focus}
 }
 \details{
   This function is only partially finished and will be improved soon. It

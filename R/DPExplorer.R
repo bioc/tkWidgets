@@ -5,9 +5,8 @@
 # Copyrihgt, 2003, J. Zhang, all rights reserved
 #
 
-DPExplorer <- function (pkgName = "",
-                        title = "BioC Data Package Explorer"){
-    on.exit(tkdestroy(base))
+DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer",
+                        getFocus = TRUE){
 
     quit <- FALSE
     dataName <- NULL
@@ -81,8 +80,12 @@ DPExplorer <- function (pkgName = "",
     }
     cancel <- function(){
         quit <- TRUE
+        if(getFocus){
+            tkgrab.release(base)
+        }
         tkdestroy(base)
     }
+    on.exit(cancel())
     finish <- function(){
         tkdestroy(base)
     }
@@ -178,6 +181,9 @@ DPExplorer <- function (pkgName = "",
         activeLoadBut()
     }
 
+    if(getFocus){
+        tkgrab.set(base)
+    }
     tkwait.window(base)
 
     if(quit){

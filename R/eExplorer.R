@@ -1,7 +1,7 @@
 # This widget gets all the R example code from R-ex directory of a
 # given package and allows users to execute the example code chunks
 # and view the result of the execution.
-eExplorer <- function(pkgName, font = "arial 13"){
+eExplorer <- function(pkgName, font = "arial 13", getFocus = TRUE){
     # An environment to evaluate the code within
     evalEnv <- new.env(hash = TRUE, parent = parent.frame())
     if(any(missing(pkgName), is.null(pkgName), is.na(pkgName),
@@ -22,6 +22,9 @@ eExplorer <- function(pkgName, font = "arial 13"){
     }
 
     end <- function(){
+        if(getFocus){
+            tkgrab.release(base)
+        }
         tkdestroy(base)
     }
     on.exit(end())
@@ -180,6 +183,9 @@ eExplorer <- function(pkgName, font = "arial 13"){
                           font = font, command = end)
     tkpack(endButton)
 
+    if(getFocus){
+        tkgrab.set(base)
+    }
     tkwait.window(base)
 
     return(invisible())

@@ -3,8 +3,7 @@
 # Copyright 2002, J. Zhang, all rights reserved.
 
 fileWizard <- function(filename = "", fun = read.table, file = "file",
-                       basic = c("header", "sep")){
-    on.exit(end)
+                       basic = c("header", "sep"), getFocus = TRUE){
 
     BOLD12 <- "Helvetica 12 bold"
     NORMAL11 <- "Helvetica 11"
@@ -18,8 +17,12 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
 
     # Destroy the window
     end <- function(){
-         tkdestroy(top)
+        if(getFocus){
+            tkgrab.release(top)
+        }
+        tkdestroy(top)
     }
+    on.exit(end)
     # Write toPop to a given entry box
 #    writeEntry <- function(name, toPop){
 #        tkdelete(name, "0", "end")
@@ -194,6 +197,9 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
 
     init()
 
+    if(getFocus){
+        tkgrab.set(top)
+    }
     tkwait.window(top)
 
     return(fileRead)

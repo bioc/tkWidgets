@@ -9,7 +9,8 @@
   explore a data package of Bioconductor and read selected elements to R
 }
 \usage{
-DPExplorer(pkgName = "", title = "BioC Data Package Explorer")
+DPExplorer(pkgName = "", title = "BioC Data Package Explorer", getFocus
+= TRUE)
 getTopLevel(title)
 loadDataPkg(pkgName)
 }
@@ -17,7 +18,10 @@ loadDataPkg(pkgName)
 \arguments{
   \item{pkgName}{\code{pkgName} a character string for the name of a
     Bioconductor's data package that has already been loaded}
-  \item{title}{\code{title} a character string for the title of the widget}
+  \item{title}{\code{title} a character string for the title of the
+    widget}
+  \item{getFocus}{\code{getFocus} a boolean indicating whether a widget
+    should grab the focus}
 }
 \details{
   If \code{pkgName} is not provided when \code{\link{DPExplorer}} is
