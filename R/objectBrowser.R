@@ -76,54 +76,73 @@ objectBrowser <- function (fun = function(x) TRUE){
         if(tkcurselection(listView) != ""){
             selectedObj <<- tkget(listView,
                                       tkcurselection(listView))
-            if(regexpr("^package", selectedObj) > 0)
-                doPack(tkcurselection(listView), selectedObj)
-            else{
-                isPack <<- FALSE
-                objType <- typeof(get(selectedObj))
-                switch(objType,
-                   "environment" = doEnv(selectedObj),
-                    doElse()
+            goin()
+#            objType <- findObjType(selectedObj)
+#            switch(objType,
+#                "environment" = doEnv(selectedObj),
+#                "package" =  doPack(tkcurselection(listView), selectedObj),
+#                doElse()
 #                   "data.frame" = doObj(selectedObj, "data.frame"),
 #                   "vector" = doObj(selectedObj, "vector"),
 #                   "list" = doObj(selectedObj, "list"),
 #                   "matrix" = doObj(selectedObj, "matrix"),
 #                   "integer" = doObj(selectedObj, "integer"),
 #                   "character" = doObj(selectedObj, "character")
-                       )
-                if(length(objLevel) >= 2)
-                    tkconfigure(upBut, state = "normal")
-            }
+#                   )
+#            if(length(objLevel) >= 2)
+#                tkconfigure(upBut, state = "normal")
         }
     }
+
+    goin <- function (){
+        if(!is.null(selectedObj)){
+            objType <- findObjType(selectedObj)
+            switch(objType,
+                "environment" = doEnv(selectedObj),
+                "package" =  doPack(tkcurselection(listView), selectedObj),
+                doElse()
+#               "data.frame" = doObj(selectedObj, "data.frame"),
+            )
+            if(length(objLevel) >= 2)
+            tkconfigure(upBut, state = "normal")
+            tkconfigure(visitBut, state = "disabled")
+            selectedObj <<- NULL
+        }
+    }
+
 
     sClick <- function () {
         if(tkcurselection(listView) != ""){
             selectedObj <<- tkget(listView,
                                       tkcurselection(listView))
-            if(regexpr("^package", selectedObj) > 0)
+            objType <- findObjType(selectedObj)
+            if(objType == "package"){
                 returnList <<- list("name" = gsub("(^package:)", "\\",
                                     selectedObj), "obj"  =
                                     package.contents(gsub("(^package:)",
-                                                          "\\", selectedObj)))
-#                returnObj <<- package.contents(gsub("(^package:)",
-#                                                    "\\", selectedObj))
-            else
+                                                     "\\", selectedObj)))
+                tkconfigure(visitBut, state = "normal")
+            }else{
+                switch(objType,
+                    "environment" = tkconfigure(visitBut,state="normal"),
+                    "data.frame" = tkconfigure(visitBut, state="normal")
+                       )
                 returnList <<- list("name" = selectedObj,
                                     "obj" = get(selectedObj))
-#                returnObj <<- get(selectedObj)
+            }
         }
+    }
+
+    getAct <- function(){
+        selectedObj <<- ".GlobalEnv"
+        goin()
     }
 
     up <- function(){
         if(isPack){
-#            if(length(objLevel) > 1){
-                writeObj(listView, pickObjs(objNames = search(),
+            writeObj(listView, pickObjs(objNames = search(),
                                              fun = fun))
-                writeCap(objLevel[1])
-#            }else{
-#                viewObj()
-#            }
+            writeCap(objLevel[1])
         }else{
             if(length(objLevel) > 2){
                 writeObj(listView, pickObjs(objNames =
@@ -141,41 +160,33 @@ objectBrowser <- function (fun = function(x) TRUE){
     }
 
     writeCap <- function(objName, asis = FALSE){
-        if(asis)
-            toWrite <- objName
-        else{
+        if(asis){
+            tkconfigure(butVisit, text = objName)
+            tkconfigure(butType, text = findObjType(objName))
+        }else{
             if(objName == "Top Level"){
-                tclVar$vText <- "Top Level"
-                tclVar$tText <- "Search path"
-#                toWrite <- objName
+                tkconfigure(butVisit, text = "Top level")
+                tkconfigure(butType, text = "Search path")
             }else{
-                tclVar$vText <- objName
-                tclVar$tText <- typeof(get(objName))
-#                toWrite <- paste(objName, ":", typeof(get(objName)))
+                tkconfigure(butVisit, text = objName)
+                tkconfigure(butType, text = findObjType(objName))
             }
         }
-#        tkconfigure(caption, text = toWrite)
     }
 
     base <- tktoplevel()
     tktitle(base) <- paste("Object Browser")
 
-#    topMenu <- tkmenu(base)
-#    tkconfigure(base, menu = topMenu)
-
     capFrame <- tkframe(base)
     labl1 <- tklabel(capFrame, text = "Visiting: ", font = LABELFONT)
     labl2 <- tklabel(capFrame, text = "Type: ", font = LABELFONT)
-    butVisit <- tkbutton(capFrame, textvariable = "vText",
+    butVisit <- tkbutton(capFrame, text = "",
                          font = LABELFONT, width = 18)
-    butType <- tkbutton(capFrame, textvariable = "tText",
+    butType <- tkbutton(capFrame, text = "",
                         font = LABELFONT, width = 18)
 
     tkgrid(labl1, butVisit, labl2, butType)
     tkpack(capFrame, side = "top")
-#    caption <- tklabel(base, text = "Top Level",
-#                       font = LABELFONT, width = 60)
-#    tkpack(caption, side = "top")
 
     listFrame <- tkframe(base, height = 40)
     listView <- makeView(listFrame)
@@ -185,11 +196,15 @@ objectBrowser <- function (fun = function(x) TRUE){
 
     butFrame <- tkframe(base)
 
-    upBut <- tkbutton(butFrame, text = "Up", width = BUTWIDTH,
+    upBut <- tkbutton(butFrame, text = "Parent", width = BUTWIDTH,
 		      command = up)
+    activeBut <- tkbutton(butFrame, text = "Active", width = BUTWIDTH,
+		      command = getAct)
+    visitBut <- tkbutton(butFrame, text = "Visit", width = BUTWIDTH,
+		      command = goin, state = "disabled")
     endBut <- tkbutton(butFrame, text = "End", width = BUTWIDTH,
 		       command = end)
-    tkpack(upBut, endBut, side = "left")
+    tkpack(upBut, activeBut, visitBut, endBut, side = "left")
     tkpack(butFrame)
 
     viewObj()
