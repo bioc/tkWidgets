@@ -9,22 +9,22 @@ dbArgsWidget <- function(){
     # Sets the working environment
     PWEnv <- new.env(hash = TRUE, parent = NULL)
     # Defines the widget components
-    label1 <- label(name = "label1", value = "Database: ", width = 15,
-                    env = PWEnv)
-    db <- entryBox(name = "db", width = 20, env = PWEnv)
-    label2 <- label(name = "label2", value = "User name: ", width = 15,
-                    env = PWEnv)
-    un <- entryBox(name = "un", width = 20, env = PWEnv)
-    label3 <- label(name = "label3", value = "Password: ", width = 15,
-                    env = PWEnv)
-    pw <- entryBox(name = "pw", width = 20, env = PWEnv)
-    label4 <- label(name = "label4", value = "Host: ", width = 15,
-                    env = PWEnv)
-    hs <- entryBox(name = "hs", value = "localhost", width = 20,
-                   env = PWEnv)
-    label5 <- label(name = "label5", value = "Table name: ", width = 15,
-                    env = PWEnv)
-    tn <- entryBox(name = "tn", width = 20, env = PWEnv)
+    label1 <- label(wName = "label1", wValue = "Database: ", wWidth = 15,
+                    wEnv = PWEnv)
+    db <- entryBox(wName = "db", wWidth = 20, wEnv = PWEnv)
+    label2 <- label(wName = "label2", wValue = "User name: ", wWidth = 15,
+                    wEnv = PWEnv)
+    un <- entryBox(wName = "un", wWidth = 20, wEnv = PWEnv)
+    label3 <- label(wName = "label3", wValue = "Password: ", wWidth = 15,
+                    wEnv = PWEnv)
+    pw <- entryBox(wName = "pw", wWidth = 20, wEnv = PWEnv)
+    label4 <- label(wName = "label4", wValue = "Host: ", wWidth = 15,
+                    wEnv = PWEnv)
+    hs <- entryBox(wName = "hs", wValue = "localhost", wWidth = 20,
+                   wEnv = PWEnv)
+    label5 <- label(wName = "label5", wValue = "Table name: ", wWidth = 15,
+                    wEnv = PWEnv)
+    tn <- entryBox(wName = "tn", wWidth = 20, wEnv = PWEnv)
     # Makes a list with the layout defined
     pWidgets <- list(dbName = list(label1 = label1, db = db),
                      tableName = list(lable5 = label5, tn = tn),
@@ -37,19 +37,19 @@ dbArgsWidget <- function(){
                      postFun = function() {}, env = PWEnv)
 
     # Returns the input values
-    if(value(pWidgets(widget)[["dbName"]][["db"]]) == ""){
+    if(wValue(pWidgets(widget)[["dbName"]][["db"]]) == ""){
        stop("Database name can not be an empty string!")
     }
-    inputs <- list(dbname = value(pWidgets(widget)[["dbName"]][["db"]]),
-                   host = value(pWidgets(widget)[["host"]][["hs"]]))
-    if(value(pWidgets(widget)[["userName"]][["un"]]) != ""){
-        inputs[["user"]] <- value(pWidgets(widget)[["userName"]][["un"]])
+    inputs <- list(dbname = wValue(pWidgets(widget)[["dbName"]][["db"]]),
+                   host = wValue(pWidgets(widget)[["host"]][["hs"]]))
+    if(wValue(pWidgets(widget)[["userName"]][["un"]]) != ""){
+        inputs[["user"]] <- wValue(pWidgets(widget)[["userName"]][["un"]])
     }
-    if(value(pWidgets(widget)[["password"]][["pw"]]) != ""){
-        inputs[["password"]] <- value(pWidgets(widget)[["password"]][["pw"]])
+    if(wValue(pWidgets(widget)[["password"]][["pw"]]) != ""){
+        inputs[["password"]] <- wValue(pWidgets(widget)[["password"]][["pw"]])
     }
-    if(value(pWidgets(widget)[["tableName"]][["tn"]]) != ""){
-        inputs[["tableName"]] <- value(pWidgets(widget)[["tableName"]][["tn"]])
+    if(wValue(pWidgets(widget)[["tableName"]][["tn"]]) != ""){
+        inputs[["tableName"]] <- wValue(pWidgets(widget)[["tableName"]][["tn"]])
     }
 
     return(inputs)

@@ -23,10 +23,10 @@ argsWidget <- function(argsList){
         for(i in names(argsList)){
             if(any(i == names(funcs))){
                 argsList[[i]] <-
-                    get(value(pWidgets(widget)[[i]][["entry"]])[[1]])
+                    get(wValue(pWidgets(widget)[[i]][["entry"]])[[1]])
             }else{
                 argsList[[i]] <-
-                    formatArg(value(pWidgets(widget)[[i]][["entry"]])[[1]])
+                    formatArg(wValue(pWidgets(widget)[[i]][["entry"]])[[1]])
             }
         }
         return(argsList)
@@ -45,17 +45,17 @@ getPWidget <- function(argsList, PWEnv){
         # Creates radio buttons with TRUE and FALSE if the default
         # value for an argument is either a TRUE or FALSE
         if(is.logical(argsList[[i]]) && !is.na(argsList[[i]])){
-            eval(substitute(j <- radioButton(name = j,
-                     value = c("TRUE" = TRUE,"FALSE" = FALSE),
-                     env = PWEnv), list(j = i)))
+            eval(substitute(j <- radioButton(wName = j,
+                     wValue = c("TRUE" = TRUE,"FALSE" = FALSE),
+                     wEnv = PWEnv), list(j = i)))
         }else{
-            eval(substitute(j <- entryBox(name = j,
-                                 value = argsList[j],
-                                 width = 15, env = PWEnv), list(j = i)))
+            eval(substitute(j <- entryBox(wName = j,
+                                 wValue = argsList[j],
+                                 wWidth = 15, wEnv = PWEnv), list(j = i)))
 
         }
-        label <- label(name = "label", value = i,
-                                             width = lWidth, env = PWEnv)
+        label <- label(wName = "label", wValue = i,
+                                             wWidth = lWidth, wEnv = PWEnv)
         tempList[["label"]] <- label
         tempList[["entry"]] <- get(i)
         pWidgets[[i]] <- tempList
