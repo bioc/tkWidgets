@@ -35,15 +35,13 @@ setArgsList <- function(filename, env){
     argsList <- list()
 
     fileInfo <- guess.sep(file.name = filename, n = 40)
-    if(!is.null(fileInfo)){
-        temp <- list()
-        temp[["file"]] <- filename
-        temp[["header"]] <- fileInfo[["header"]]
-        temp[["sep"]] <- fileInfo[["separator"]]
-        argsList[["state1"]] <- temp
-        assignArgs(argsList, env)
-        setColInfos(fileInfo[["type"]], env)
-    }
+    temp <- list()
+    temp[["file"]] <- filename
+    temp[["header"]] <- fileInfo[["header"]]
+    temp[["sep"]] <- fileInfo[["separator"]]
+    argsList[["state1"]] <- temp
+    assignArgs(argsList, env)
+    setColInfos(fileInfo[["type"]], env)
 }
 # Set and get methods for argument list
 assignArgs <- function(value, env){
@@ -76,7 +74,7 @@ getColInfo <- function(env){
 }
 # Creates colInfo objects and sets the value of 'colInfos' list
 setColInfos <- function(types, env){
-    initColInfo()
+#    initColInfo()
     if(missing(types)){
         assignColInfo(list(), env)
     }else{
@@ -297,7 +295,7 @@ setState1TFrame <- function(frame, viewer, delims, env){
     # Populate the entry box for file name when the brose button is
     # clicked
     browse <- function(){
-        filename <- fileBrowser(nSelect = 1)
+        filename <- tclvalue(tkgetOpenFile())
         writeList(nameEntry, filename, clear = TRUE)
         setArgsList(filename, env)
         showData4State1(viewer, env)

@@ -41,8 +41,10 @@ guess.sep <- function(file.name, n = 5, seps = ""){
         type <- find.type(toCheck[2:length(toCheck)],separator, header)
         return(list(header = header, separator = separator, type = type))
     }else{
-        warning("I could not detect any delimiter")
-        return(NULL)
+#        warning("I could not detect any delimiter")
+        return(list(header = FALSE, separator = NULL,
+                    type = find.type(toCheck[2:length(toCheck)],
+                    header = FALSE)))
     }
 }
 
@@ -85,8 +87,8 @@ find.type <- function(line, sep, header = FALSE){
              types <- rbind(types, charOrNum(temp))
          }
      }else{
-         for(i in 1:nrow(line)){
-             types <- rbind(types, charOrNum(line[1,]))
+         for(i in line){
+             types <- rbind(types, charOrNum(i))
          }
      }
      if(nrow(unique(types)) == 1){
