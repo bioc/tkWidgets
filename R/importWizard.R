@@ -474,6 +474,7 @@ setQuoteList <- function(frame, env){
 # quotes in state2
 setQuote <- function(listBox, env, state = "state2"){
     quotes <- ""
+    # Quote can be multiple (" and/or ')
     selIndex <- unlist(strsplit(tkcurselection(listBox), " "))
     for(i in selIndex){
         quotes <- paste(quotes, tkget(listBox, i), sep = "")
@@ -496,8 +497,12 @@ setState2BFrame <- function(frame, env){
 showData4State2 <- function(canvas, env, state = "state2"){
     # Only show the number of rows defined
     temp <- getArgs(env)[[state]]
-    temp[["nrow"]] <- getShowNum(env)
+#    temp[["nrow"]] <- getShowNum(env)
     dataFile <- as.matrix(do.call("read.table", temp))
+    # Cut to right size of file is longer than maxRow
+    if(nrow(dataFile) > getShowNum(env)){
+        dataFile <- dataFile[1:getShowNum(env),]
+    }
     tempFrame <- tkframe(canvas)
     for(i in 1:ncol(dataFile)){
         tempList <- tklistbox(tempFrame, width = 0, height = 0,
@@ -567,8 +572,12 @@ setState3BFrame <- function(frame, env){
                        what = "canvas", side = "top")
     tempFrame <- tkframe(rCanv)
     argsList <- getArgs(env)[["state3"]]
-    argsList[["nrow"]] <- getShowNum(env)
+#    argsList[["nrow"]] <- getShowNum(env)
     dataFile <- do.call("read.table", argsList)
+    # Cut to right size of file is longer than maxRow
+    if(nrow(dataFile) > getShowNum(env)){
+        dataFile <- dataFile[1:getShowNum(env),]
+    }
     # Finds the data type for columns
     colInfos <- getColInfo(env)
     # Finds the maximum number of characters for each column
