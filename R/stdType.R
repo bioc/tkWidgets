@@ -11,6 +11,3 @@ stdType <- function(toCheck = "It works"){
         return(mode(toCheck))
 }
 
-stdValue <- function(toCheck = "It works"){
-    objViewer(toCheck)
-}
