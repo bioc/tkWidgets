@@ -73,7 +73,7 @@ values.Widget(x)
               buttonText=NULL)
 
   widget1 <- list(wList = list(a = pW1, b = pW2, c = pW3),
-                  preFun = function() "Hi"),
+                  preFun = function() "Hi",
                   postFun = function() "Bye")
 
 # Define the classes
