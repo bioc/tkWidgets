@@ -13,6 +13,8 @@ DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer",
     keyName <- NULL
     keySelection <- NULL
 
+    currentList <- list()
+
     if(typeof(pkgName) != "character"){
         tkmessageBox(title = "Argument Error",
                          message = "Package name must be a character string",
@@ -45,16 +47,20 @@ DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer",
             writeList(valueList, capture.output(get(dName)))
         }else{
             dataName <<- dName
-            keys <- ls(get(dataName, pos = grep(pkgName, search())))
-            writeList(keyList, keys)
+            currentList <<- as.list(get(dataName,
+                                        pos = grep(pkgName, search())))
+            #keys <- ls(get(dataName, pos = grep(pkgName, search())))
+            writeList(keyList, names(currentList))
             tkdelete(valueList, "0", "end")
         }
     }
     keySelected <- function(){
-        keyName <<- as.character(tkget(keyList,
-                                       tkcurselection(keyList)))
-        values <- get(keyName, get(dataName, pos = grep(pkgName, search())))
-        writeList(valueList, values)
+        keyName <<- paste(as.character(tkget(keyList,
+                                       tkcurselection(keyList))),
+                          sep = "", collapse = " ")
+        #values <- get(keyName, get(dataName, pos = grep(pkgName, search())))
+        #writeList(valueList, values)
+        writeList(valueList, currentList[[keyName]])
         tkconfigure(selectBut, state = "normal")
     }
     select <- function(){
