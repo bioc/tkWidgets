@@ -19,6 +19,9 @@ pExplorer <- function (pkgName = ""){
         tkdestroy(base)
     }
     on.exit(end())
+    writePkgDirs <- function(){
+        writeList(listView, getPkgContents(tclvalue(selection)))
+    }
     # When a user double clicks an item in the list box,
     # populate the list box with new files if the item is a directory
     # or write the contents to the display window if the item is a
@@ -81,6 +84,9 @@ pExplorer <- function (pkgName = ""){
     dropFrame <- tkframe(topFrame)
     dropdownList(dropFrame, pkgNames, selection, 20, tclvalue(selection))
     tkpack(dropFrame, side = "left", expand = TRUE, fill = "x")
+    exBut <- tkbutton(topFrame, text = "Explore", width = 10,
+                      command = writePkgDirs)
+    tkpack(exBut, side = "left", expand = FALSE)
     tkpack(topFrame, side = "top", expand = FALSE, fill = "x",
            pady = 5, padx = 5)
     # Put the list box for package contents and associated buttons
@@ -98,7 +104,6 @@ pExplorer <- function (pkgName = ""){
 
     tkbind(listView, "<Double-Button-1>", dClick)
 #    tkbind(listView, "<B1-ButtonRelease>", sClick)
-    writeList(listView, getPkgContents(tclvalue(selection)))
     tkpack(leftFrame, side = "left", expand = TRUE, fill = "both")
     # Put the text box to show contents of a selected file
     rightFrame <- tkframe(midFrame)
@@ -120,6 +125,10 @@ pExplorer <- function (pkgName = ""){
     endBut <- tkbutton(butFrame, text = "Finish", width = 12, command = end)
     tkpack(endBut, side = "left", expand = FALSE, padx = 5)
     tkpack(butFrame, pady = 5)
+
+    if(pkgName != ""){
+        writePkgDirs()
+    }
 
     tkwait.window(base)
 
