@@ -596,7 +596,7 @@ setState3BFrame <- function(frame, env){
     tempFrame <- tkframe(rCanv)
     argsList <- getArgs(env)[["state3"]]
     dataFile <- do.call("read.table", argsList)
-    # Cut to right size of file is longer than maxRow
+    # Cut to right size of file if longer than maxRow
     if(nrow(dataFile) > getShowNum(env)){
         dataFile <- dataFile[1:getShowNum(env),]
     }
