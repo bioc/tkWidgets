@@ -96,24 +96,32 @@ objectBrowser<- function (env = .GlobalEnv,
     # Executed when a user double clicks an ojbect that is a
     # list. Shows the number of columns, number of rows and column names.
     doList <- function (aList){
-
-        if(is.null(ncol(get(aList))))
-            towrite <- c("Type: List",
-                         paste("Length:", length(get(aList))))
-
-
-        toWrite <- c("Type: List",
-                     paste("Number of columns:", ncol(get(aList))),
-                     paste("Number of row(s):", nrow(get(aList))),
-                     paste("Column Name(s):"),names(get(aList)))
-
+        currentState <<- "list"
+        if(is.data.frame(get(aList))){
+            toWrite <- c("Type: data frame",
+                         paste("Number of columns:", ncol(get(aList))),
+                         paste("Number of row(s):", nrow(get(aList))),
+                         "Column name(s):",
+                         colnames(get(aList)),
+                         "Row name(s):",
+                         row.names(get(aList)))
+        }else{
+            toWrite <- c("Type: list",
+                         paste("Length:", length(get(aList))),
+                         "Element name(s):",
+                         names(get(aList)))
+        }
         writeList(listView, toWrite, clear = TRUE)
         writeCap(aList)
+        tkconfigure(selectBut, state = "disabled")
     }
 
     doVector <- function(vect){
         currentState <<- "vector"
         writeList(listView, get(vect), clear = TRUE)
+    }
+
+    doClosure <- function(code){
     }
 
     # Executed when a user double clicks an object name in a list box.
@@ -134,6 +142,7 @@ objectBrowser<- function (env = .GlobalEnv,
                 objType <- typeof(get(selectedObj))
             }
             switch(objType,
+               "closure" = doClosure(selectedObj),
                "environment" = doEnv(selectedObj),
                "package" =  doPack(tkcurselection(listView), selectedObj),
                "list" = doList(selectedObj),
@@ -148,7 +157,9 @@ objectBrowser<- function (env = .GlobalEnv,
     # object names
     sClick <- function () {
         selectedObj <<- NULL
-        tkconfigure(selectBut, state = "normal")
+        if(currentState != "list"){
+            tkconfigure(selectBut, state = "normal")
+        }
         selIndex <<- unlist(strsplit(
                               as.character(tkcurselection(listView)), " "))
         if(length(selIndex) == 1){
@@ -169,6 +180,7 @@ objectBrowser<- function (env = .GlobalEnv,
         objsInSel <<- NULL
         selectedObj <<- ".GlobalEnv"
         goin()
+        tkconfigure(selectBut, state = "disabled")
     }
 
     # Moves one step back the path of objects browsered
