@@ -5,8 +5,8 @@
 \alias{name}
 \alias{type<-}
 \alias{type}
-\alias{drop<-}
-\alias{drop}
+\alias{dropOrNot<-}
+\alias{dropOrNot}
 \alias{colInfo}
 \title{Class "colInfo" a class to keep column information for a data file}
 \description{Objects of this class store column information for a data
@@ -23,7 +23,7 @@ Objects can be created by calls of the form \code{new("colInfo", ...)}.
       string for the name of a data column}
     \item{\code{type}:}{Object of class \code{"character"} a character
       string for the type of the data column}
-    \item{\code{drop}:}{Object of class \code{"logical"} a boolean
+    \item{\code{dropOrNot}:}{Object of class \code{"logical"} a boolean
       indicating whether the column will be droped (TRUE) when the data
       file is read by \code{\link{read.table}}}
   }
@@ -39,10 +39,10 @@ Objects can be created by calls of the form \code{new("colInfo", ...)}.
       for type}
     \item{type}{\code{signature(object = "colInfo")}: Gets the value for
       type}
-    \item{drop<-}{\code{signature(object = "colInfo")}: Sets the value
-      for drop}
-    \item{drop}{\code{signature(object = "colInfo")}: Gets the value for
-      drop}
+    \item{dropOrNot<-}{\code{signature(object = "colInfo")}: Sets the value
+      for dropOrNot}
+    \item{dropOrNot}{\code{signature(object = "colInfo")}: Gets the value for
+      dropOrNot}
   }
 }
 \references{Programming with data}
@@ -56,6 +56,6 @@ Objects can be created by calls of the form \code{new("colInfo", ...)}.
   test <- colInfo("info1", "character", FALSE)
   name(test)
   type(test)
-  drop(test)
+  dropOrNot(test)
 }
 \keyword{classes}

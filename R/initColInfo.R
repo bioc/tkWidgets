@@ -1,12 +1,12 @@
 # Functions that initializes or constructs a colInfo class/object
 # name - the name for a column
 # type - data type for a column
-# drop - a boolean indicating whether the column will be droped
+# dropOrNot - a boolean indicating whether the column will be droped
 
 .initColInfo <- function(where){
     setClass("colInfo", representation(name = "character",
                                        type = "character",
-                                       drop = "logical"),
+                                       dropOrNot = "logical"),
                                        where = where)
     # Set the get methods
     if(!isGeneric("name")){
@@ -23,13 +23,13 @@
     }
     setMethod("type", "colInfo",
               function(object) object@type, where = where)
-    if(!isGeneric("drop")){
-        setGeneric("drop",
-                   function(object) standardGeneric("drop"),
+    if(!isGeneric("dropOrNot")){
+        setGeneric("dropOrNot",
+                   function(object) standardGeneric("dropOrNot"),
                    where = where)
     }
-    setMethod("drop", "colInfo",
-              function(object) object@drop, where = where)
+    setMethod("dropOrNot", "colInfo",
+              function(object) object@dropOrNot, where = where)
     # Define the replace methods
     if(!isGeneric("name<-")){
         setGeneric("name<-", function(object, value)
@@ -43,15 +43,15 @@
     }
     setReplaceMethod("type", "colInfo", function(object, value){
                   object@type <- value; object}, where = where)
-    if(!isGeneric("drop<-")){
-        setGeneric("drop<-", function(object, value)
-                   standardGeneric("drop<-"), where = where)
+    if(!isGeneric("dropOrNot<-")){
+        setGeneric("dropOrNot<-", function(object, value)
+                   standardGeneric("dropOrNot<-"), where = where)
     }
-    setReplaceMethod("drop", "colInfo", function(object, value){
-                  object@drop <- value; object}, where = where)
+    setReplaceMethod("dropOrNot", "colInfo", function(object, value){
+                  object@dropOrNot <- value; object}, where = where)
     return(invisible("done"))
 }
 
 colInfo <- function(name, type, drop){
-    new("colInfo", name = name, type = type, drop = drop)
+    new("colInfo", name = name, type = type, dropOrNot = drop)
 }

@@ -80,7 +80,7 @@ setColInfos <- function(types, env){
     }else{
         temp <- list()
         for(i in 1:length(types)){
-            # name = "", type = types[i], drop = FALSE
+            # name = "", type = types[i], dropOrNot = FALSE
             temp[[i]] <- colInfo("", types[i], FALSE)
         }
         assignColInfo(temp, env)
@@ -232,7 +232,7 @@ finish <- function(env){
         colNames <- NULL
         colToDrop <- NULL
         for(i in 1:length(colInfos)){
-            if(drop(colInfos[[i]])){
+            if(dropOrNot(colInfos[[i]])){
                 colToDrop <- c(colToDrop, i)
             }else{
                 switch(type(colInfos[[i]]),
@@ -680,11 +680,11 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos,
     assignColInfo(colInfos, env)
 }
 # Create a list box with data written in
-writeCol4Lines <- function(tempFrame, dataCol){
+writeCol4Lines <- function(tempFrame, dataFile){
     colFrame <- tkframe(tempFrame)
     colList <- tklistbox(colFrame, width = 0, height = 0,
                                          background = "white")
-    tkinsert(colList, "end", dataCol)
+    tkinsert(colList, "end", dataFile)
     tkpack(colList, side = "top", fill = "x", expand = TRUE)
     tkpack(colFrame, side = "left", fill = "both", expand = TRUE)
 }
@@ -693,11 +693,11 @@ writeCol4Lines <- function(tempFrame, dataCol){
 dropColumn <- function(index, env){
     colInfos <- getColInfo(env)
     temp <- colInfos[[index]]
-    if(drop(colInfos[[index]])){
+    if(dropOrNot(colInfos[[index]])){
         temp <- colInfos[[index]]
-        drop(temp) <- FALSE
+        dropOrNot(temp) <- FALSE
     }else{
-        drop(temp) <- TRUE
+        dropOrNot(temp) <- TRUE
     }
     colInfos[[index]] <- temp
     assignColInfo(colInfos, env)
