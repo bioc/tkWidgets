@@ -122,6 +122,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 
     write2List <- function (listBox, toWrite){
         tkdelete(listBox, 0, "end")
+        trash <- sapply(toWrite, writeList, widget = listBox, clear = FALSE)
         tkinsert(listBox, "end", toWrite)
     }
 
