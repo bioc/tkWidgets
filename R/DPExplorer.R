@@ -26,14 +26,11 @@ DPExplorer <- function (pkgName = "",
             return(NULL)
         }else{
             keys <- getSelectedFromEnv(workEnv)
-            where <- grep(getPkgNameFromEnv(workEnv), search())
             if(length(keys) == 1){
-                return(get(keys, get(getDataNameFromEnv(workEnv),
-                                     pos = where)))
+                return(get(keys, get(getDataNameFromEnv(workEnv))))
             }else{
                 return(multiget(keys,
-                                 get(getDataNameFromEnv(workEnv),
-                                     pos = where)))
+                                 get(getDataNameFromEnv(workEnv))))
             }
         }
     }
@@ -176,8 +173,9 @@ packDataNameList <- function(base, env){
     dataSelected <- function(){
         dataName <- as.character(tkget(dataNameList,
                                        tkcurselection(dataNameList)))
-        where <- grep(getPkgNameFromEnv(env), search())
-        keys <- ls(get(dataName, pos = where))
+        load(file.path(.find.package(getPkgNameFromEnv(env)), "data",
+                       paste(dataName, ".rda", sep = "")), env = .GlobalEnv)
+        keys <- ls(get(dataName))
         writeList(getKeyListFromEnv(env), keys)
         assignDataName(dataName, env)
     }
@@ -199,8 +197,7 @@ packKeyList <- function(base, env){
     keySelected <- function(){
         keyName <- as.character(tkget(keyList,
                                        tkcurselection(keyList)))
-        where <- grep(getPkgNameFromEnv(env), search())
-        values <- get(keyName, get(getDataNameFromEnv(env), pos = where))
+        values <- get(keyName, get(getDataNameFromEnv(env)))
         writeList(getValueListFromEnv(env), values)
         assignKey(keyName, env)
         tkconfigure(getSelectBut(env), state = "normal")
@@ -349,7 +346,7 @@ getNameFrame <- function(base, pkgName, env){
 loadDataPkg <- function(pkgName, env){
 
     options(show.error.messages = FALSE)
-    tryMe <- try(do.call("library", list(package = pkgName)))
+    tryMe <- try(.find.package(pkgName))
     options(show.error.messages = TRUE)
     if(inherits(tryMe, "try-error")){
         tkmessageBox(title = "Invalid Package Name",
@@ -359,7 +356,7 @@ loadDataPkg <- function(pkgName, env){
     }else{
         assignPkgName(pkgName, env)
         return(gsub("\\.rda$", "",
-                    list.files(file.path(.path.package(pkgName),
+                    list.files(file.path(.find.package(pkgName),
                                          "data"), pattern = ".rda")))
         }
 }
