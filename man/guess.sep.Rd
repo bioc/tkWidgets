@@ -15,7 +15,7 @@
 \usage{
 guess.sep(file.name, numLine = 5, seps = "", isFile = TRUE)
 guess.header(twoLines, sep)
-find.type(file.name, sep, header = FALSE, numLine = 5)
+find.type(file.name, sep, header = FALSE, numLine = 5, isFile = TRUE)
 charOrNum(vect)
 getRowNames(file.name, sep, header, skip)
 }

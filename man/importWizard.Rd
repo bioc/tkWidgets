@@ -21,6 +21,8 @@
 \alias{setState3BFrame}
 \alias{getName4Data}
 \alias{writeCol4Matrix}
+\alias{popStartLine}
+
 \title{A widget for importing data to R}
 \description{
   Functions constructs a widget that allows users to inport data
@@ -35,7 +37,7 @@ getAFrame(base, env)
 finish(env)
 getState1Frame(base, env)
 setState1BFrame(frame, env)
-setState1TFrame(frame, viewer, delims, env)
+setState1TFrame(frame, viewer, delims, env, startList)
 showData4State1(widget, env)
 setState1MFrame(frame, env, dataViewer)
 getState2Frame(base, env, state = "state2", reset = FALSE)
@@ -50,6 +52,7 @@ setState3TFrame(frame, env)
 setState3BFrame(frame, env)
 getName4Data(filename, objType)
 writeCol4Matrix(tempFrame, dataFile, colInfos, env)
+popStartLine(startList, env)
 }
 
 \arguments{
@@ -83,6 +86,7 @@ writeCol4Matrix(tempFrame, dataFile, colInfos, env)
   \item{dataViewer}{\code{dataViewer} a tkwin object for a list box}
   \item{objType}{\code{objType} a character string indicating the data
     type of an object to be saved. Defaulted to "object"}
+  \item{startList}{\code{startList} a tk text box object}
 }
 \details{
   \code{\link{importWizard}} mimics the interface of MS Excel and
