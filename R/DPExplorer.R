@@ -7,12 +7,20 @@
 
 DPExplorer <- function (pkgName = "",
                         title = "BioC Data Package Explorer"){
+    on.exit(tkdestroy(base))
+
     quit <- FALSE
     dataName <- NULL
     keyName <- NULL
     keySelection <- NULL
 
-    on.exit(tkdestroy(base))
+    if(typeof(pkgName) != "character"){
+        tkmessageBox(title = "Argument Error",
+                         message = "Package name must be a character string",
+                         icon = "error",
+                         type = "ok")
+        stop()
+    }
     loadDP <- function(){
         pkgName <<- tclvalue(nameVar)
         if(pkgName == ""){

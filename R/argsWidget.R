@@ -79,23 +79,28 @@ formatArg <- function(toFormat){
     if(is.logical(toFormat)){
         options(warn = 0)
         return(toFormat)
+    }
+    if(toFormat == "TRUE"){
+        return(TRUE)
+    }
+    if(toFormat == "FALSE"){
+        return(FALSE)
+    }
+    options(warn = 0)
+    if(toFormat == ""){
+        return(toFormat)
+    }
+    # expression and negative numbers can be "language"
+    if(is.language(toFormat)){
+        return(formula(toFormat))
+    }
+    options(warn = -1)
+    temp <- as.numeric(toFormat)
+    options(warn = 0)
+    if(is.na(temp)){
+        return(getTrueNullNa(toFormat))
     }else{
-        options(warn = 0)
-        if(toFormat == ""){
-            return(toFormat)
-        }
-        # expression and negative numbers can be "language"
-        if(is.language(toFormat)){
-            return(formula(toFormat))
-        }
-        options(warn = -1)
-        temp <- as.numeric(toFormat)
-        options(warn = 0)
-        if(is.na(temp)){
-           return(getTrueNullNa(toFormat))
-        }else{
-            return(temp)
-        }
+        return(temp)
     }
 }
 
