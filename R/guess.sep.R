@@ -5,7 +5,7 @@
 # Copyright 2002, J. Zhang, all rights reserved
 #
 
-guess.sep <- function(file.name, n = 5, seps = ""){
+guess.sep <- function(file.name, numLine = 5, seps = "", isFile = TRUE){
 
     separator <- ""
     header <- FALSE
@@ -16,7 +16,11 @@ guess.sep <- function(file.name, n = 5, seps = ""){
         seps <- c(" ", ",", ";", "\t", seps)
     }
 
-    toCheck <- readLines(file.name, n = n)
+    if(isFile){
+        toCheck <- readLines(file.name, n = numLine)
+    }else{
+        toCheck <- file.name
+    }
 
     w<-NULL
 

@@ -34,29 +34,40 @@ importWizard <- function(filename, maxRow = 400){
 }
 # Using function guess.sep to figure out the the header, sep, and data
 # type of a file and sets the argument list and colInfo
-setArgsList <- function(filename, env){
-    argsList <- list()
+setArgsList <- function(filename, env, isFile = TRUE, init = TRUE){
     options(show.error.messages = FALSE)
-    fileInfo <- try(guess.sep(file.name = filename, n = 40))
+    fileInfo <- try(guess.sep(file.name = filename, numLine = 40,
+                              isFile = isFile))
     options(show.error.messages = TRUE)
     if(inherits(fileInfo, "try-error")){
-    tkmessageBox(title = "Incorrect File Name",
-                 message = paste("File name", filename, "may not be valid.",
-                           "Please provide a correct file name",
-                           "or use the browse button on the interface",
-                           "to get a correct file name."),
-                 icon = "error",
-                 type = "ok")
+        tkmessageBox(title = "Incorrect File Name",
+                 message = paste("An error message:\n\n", fileInfo,
+                           "\nwas generated while reading file",
+                           filename, "."), icon = "error", type = "ok")
         return(FALSE)
     }else{
-        temp <- list()
-        temp[["file"]] <- filename
-        temp[["header"]] <- fileInfo[["header"]]
-        temp[["sep"]] <- fileInfo[["separator"]]
-        argsList[["state1"]] <- temp
+        if(init){
+            argsList <- list()
+            temp <- formals("read.table")
+            temp[["file"]] <- filename
+            temp[["header"]] <- fileInfo[["header"]]
+            temp[["sep"]] <- fileInfo[["separator"]]
+            temp[["quote"]] <- ""
+            # Reassign fill with the value of blank.lines.skip
+            temp[["fill"]] <- !temp[["blank.lines.skip"]]
+            argsList[["state1"]] <- as.list(temp)
+        }else{
+            argsList <- getArgs(env)
+            argsList[["state1"]][["header"]] <- fileInfo[["header"]]
+            argsList[["state1"]][["sep"]] <- fileInfo[["separator"]]
+        }
         assignArgs(argsList, env)
         setColInfos(fileInfo[["type"]], env)
-        assignLineData(readLines(filename, n = getShowNum(env)), env)
+        if(isFile){
+            assignLineData(readLines(filename, n = getShowNum(env)), env)
+        }else{
+            assignLineData(filename, env)
+        }
         return(TRUE)
     }
 }
@@ -126,22 +137,38 @@ initImportWizard <- function(env){
         tkdestroy(top)
     }
     nextState <- function(){
-        tempFrame <- changeState(canvas, backBut, nextBut, env, TRUE,
-                                 endBut)
+        args <- getArgs(env)
+        if(is.null(args[["state1"]][["file"]])){
+            tkmessageBox(title = "Import Error",
+                         message = "I do not know what file to import!",
+                         icon = "error",
+                         type = "ok")
+        }else{
+            tempFrame <- changeState(canvas, backBut, nextBut, env, TRUE,
+                                 endBut, viewBut)
+            tkdestroy(currentFrame)
+            tkpack(tempFrame, fill = "both", expand = TRUE)
+            currentFrame <<- tempFrame
+        }
+    }
+    preState <- function(){
+        tempFrame<- changeState(canvas, backBut, nextBut, env, FALSE,
+                                endBut, viewBut)
         tkdestroy(currentFrame)
         tkpack(tempFrame, fill = "both", expand = TRUE)
         currentFrame <<- tempFrame
     }
-    preState <- function(){
-        tempFrame<- changeState(canvas, backBut, nextBut, env, FALSE,
-                                endBut)
+    redraw <- function(){
+        tempFrame <- getAFrame(canvas, env)
         tkdestroy(currentFrame)
         tkpack(tempFrame, fill = "both", expand = TRUE)
         currentFrame <<- tempFrame
     }
     finishClicked <- function(){
         dataList <<- finish(env)
-        end()
+        if(!is.null(dataList)){
+            end()
+        }
     }
 
     ## Set up the interface
@@ -156,6 +183,8 @@ initImportWizard <- function(env){
     ## The bottom frame contains the buttons that allow users to
     ## navigate the importing process
     butFrame <- tkframe(top)
+    viewBut <- tkbutton(butFrame, text = "View", width = 8,
+                        state = "disabled", command = redraw)
     canBut <- tkbutton(butFrame, text = "Cancel", width = 8,
                        command = end)
     backBut <- tkbutton(butFrame, text = "< Back", width = 8,
@@ -164,9 +193,10 @@ initImportWizard <- function(env){
                         command = nextState)
     endBut <- tkbutton(butFrame, text = "Finish", width = 8,
                        state = "disabled", command = finishClicked)
-    tkpack(canBut, backBut, nextBut, endBut, side = "left")
+    tkpack(canBut, backBut, nextBut, viewBut, endBut, side = "left")
     tkpack(butFrame, pady = 10, fill = "y", expand = TRUE)
 
+    args <- getArgs(env)
     tkwait.window(top)
     return(dataList)
 }
@@ -185,9 +215,9 @@ getTopCan <- function(base, env){
 }
 # Changes the state and thus the interface
 changeState <- function(canvas, backBut, nextBut, env, forward = TRUE,
-                        endBut){
+                        endBut, viewBut){
     # Sets the current state
-    setNewState(env, backBut, nextBut, forward, endBut)
+    setNewState(env, backBut, nextBut, forward, endBut, viewBut)
     if(forward){
         addArgs(env)
     }else{
@@ -198,25 +228,30 @@ changeState <- function(canvas, backBut, nextBut, env, forward = TRUE,
 }
 # Sets the string for the new state (next or previous) and
 # actviates/inactivates buttons depending on the state
-setNewState <- function(env, backBut, nextBut, forward = TRUE, endBut){
+setNewState <- function(env, backBut, nextBut, forward = TRUE,
+                        endBut, viewBut){
     if(forward){
         if(getCState(env) == "state1"){
             assignCState("state2", env)
             tkconfigure(backBut, state = "normal")
+            tkconfigure(viewBut, state = "normal")
         }else{
             assignCState("state3", env)
             tkconfigure(nextBut, state = "disabled")
             tkconfigure(endBut, state = "normal")
+            tkconfigure(viewBut, state = "disabled")
         }
     }else{
         if(getCState(env) == "state2"){
             assignCState("state1", env)
             tkconfigure(nextBut, state = "normal")
             tkconfigure(backBut, state = "disabled")
+            tkconfigure(viewBut, state = "disabled")
         }else{
             assignCState("state2", env)
             tkconfigure(nextBut, state = "normal")
             tkconfigure(endBut, state = "disabled")
+            tkconfigure(viewBut, state = "normal")
         }
     }
 }
@@ -249,40 +284,50 @@ getAFrame <- function(base, env){
 # The importing process ends. Return a list with argument list and
 # data read using read.table as elements
 finish <- function(env){
-    switch(getCState(env),
-           "state1" = args <- getArgs(env)[["state1"]],
-           "state2" = args <- getArgs(env)[["state2"]],
-           "state3" = args <- getArgs(env)[["state3"]])
+    args <- getArgs(env)[["state3"]]
+    if(is.null(args[["quote"]])){
+        args[["quote"]] <- "\"'"
+    }
     dataName <- getName4Data(args[["file"]])
-    dataFile <- do.call("read.table", args)
-    colInfos <- getColInfo(env)
-    colNames <- NULL
-    colToDrop <- NULL
-    for(i in 1:length(colInfos)){
-        if(dropOrNot(colInfos[[i]])){
-            colToDrop <- c(colToDrop, i)
-        }else{
-            switch(type(colInfos[[i]]),
+    options(show.error.messages = FALSE)
+    dataFile <- try(do.call("read.table", args))
+    options(show.error.message = TRUE)
+    if(inherits(dataFile, "try-error")){
+        tkmessageBox(title = "Import Error",
+                     message = paste("An error message:\n\n", dataFile,
+                     "\nwas generated while reading file ",
+                     args[["file"]], "."), icon = "error", type = "ok")
+        return(NULL)
+    }else{
+        colInfos <- getColInfo(env)
+        colNames <- NULL
+        colToDrop <- NULL
+        for(i in 1:length(colInfos)){
+            if(dropOrNot(colInfos[[i]])){
+                colToDrop <- c(colToDrop, i)
+            }else{
+                switch(type(colInfos[[i]]),
                    "Character" = dataFile[, i] <- as.character(dataFile[, i]),
                    "Numeric" = dataFile[, i] <- as.numeric(dataFile[, i]))
-            colNames <- c(colNames, name(colInfos[[i]]))
+                colNames <- c(colNames, name(colInfos[[i]]))
+            }
         }
+        # Drop the columns
+        if(!is.null(colToDrop)){
+            dataFile <- dataFile[, -colToDrop]
+        }
+        # In case there is only one column left
+        if(is.null(ncol(dataFile))){
+            dataFile <- data.frame(matrix(dataFile, ncol = 1))
+            names(dataFile) <- colNames
+        }else{
+            names(dataFile) <- colNames
+        }
+        if(!is.null(dataName)){
+            assign(dataName, dataFile, env = .GlobalEnv)
+        }
+        return(list(args = args, data = dataFile))
     }
-    # Drop the columns
-    if(!is.null(colToDrop)){
-        dataFile <- dataFile[, -colToDrop]
-    }
-    # In case there is only one column left
-    if(is.null(ncol(dataFile))){
-        dataFile <- data.frame(matrix(dataFile, ncol = 1))
-        names(dataFile) <- colNames
-    }else{
-        names(dataFile) <- colNames
-    }
-    if(!is.null(dataName)){
-        assign(dataName, dataFile, env = .GlobalEnv)
-    }
-    return(list(args = args, data = dataFile))
 }
 # Gets the frame containing the interface for the top frame of
 # importWizard for state1
@@ -297,7 +342,7 @@ getState1Frame <- function(base, env){
     # The mid frame contains the delimiter and number line
     # information.
     midFrame <- tkframe(frame)
-    delims <- setState1MFrame(midFrame, env)
+    delims <- setState1MFrame(midFrame, env, dataViewer)
     # The top frame contains a entry box and a browse button that
     # allows for browing directories for a file name
     topFrame <- tkframe(frame)
@@ -327,6 +372,13 @@ setState1TFrame <- function(frame, viewer, delims, env){
     browse <- function(){
         filename <- tclvalue(tkgetOpenFile())
         writeList(nameEntry, filename, clear = TRUE)
+        argsSet <- setArgsList(filename, env)
+        if(argsSet){
+            showData4State1(viewer, env)
+            if(!is.null(getArgs(env)[["state1"]][["sep"]])){
+                tkselect(delims[["delimit"]])
+            }
+        }
     }
     # Get the file
     getFile <- function(){
@@ -365,7 +417,18 @@ setState1TFrame <- function(frame, viewer, delims, env){
 }
 # Show the data read in using readLines for state1
 showData4State1 <- function(widget, env){
-     dataFile <- getLineData(env)
+     skip <- getArgs(env)[["state1"]][["skip"]]
+     if(!is.null(skip)){
+         dataFile <- getLineData(env)
+         showNum <- getShowNum(env)
+         if(length(dataFile) > showNum){
+             dataFile <- dataFile[(skip + 1):showNum]
+         }else{
+             dataFile <- dataFile[(skip + 1):length(dataFile)]
+         }
+     }else{
+         dataFile <- getLineData(env)
+     }
      # Preventing the header to be shown
      if(getArgs(env)[["state1"]][["header"]]){
          dataFile <- dataFile[2:length(dataFile)]
@@ -380,10 +443,23 @@ showData4State1 <- function(widget, env){
      }
 }
 # Sets the mid frame for state1
-setState1MFrame <- function(frame, env){
+setState1MFrame <- function(frame, env, dataViewer){
     # Executed when values in start at row list box is clicked
     startClicked <- function(){
         setSkip(startList, env)
+        args <- getArgs(env)
+        skip <- as.numeric(args[["state1"]][["skip"]])
+        assignShowNum((getShowNum(env) + skip), env)
+        dataFile <- getLineData(env)
+        showNum <- getShowNum(env)
+        if(length(dataFile) > showNum){
+            dataFile <- dataFile[(skip + 1):showNum]
+        }else{
+            dataFile <- dataFile[(skip + 1):length(dataFile)]
+        }
+        setArgsList(dataFile, env, FALSE, FALSE)
+#        showData4State1(dataViewer, env)
+
     }
     leftPan <- tkframe(frame)
     delimit <- tclVar()
@@ -474,7 +550,6 @@ setSepRadios <- function(frame, env, state = "state2"){
     sepEntered <- function(){
         tkselect(sepButs[["other"]])
         temp <- getArgs(env)
-        print(paste("sep = ", tkget(otherEntry)))
         temp[[state]][["sep"]] <- as.character(tkget(otherEntry))
         assignArgs(temp, env)
     }
@@ -635,11 +710,12 @@ setState3BFrame <- function(frame, env){
                        what = "canvas", side = "top")
     tempFrame <- tkframe(rCanv)
     argsList <- getArgs(env)[["state3"]]
+    argsList[["nrows"]] <- getShowNum(env)
     dataFile <- do.call("read.table", argsList)
     # Cut to right size of file if longer than maxRow
-    if(nrow(dataFile) > getShowNum(env)){
-        dataFile <- dataFile[1:getShowNum(env),]
-    }
+#    if(nrow(dataFile) > getShowNum(env)){
+#        dataFile <- dataFile[1:getShowNum(env),]
+#    }
     # Finds the data type for columns
     colInfos <- getColInfo(env)
     writeCol4Matrix(tempFrame, dataFile, colInfos, env)
@@ -649,16 +725,7 @@ setState3BFrame <- function(frame, env){
 # Create a group of list boxes with entry boxes and a radio button on
 # top to allow for user inputs.
 writeCol4Matrix <- function(tempFrame, dataFile, colInfos, env){
-    typeEntry <- list()
-    dropCheck <- list()
-    nameEntry <- list()
-    # Lists to keep the command associated with the radio buttons of
-    # entry boxex
-    dropCMD <- list()
-    nameCMD <- list()
-    typeCMD <- list()
-    colList <- list()
-    for(i in 1:ncol(dataFile)){
+    writeDataCol <- function(i, data){
         colFrame <- tkframe(tempFrame)
         dropCMD[[i]] <- function(){}
         body <- list(as.name("{"),
@@ -669,10 +736,15 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos, env){
                                    variable = var, command = dropCMD[[i]])
         tkpack(dropCheck[[i]], side = "top", fill = "x", expand = TRUE)
         nameEntry[[i]] <- tkentry(colFrame, width = 0)
-        writeList(nameEntry[[i]], colnames(dataFile)[i])
         # Also updates the value of colInfos
         temp <- colInfos[[i]]
-        name(temp) <- colnames(dataFile)[i]
+        if(!is.null(colnames(data))){
+            writeList(nameEntry[[i]], colnames(data))
+            name(temp) <- colnames(data)
+        }else{
+            writeList(nameEntry[[i]], paste("V", i, sep = ""))
+            name(temp) <- paste("V", i, sep = "")
+        }
         colInfos[[i]] <- temp
         nameCMD[[i]] <- function(){}
         body <- list(as.name("{"), substitute(eval(setColName(j,
@@ -690,9 +762,25 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos, env){
         tkpack(typeEntry[[i]], side = "top", fill = "x", expand = TRUE)
         colList[[i]] <- tklistbox(colFrame, width = 0,
                                   height = 0, background = "white")
-        tkinsert(colList[[i]], "end", dataFile[,i])
+        tkinsert(colList[[i]], "end", data)
         tkpack(colList[[i]], side = "top", fill = "x", expand = TRUE)
         tkpack(colFrame, side = "left", fill = "both", expand = TRUE)
+    }
+    typeEntry <- list()
+    dropCheck <- list()
+    nameEntry <- list()
+    # Lists to keep the command associated with the radio buttons of
+    # entry boxex
+    dropCMD <- list()
+    nameCMD <- list()
+    typeCMD <- list()
+    colList <- list()
+    if(is.null(ncol(dataFile))){
+        writeDataCol(1, dataFile)
+    }else{
+        for(i in 1:ncol(dataFile)){
+            writeDataCol(i, dataFile[,i])
+        }
     }
     # Sets values for colInfo object
     assignColInfo(colInfos, env)
