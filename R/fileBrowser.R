@@ -44,6 +44,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     inList <- function(){
         selectedObj <- as.character(tkget(listView,(tkcurselection(listView))))
         if(regexpr(Platform()$file.sep, selectedObj) >= 1){
+            if(currentNode == 1)
+                path <<- ""
 	    path <<- paste(path, Platform()$file.sep,
                            gsub(Platform()$file.sep, "\\", selectedObj),
                            sep = "")
@@ -52,7 +54,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                      pickFiles(dirsNFiles(path), testFun,
                                prefix, suffix))
             writeCap(path)
-            if(currentNode >= 2)
+            if(currentNode >= 1)
                 tkconfigure(upBut, state = "normal")
         }
     }
@@ -112,30 +114,32 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
 
     fileUP <- function (){
-        if(currentNode > 2){
+        if(currentNode > 2)
 	    path <<- paste(nodes[1:(currentNode - 1)],
 			  sep = "", collapse = Platform()$file.sep)
-            writeDir(listView, pickFiles(dirsNFiles(path), testFun,
+        if(currentNode == 2)
+            path <<- Platform()$file.sep
+        writeDir(listView, pickFiles(dirsNFiles(path), testFun,
                                          prefix, suffix))
-            writeCap(path)
-            currentNode <<- currentNode - 1
-            if(currentNode == 2)
-   	        tkconfigure(upBut, state = "disabled")
-        }
+        writeCap(path)
+        currentNode <<- currentNode - 1
+        if(currentNode == 1)
+   	    tkconfigure(upBut, state = "disabled")
     }
 
     up <- function(){
         tkconfigure(selectBut, state = "disabled")
-        if(currentNode > 2){
+        if(currentNode > 2)
 	    path <<- paste(nodes[1:(currentNode - 1)],
 			  sep = "", collapse = Platform()$file.sep)
-            writeDir(listView, pickFiles(dirsNFiles(path), testFun,
+        if(currentNode == 2)
+            path <<- Platform()$file.sep
+        writeDir(listView, pickFiles(dirsNFiles(path), testFun,
                                          prefix, suffix))
-            writeCap(path)
-            currentNode <<- currentNode - 1
-            if(currentNode == 2)
-   	        tkconfigure(upBut, state = "disabled")
-        }
+        writeCap(path)
+        currentNode <<- currentNode - 1
+        if(currentNode == 1)
+   	    tkconfigure(upBut, state = "disabled")
     }
 
     writeToView <- function(aView, toWrite){
