@@ -1,7 +1,7 @@
 # Functions that quide users through the steps of inporting a
 # phenoData object. Used by the affy package.
 
-importPhenoData <- function(sampleNames){
+importPhenoData <- function(sampleNames = NULL){
 
     fileName <- tclVar()
     objName <- tclVar()
@@ -30,7 +30,7 @@ importPhenoData <- function(sampleNames){
             args[["file"]] <- tclvalue(fileName)
             args <- argsWidget(args,
                                inst = "Arguments for function read.table")
-            args[["row.names"]] <- sampleNames
+            #args[["row.names"]] <- sampleNames
             options(show.error.messages = FALSE)
             tryMe<- try(do.call("read.table", as.list(args)))
             options(show.error.messages = TRUE)
@@ -56,9 +56,9 @@ importPhenoData <- function(sampleNames){
             if(is.null(pdata)){
                 pdata <<- get(tclvalue(objName), env = .GlobalEnv)
             }
+            pdata <<- sNames4rNames(pdata, sampleNames)
             if(!is.null(pdata)){
-                newPhenoData <<- createPhenoData(sNames4rNames(pdata,
-                                      sampleNames), sampleNames)
+                newPhenoData <<- createPhenoData(pdata, sampleNames)
                 end()
             }
         }
@@ -67,9 +67,17 @@ importPhenoData <- function(sampleNames){
         if(tclvalue(phenoName) == ""){
             yesno <- tkmessageBox(title = "New phenoData",
                      message = "No name provided. Create new?",
-                     icon = "error",
+                     icon = "question",
                      type = "yesno")
             if(tclvalue(yesno) == "yes"){
+                if(!is.null(sampleNames)){
+                    pdata <<- sNames4rNames(data.frame(matrix("",
+                                    ncol = 1, nrow = length(sampleNames))),
+                                            sampleNames)
+                }else{
+                    pdata <<- data.frame(matrix("", ncol = 1, nrow = 1))
+                }
+                colnames(pdata) <<- paste("Covar1")
                 newPhenoData <<- createPhenoData(pdata, sampleNames)
                 end()
             }
@@ -83,8 +91,8 @@ importPhenoData <- function(sampleNames){
             }else{
                 pdata <<- pData(phenodata)
             }
-            newPhenoData <<- createPhenoData(sNames4rNames(pdata,
-                                        sampleNames), sampleNames)
+            pdata <<- sNames4rNames(pdata, sampleNames)
+            newPhenoData <<- createPhenoData(pdata, sampleNames)
             end()
         }
     }
@@ -125,8 +133,18 @@ importPhenoData <- function(sampleNames){
     tkpack(tklabel(base, text = paste("Welcome! I will guide you through",
                         "the steps needed to input your phenoData")),
                   side = "top", expand = FALSE, padx = 5, pady = 5)
-    tkpack(tklabel(base, text = "Please choose from the options below:"),
-                   side = "top", expand = FALSE, padx = 5, pady =5)
+    noteFrame <- tkframe(base, borderwidth = 2, relief = "groove")
+    tkpack(tklabel(noteFrame, text = paste(".Read From File: create a",
+                              "phenoData using a file name typed/browsed in.",
+                              "\n.Read From Object: create a phenoData",
+                              "using an existing data frame in .GlobalEnv.",
+                              "\n Type/browse in the name of the data frame.",
+                              "\n.Edit/Creat: Edit an existing phenoData",
+                              "(name needed) in .GlobalEnv or create",
+                              "\n a new phenoData (name optional)."),
+                   justify = "left"),
+                  side = "top", expand = FALSE, pady = 5)
+    tkpack(noteFrame, side = "top", expand = FALSE, pady = 5, padx = 5)
     # Interface for reading from a file
     readFrame <- tkframe(base)
     fileBut <- tkbutton(readFrame, text = "Read From File", width = 16,
@@ -196,21 +214,31 @@ sNames4rNames <- function(pdata, sampleNames){
     if(inherits(tryMe, "try-error")){
         ok <- tkmessageBox(title = "Sample mis-match",
                      message = paste("Length of sample names and",
-                         "row numbers of data frame do not match"),
-                     icon = "error",
-                     type = "ok")
-        return(NULL)
+                         "row numbers of data frame do not match.",
+                         "\nContinue?"),
+                     icon = "question",
+                     type = "yesno")
+        if(tclvalue(ok) == "no"){
+            return(NULL)
+        }
+    }else{
+        if(!is.null(sampleNames)){
+            rownames(pdata) <- sampleNames
+        }
     }
     return(pdata)
 }
+
 createPhenoData <- function(pdata, sampleNames){
     phenoObj <- NULL
     phenoList <- NULL
+    addNum <- tclVar()
+    rowOrCol <- tclVar()
 
     if(is.null(pdata)){
-        covarNum <- tclVar(1)
+        covarNum <- 1
     }else{
-        covarNum <- tclVar(ncol(pdata))
+        covarNum <- ncol(pdata)
     }
 
     end <- function(){
@@ -223,32 +251,48 @@ createPhenoData <- function(pdata, sampleNames){
         end()
     }
     changeCovar <- function(){
+        if(tclvalue(rowOrCol) == "Covariates"){
+            covarNum <<- covarNum + as.numeric(tclvalue(addNum))
+        }
+        pdata <<- modPData(pdata, tclvalue(rowOrCol),
+                           as.numeric(tclvalue(addNum)))
         phenoList <<- writePhenoTable(base, dataText, pdata, sampleNames,
-                                 as.numeric(tclvalue(covarNum)))
+                                 covarNum)
     }
 
     base <- tktoplevel()
     tktitle(base) <- "BioC PhenoData Wizard"
 
     tkpack(tklabel(base, text = paste("Please enter pheno data using",
-                        "the table below\n\nThe first column shows sample",
-                         "names and the first row shows covariate names.",
-                         "\nEmpty cells right below covariate names are for",
-                         "entries for desciptions nof covariates."),
+                        "the table below:")), pady = 5)
+    noteFrame <- tkframe(base, borderwidth = 2, relief = "groove")
+    tkpack(tklabel(noteFrame, text = paste(".Cells in the first column/row",
+                         "with Ratain/Delete indicates whether a column/row",
+                        "\n will be ratained or deleteded.",
+                         "\n.The second row shows covariate names and",
+                         "the second column shows sample names.",
+                         "\n.Empty cells right below covariate names are for",
+                         "entries for desciptions nof covariates.",
+                         "\n.Values in all cells are editable."),
                    justify = "left"),
-                  side = "top", expand = FALSE, padx = 5, pady = 5)
+                  side = "top", expand = FALSE, pady = 5)
+    tkpack(noteFrame, side = "top", expand = FALSE, padx = 5)
     # Dropdown list for covariate numbers
     covarDrop <- tkframe(base)
-    tkpack(tklabel(covarDrop, text = "Number of covariate:"),
-           side = "left", expand = FALSE)
-    drop <- tkframe(covarDrop)
-    dropdownList(drop, 1:20, covarNum, 10,
-                 ifelse(tclvalue(covarNum) == "", 1,
-                        tclvalue(covarNum)), TRUE)
-    tkpack(drop, side = "left", expand = TRUE, fill = "x")
+    tkpack(tklabel(covarDrop, text = "Add "), side = "left", expand = FALSE)
+    numFrame <- tkframe(covarDrop)
+    dropdownList(numFrame, as.character(0:20), addNum, 3, "0", TRUE)
+    tkpack(numFrame, side = "left", expand = FALSE, fill = "x")
+    tkpack(tklabel(covarDrop, text = " new "), side = "left",
+           expand = FALSE)
+    rowFrame <- tkframe(covarDrop)
+    dropdownList(rowFrame, c("Samples", "Covariates"), rowOrCol, 10,
+                 "Samples", TRUE)
+    tkpack(rowFrame, side = "left", expand = TRUE, fill = "x")
     tkpack(tkbutton(covarDrop, text = "Apply", width = 7,
                     command = changeCovar), expand = FALSE)
-    tkpack(covarDrop, side = "top", expand = TRUE, fill = "x", padx = 5)
+    tkpack(covarDrop, side = "top", expand = TRUE, fill = "x",
+           padx = 5, pady = 5)
 
     # A text widget to keep phenoData entries
     dataFrame <- tkframe(base)
@@ -267,29 +311,45 @@ createPhenoData <- function(pdata, sampleNames){
     tkpack(butFrame, expand = FALSE, fill = "x", padx = 5, pady = 5)
 
     phenoList <- writePhenoTable(base, dataText, pdata, sampleNames,
-                                 as.numeric(tclvalue(covarNum)))
+                                 covarNum)
 
     tkwait.window(base)
 
     return(phenoObj)
 }
-
+# Write data contained by pdata to the text widget
 writePhenoTable <- function(base, textWidget, pdata, sampleNames,
                             covarNum){
     phenoMat <- makePhenoData(pdata, sampleNames, covarNum)
     values <- list()
     tkdelete(textWidget, "0.0", "end")
+    #tempEntry <- list()
     for(i in 1:nrow(phenoMat)){
         tempList <- list()
         for(j in 1:ncol(phenoMat)){
-            if(i == 1 || j == 1){
+            if(i < 3 || j < 3 || (i == 3 && j == 2)){
                 style <- "raised"
             }else{
                 style <- "sunken"
             }
+            if(i < 4 && j < 3){
+                state <- "disabled"
+            }else{
+                state <- "normal"
+            }
             tempList[[j]] <- tclVar(phenoMat[i, j])
             tempEntry <- tkentry(base, textvariable = tempList[[j]],
-                                   width = 11, relief = style)
+                                state = state, width = 11, relief = style)
+            if((i > 2 && j == 1) || (i == 1 && j > 2)){
+                fun <- function() {}
+                body <- list(as.name("{"),
+                             substitute(temp <- tclvalue(tkget(tempEntry))),
+                             substitute(tkdelete(tempEntry, 0, "end")),
+                             substitute(tkinsert(tempEntry, "end",
+                               ifelse(temp == "Retain", "Delete", "Retain"))))
+                body(fun) <- as.call(body)
+                tkbind(tempEntry, "<B1-ButtonRelease>", fun)
+            }
             tkwindow.create(textWidget, "end", window = tempEntry)
         }
         tkinsert(textWidget, "end", "\n")
@@ -298,28 +358,37 @@ writePhenoTable <- function(base, textWidget, pdata, sampleNames,
     return(values)
 }
 
+
 makePhenoData <- function(pdata, sampleNames, covarNum){
     if(!is.null(pdata)){
-        if(covarNum == ncol(pdata)){
-            temp <- rbind(c("", colnames(pdata)), rep("", nrow(pdata)),
-                          as.matrix(cbind(rownames(pdata), pdata)))
-        }else if(covarNum > ncol(pdata)){
-            temp <- rbind(c("", colnames(pdata), rep("", nrow(pdata)),
-                        paste("CoVar", (ncol(pdata)+1):covarNum, sep = "")),
-                          as.matrix(cbind(rownames(pdata),
-                         pdata, matrix("", ncol = covarNum - ncol(pdata),
-                                       nrow = length(sampleNames)))))
-        }else{
-            temp <- rbind(c("", colnames(pdata)[1:covarNum]),
-                          rep("", nrow(pdata)),
-                          as.matrix(cbind(rownames(pdata),
-                         pdata[, 1:covarNum])))
+        #if(covarNum == ncol(pdata)){
+            temp <- rbind(c("", "", rep("Retain", ncol(pdata))),
+                          c("", "", colnames(pdata)), rep("",
+                                                    (ncol(pdata) + 2)),
+                          as.matrix(cbind(rep("Retain",
+                                              length(rownames(pdata))),
+                                                  rownames(pdata), pdata)))
+        #}else if(covarNum > ncol(pdata)){
+         #   temp <- rbind(c("", "", rep("Retain", covarNum)),
+         #                 c("", "", colnames(pdata),
+         #                   rep("", nrow(pdata)),
+         #               paste("CoVar", (ncol(pdata)+1):covarNum, sep = "")),
+         #                 as.matrix(cbind(rownames(pdata),
+         #                pdata, matrix("", ncol = covarNum - ncol(pdata),
+         #                              nrow = length(sampleNames)))))
+        #}else{
+        #    temp <- rbind(c("", colnames(pdata)[1:covarNum]),
+        #                  rep("", nrow(pdata)),
+        #                  as.matrix(cbind(rownames(pdata),
+        #                 pdata[, 1:covarNum])))
 
-        }
+        #}
     }else{
-        temp <- rbind(c("", paste("Covar", 1:covarNum, sep = "")),
-                      rep("", covarNum + 1),
-                      as.matrix(cbind(sampleNames, matrix("",
+        temp <- rbind(c("", "", rep("Retain", covarNum)),
+                      c("", "", paste("Covar", 1:covarNum, sep = "")),
+                      rep("", covarNum + 2),
+                      as.matrix(cbind(rep("Retain", length(sampleNames)),
+                                      sampleNames, matrix("",
                       ncol = covarNum, nrow = length(sampleNames)))))
     }
     return(as.matrix(temp))
@@ -330,21 +399,19 @@ convert2PData <- function(phenoList){
     varlist <- list()
     cnames <- NULL
     for(i in 1:length(phenoList)){
-        temp <- phenoList[[i]]
         tempP <- NULL
+        temp <- phenoList[[i]]
         for(j in 1:length(temp)){
-            if(i > 2){
-                tempP <- c(tempP, tclvalue(temp[[j]]))
-            }else if (i == 2 && j != 1){
-                varlist[[length(varlist) + 1]] <- tclvalue(temp[[j]])
-            }else if(i == 1 && j != 1){
-                cnames <- c(cnames, tclvalue(temp[[j]]))
-            }
+            tempP <- c(tempP, tclvalue(temp[[j]]))
         }
         pdata <- rbind(pdata, tempP)
     }
-    rnames <- pdata[,1]
-    pdata <- pdata[,2:ncol(pdata)]
+    pdata <- pdata[, pdata[1,] != "Delete"]
+    pdata <- pdata[pdata[,1] != "Delete",]
+    varlist <- as.list(pdata[2, 3:ncol(pdata)])
+    rnames <- pdata[4:nrow(pdata), 2]
+    cnames <- pdata[2, 3:ncol(pdata)]
+    pdata <- pdata[-(1:3), -(1:2)]
     if(is.null(nrow(pdata))){
         pdata <- data.frame(matrix(pdata, ncol = 1))
     }
@@ -356,7 +423,23 @@ convert2PData <- function(phenoList){
 
 }
 
+# Function that add new rows/columns to pdata
+modPData <- function(pdata, rowOrCol, addNum){
+    if(rowOrCol == "Covariates" && addNum > 0){
+        temp <- cbind(pdata,
+                      matrix("", nrow  = nrow(pdata),
+                             ncol = addNum))
+        colnames(temp) <- c(colnames(pdata), paste("Covar",
+                       (ncol(pdata) + 1):(ncol(pdata) + addNum), sep = ""))
 
+    }else{
+        temp <- rbind(as.matrix(pdata), matrix("",nrow = addNum,
+                                               ncol = ncol(pdata)))
+        rownames(temp) <- c(rownames(pdata), cbind(paste("Sample",
+                      (nrow(pdata) + 1):(nrow(pdata) + addNum), sep = "")))
+    }
+    return(temp)
+}
 
 
 

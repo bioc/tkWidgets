@@ -6,10 +6,11 @@
 \alias{writePhenoTable}
 \alias{makePhenoData}
 \alias{convert2PData}
+\alias{modPData}
 
-\title{A function to input data for a phenoData object}
+\title{Functions to input data for a phenoData object}
 \description{
-  This function allows users to read data from an existing file or an R
+  This functions allow users to read data from an existing file or an R
   data frame object and use the data frame to construct a phenoData object
 }
 \usage{
@@ -20,6 +21,7 @@ sNames4rNames(pdata, sampleNames)
 writePhenoTable(base, textWidget, pdata, sampleNames, covarNum)
 makePhenoData(pdata, sampleNames, covarNum)
 convert2PData(phenoList)
+modPData(pdata, rowOrCol, addNum)
 }
 
 \arguments{
@@ -38,7 +40,12 @@ convert2PData(phenoList)
     widget}
   \item{covarNum}{\code{covarNum} an integer for the number of
     covariates a phenoData object will have}
-  \item{phenoList}{\code{phenoList} a list of lists for tclVar() objects}
+  \item{phenoList}{\code{phenoList} a list of lists for tclVar()
+    objects}
+  \item{rowOrCol}{\code{rowOrCol} a character string that can either be
+    "Sample" or "Covariate"}
+  \item{addNum}{\code{addNum} an integer for the number of columns or
+    rows to be added to \code{pdata}}
 }
 
 \details{
