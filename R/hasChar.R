@@ -4,11 +4,14 @@
 #
 # Copyright 2002, J. Zhang. All rights reserved.
 #
-##why did you get rid of hasSuffix and hasPrefix -- you should not be 
-## changing the API -- you just broke everyone's code -- for no real
-##reason -- you could have a hasPrefix and hasSuffix that simply call this
-##function. You can't really go around changing the API unless there is a
-##really good reason....
+
+hasPrefix <- function(aPrefix){
+    hasChar(aPrefix, "prefix")
+}
+
+hasSuffix <- function(aSuffix){
+    hasChar(aSuffix, "suffix")
+}
 
 hasChar <- function (tocheck, what = ""){
 
@@ -16,10 +19,6 @@ hasChar <- function (tocheck, what = ""){
         stop(paste("Bad value:", tocheck))
 
     function(x){
-        ##didn't you just check this?
-        if(!is.character(x) || nchar(x) < 1 )
-        stop("Bad string value!")
-
         if(what == "prefix"){
             pattern <- paste("^", tocheck, sep = "")
         }else if(what == "suffix"){

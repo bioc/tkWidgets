@@ -5,7 +5,7 @@
 # Copyright 2002, J. Zhang, all rights reserved
 #
 
-guess.sep <- function(file.name, n = 3, seps = ""){
+guess.sep <- function(file.name, n = 5, seps = ""){
 
     separator <- "Not detected"
     header <- "Not detected"
@@ -18,18 +18,27 @@ guess.sep <- function(file.name, n = 3, seps = ""){
 
     toCheck <- readLines(file.name, n = n)
 
-    for(i in seps){
-        temp <- length(unlist(strsplit(toCheck[1], i)))
-        if(temp > 1){
-            for(j in 2:length(toCheck)){
-                temp2 <- length(unlist(strsplit(toCheck[j], i)))
-                if(temp == temp2){
-                    separator <- i
-                    break
-                }
-            }
-        }
+    w<-NULL
+    for(i in seps) { w[[i]] <- strsplit(x, i)}
+    v <- lapply(w, function(x) sapply(x, length))
+    good <- function(x) all(x==x[1]) && x[1] > 1
+    found <- sapply(v, good)
+    sep <- names(found[found])
+    if(length(sep) == 1){
+        separator <- sep
     }
+#    for(i in seps){
+#        temp <- length(unlist(strsplit(toCheck[1], i)))
+#        if(temp > 1){
+#            for(j in 2:length(toCheck)){
+#                temp2 <- length(unlist(strsplit(toCheck[j], i)))
+#                if(temp == temp2){
+#                    separator <- i
+#                    break
+#                }
+#            }
+#        }
+#    }
 
     if(separator != "Not detected"){
        header <- guess.header(toCheck[1:2], separator)
@@ -72,7 +81,6 @@ guess.header <- function(twoLines, sep){
 }
 
 find.type <- function(line, sep){
-     on.exit(options(warn = 1))
 
      line <- unlist(strsplit(line, sep))
      options(warn = -1)
