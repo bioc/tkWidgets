@@ -8,7 +8,7 @@
 !  selected objects will be returned.
 }
 \usage{
-objectBrowser(env = parent.frame(1), fun = function(x) TRUE,
+objectBrowser(env = .GlobalEnv, fun = noAuto,
               textToShow = "Select object(s)", nSelect = -1)
 }
 \arguments{

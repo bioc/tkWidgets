@@ -71,7 +71,7 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
     }
     pkgSelect <- function(){
         options(show.error.messages = FALSE)
-        opt <- try(getListOption(pkgDropBut, pkgNames))
+        opt <- try(getListOption(pkgDropBut, pkgNames, 15, TRUE))
         options(show.error.messages = TRUE)
         if(!inherits(opt, "try-error")){
             #tkconfigure(pkgEntry, state = "normal")

@@ -6,18 +6,16 @@
 #
 
 vExplorer <- function (title = "BioC Vignettes Explorer",
-                       pkgName ="", font = ifelse(.Platform$OS.type
+                       pkgName ="",
+                       font = ifelse(.Platform$OS.type
                                     == "unix", "arial 14", "arial 11")){
 
-#    require(Biobase) || stop("Package Biobase not available!")
     require("tools", character.only = TRUE) ||
     stop("Package tools not available!")
-#    require(DynDoc) || stop("Package DynDoc not available!")
 
     on.exit(tkdestroy(base))
     PLATFORM <- .Platform$OS.type
     selectedPkg <- NULL
-#    selectedVig <- NULL
     vigList <- NULL
 
     end <- function(){
@@ -46,7 +44,6 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
                      tkinsert(vigViewer, "end", i)
                  }
              }
-#             tkconfigure(vButton, state = "disabled")
          }
     }
 
@@ -117,10 +114,9 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     # Populates the list box for package names
     .popPackList(packViewer, pkgName)
     if(pkgName != ""){
-         write2VigList(pkgName)
-     }
-
-#    tkconfigure(vButton, state = "disabled")
+        selectedPkg <- pkgName
+        write2VigList(pkgName)
+    }
 
     tkwait.window(base)
 }

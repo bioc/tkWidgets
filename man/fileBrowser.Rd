@@ -9,7 +9,7 @@
 }
 \usage{
 fileBrowser(path="", testFun = function(x) TRUE, prefix = NULL,
-	    suffix = NULL, textToShow = "Choose file(s) to be read in.",
+	    suffix = NULL, textToShow = "Select file(s)",
 	    nSelect = -1)
 }
 \arguments{

@@ -10,10 +10,10 @@
 }
 \usage{
 listSelect(aList, topLbl = "Select Elements From The Following List",
-           typeFun = stdType, valueFun = objViewer)
+           typeFun = stdType, valueFun = stdView)
 writeSelBox(baseW, aList, typeFun = NULL, valueFun = NULL)
    writeBut(baseW, butList, butWidth = 6)
- writeLabel(baseW, typeFun, valueFun)
+writeLabel(baseW, typeFun, valueFun)
 }
 
 \arguments{

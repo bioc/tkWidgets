@@ -9,7 +9,7 @@
   based on the default and user input requirements.
 }
 \usage{
-pickObjs(objNames, fun = function(x) TRUE)
+pickObjs(objNames, fun = noAuto)
 noAuto(x)
 }
 

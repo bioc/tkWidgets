@@ -28,7 +28,7 @@
   together with the argument list used to import the data using read.table
 }
 \usage{
-importWizard(filename = "", maxRow = 200)
+importWizard(filename = "", maxRow = 400)
 initImportWizard(env)
 getTopCan(base, env)
 getAFrame(base, env)

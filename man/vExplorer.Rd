@@ -8,8 +8,8 @@
   code chunks of vignettes.
 }
 \usage{
-vExplorer(title = "BioC Vignettes Browser", pkgName = "",  font =
-ifelse(.Platform$OS.type  == "unix", "arial 14", "arial 11"))
+vExplorer(title = "BioC Vignettes Explorer", pkgName = "", font =
+ifelse(.Platform$OS.type == "unix", "arial 14", "arial 11"))
 viewVignette(title, packName, vigPath, pdfPath, font = "arial 11")
 }
 
