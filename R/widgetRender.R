@@ -40,8 +40,10 @@ widgetRender <- function (iWidget, tkTitle) {
         for(i in 1:length(wList) ) {
             if(!BUTTONLAST[[i]]){
                 if(!is.null(WfromText(wList))){
-                     WLValue(iWidget, i) <<- WfromText(wList[[i]])
-                                            (tclvalue(entryValue[[i]]))
+                     eval(substitute(WLValue(iWidget, i) <<-
+                                     WfromText(wList[[i]])
+                                     (tclvalue(entryValue[[i]])),
+                                     list(i = i)))
                 }else{
                      WLValue(iWidget, i) <<- tclvalue(entryValue[[i]])
                 }
