@@ -4,7 +4,7 @@
 #
 # Copyright 2002, J. Zhang. All right reserved.
 #
-dataViewer <- function(data, height = 20, width = 35, save = TRUE){
+dataViewer <- function(data, save = TRUE){
 
     base <- tktoplevel()
     tktitle(base) <- "BioC tkWidgets"
@@ -19,13 +19,20 @@ dataViewer <- function(data, height = 20, width = 35, save = TRUE){
                              hScroll = TRUE, what = "canvas")
 
     dataFrame <- tkframe(innerFrame)
+    columnLength <- numberChar(data)
     for(i in 1:ncol(data)){
-        tempList <- tklistbox(dataFrame, width = 0, height = 0,
+        tempFrame <- tkframe(dataFrame)
+        if(!is.null(colnames(data))){
+            colWidth <- max(columnLength[i], nchar(colnames(data)[i]))
+            tempName <- tkbutton(tempFrame, text = colnames(data)[i],
+                                 width = colWidth - 3)
+            tkpack(tempName)
+        }
+        tempList <- tklistbox(tempFrame, width = colWidth, height = 0,
                                              background = "white")
         writeList(tempList, data[,i])
         tkpack(tempList, side = "left", expand = TRUE, fill = "y")
-
-
+        tkpack(tempFrame, side = "left")
     }
 #    tkpack(dataFrame)
 #    tkwindow.create(innerFrame, "0.0", window = dataFrame)
