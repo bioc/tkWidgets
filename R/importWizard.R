@@ -198,7 +198,7 @@ initImportWizard <- function(env){
 
     args <- getArgs(env)
     tkwait.window(top)
-    return(dataList)
+    return(invisible(dataList))
 }
 # Creates a top frame of an empty canvas
 getTopCan <- function(base, env){
@@ -291,7 +291,7 @@ finish <- function(env){
     dataName <- getName4Data(args[["file"]])
     options(show.error.messages = FALSE)
     dataFile <- try(do.call("read.table", args))
-    options(show.error.message = TRUE)
+    options(show.error.messages = TRUE)
     if(inherits(dataFile, "try-error")){
         tkmessageBox(title = "Import Error",
                      message = paste("An error message:\n\n", dataFile,
@@ -681,10 +681,10 @@ setState3TFrame <- function(frame, env){
         moreArgs(env)
     }
     label <- tklabel(frame, text = paste("Editable column names are",
-                            "shown in the first entry box on top of data",
-                            "columns.\nEditable data type of columns is",
+                            " shown in the first entry box on top of data",
+                            " columns.\nEditable data type of columns is",
                             " shown in the entry box following coloumn",
-                            "names\nClick the check box on top of a column",
+                            " names\nClick the check box on top of a column",
                             " to drop the column.\nClik 'More Args' button",
                             " for more arguments.", sep = ""),
                        width = 80, height = 4, justify = "left")
@@ -745,7 +745,7 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos, env){
             writeList(nameEntry[[i]], paste("V", i, sep = ""))
             name(temp) <- paste("V", i, sep = "")
         }
-        colInfos[[i]] <- temp
+        colInfos[[i]] <<- temp
         nameCMD[[i]] <- function(){}
         body <- list(as.name("{"), substitute(eval(setColName(j,
                                    nameEntry[[j]], env)), list(j = i)))

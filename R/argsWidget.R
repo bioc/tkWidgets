@@ -10,7 +10,7 @@ argsWidget <- function(argsList){
     # Arguments that are functions
     funcs <- getSymbol(argsList)
     # Conver functions to characters
-    argsList <- funcs2Char(argsList, funcs)
+    argsList <- sapply(funcs2Char(argsList, funcs), formatArg)
     # Constructs the interface
     # Sets the working environment
     PWEnv <- new.env(hash = TRUE, parent = NULL)
@@ -64,7 +64,11 @@ formatArg <- function(toFormat){
 
     # Turns off any warnings when checking for NULL, NA, and boolean
     options(warn = -1)
-    if(any(is.null(toFormat), is.na(toFormat), is.logical(toFormat))){
+    if(is.na(toFormat)){
+        options(warn = -1)
+        return("NA")
+    }
+    if(any(is.null(toFormat), is.logical(toFormat))){
         options(warn = 0)
         return(toFormat)
     }else{
