@@ -4,59 +4,60 @@
 \alias{writeBut}
 \alias{writeLabel}
 \title{Functions that make a widget with selection boxes based on user
-  specifications} 
+  specifications}
 \description{
   These functions creates a widget that allows users to view and make
   selections of items shown on the interface.
 }
 \usage{
 listSelect(aList, topLbl = "Select Elements From The Following List",
-typeFun = stdType, valueFun = objViewer)
+           typeFun = stdType, valueFun = objViewer)
 writeSelBox(baseW, aList, typeFun = NULL, valueFun = NULL)
-writeBut(baseW, butList, butWidth = 6)
-writeLabel(baseW, typeFun, valueFun)
+   writeBut(baseW, butList, butWidth = 6)
+ writeLabel(baseW, typeFun, valueFun)
 }
 
 \arguments{
-  \item{aList}{A list with names and object pairs (e. g. a = "AAA")}
-  \item{topLbl}{A character string for the text to be shown as a title}
-  \item{typeFun}{An R funtion that takes an R object as an arguement and
-    returns a description of the object}
-  \item{valueFun}{An R function that takes an R object as an argument
-    and show the content of the object. The function should get the
-    representation of the object and calls function objViewer to have
-    the representation rendered in a widget}
-  \item{baseW}{An window widget to which the selection boxes will be
-    put}
-  \item{butList}{A list with names and function pairs that define the
+  \item{aList}{list with names and object pairs (e. g. \code{a = "AAA"}).}
+  \item{topLbl}{character string for the text to be shown as a title.}
+  \item{typeFun}{function that takes an \R object as an arguement and
+    returns a description of the object.}
+  \item{valueFun}{function that takes an \R object as an argument
+    and shows the content of the object.  The function should get the
+    representation of the object and calls \code{\link{objViewer}} to have
+    the representation rendered in a widget.}
+  \item{baseW}{a window widget to which the selection boxes will be put.}
+  \item{butList}{a list with names and function pairs that define the
     name and behavior of buttons to be put on the widget to be
     generated}
-  \item{butWidth}{A numerical value specifying the width of buttons to
-    be created}
+  \item{butWidth}{numerical value specifying the width of buttons to
+    be created.}
 }
 \details{
-   Both typeFun and valueFun have to take an argument (the R object to
-   be shown). It works well for the valueFun function to call the
-   objViewer function with whatever to be shown passed to objViewer as
-   an argument.
+  Both \code{typeFun} and \code{valueFun} have to take an argument (the
+  \R object to be shown).  It works well for the \code{valueFun}
+  function to call \code{\link{objViewer}()} with whatever to be shown
+  passed to \code{objViewer} as an argument.
 }
 \value{
-   listSelect returns a list with the names of the R objects in the
-   original list associated with TRUE (selected) or FALSE (deselected).
+   \code{listSelect()} returns a list with the names of the \R objects in the
+   original list associated with \code{TRUE} (selected) or \code{FALSE}
+   (deselected).
 }
 \author{Jianhua Zhang}
 \note{The functions are part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioninformatics functionalities through R}
-
+  Cancer Institute to provide Bioninformatics functionalities through \R.
+}
 \seealso{\code{\link{objViewer}}}
 
 \examples{
+aList <- list(a = "AAA", b = c(123, 456, 789),
+              c = as.data.frame(matrix(1:10, ncol = 2)),
+              d = stdType)
 # Since user interference is required, the example code does not run
 # automatically
-aList <- list(a = "AAA", b = c(123, 456, 789), c =
-as.data.frame(matrix(1:10, ncol = 2)), d = stdType)
 if(interactive())
-listSelect(aList)}
+  listSelect(aList)}
 }
 \keyword{interface}
 
