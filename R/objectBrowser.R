@@ -230,7 +230,7 @@ objectBrowser<- function (fun = function(x) TRUE,
     tkbind(listView, "<B1-ButtonRelease>", sClick)
 
     butFrame <- tkframe(leftFrame)
-    upBut <- tkbutton(butFrame, text = "UP", width = BUTWIDTH,
+    upBut <- tkbutton(butFrame, text = "Up", width = BUTWIDTH,
 		      command = up)
     activeBut <- tkbutton(butFrame, text = "Reset", width = BUTWIDTH,
 		      command = getAct)

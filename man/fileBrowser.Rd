@@ -9,7 +9,8 @@
   for the selected files. 
 }
 \usage{
-fileBrowser(path="", testFun = function(x) TRUE, prefix = NULL, suffix = NULL,textToShow = "Choose file(s) to be read in.")
+fileBrowser(path="", testFun = function(x) TRUE, prefix = NULL, suffix =
+NULL,textToShow = "Choose file(s) to be read in.", nSelect = -1)
 }
 
 \arguments{
@@ -23,6 +24,8 @@ fileBrowser(path="", testFun = function(x) TRUE, prefix = NULL, suffix = NULL,te
     names that do not have that suffix as part of their names.}
   \item{textToShow}{A character string to be shown on the GUI to given
     instructions to users.}
+  \item{nSelect}{An integer for the number of files that should be
+    selected. No limitation if nSelect = -1}
 }
 \details{
   When a path is viewed, files will be displayed as they are and
@@ -34,10 +37,27 @@ fileBrowser(path="", testFun = function(x) TRUE, prefix = NULL, suffix = NULL,te
   displayed. When a file/directory is selected and the "End" button
   pressed, the full path for the selected files selected will be
   returned. The GUI is modal and has to be closed by pressing the "End"
-  button before doing any other operations. 
+  button before doing any other operations. Functions, prefix, and
+  suffix can be specified. For examples of valid functions, see code in
+  hasPrefix.R and hasSuffix.R.
 
-  Functions, prefix, and suffix can be specified. For examples of valid
-  functions, see code in hasPrefix.R and hasSuffix.R.
+  The following is a list of the buttons and the associated behavior:
+
+  Up - Moves the directory whose content is to be displyed one level up
+  along the directory tree. No action if already on top of the tree.
+
+  Select >> - When a file or files in the directory box have been
+  highlighted and the "Select >>" button pushed, the highlighted file(s)
+  will be displyed in the box for selected file(s) on the right.
+
+  << Remove - When a file or files in the box for selected files have been
+  highlighted and the "<< Remove" button pushed, the highlighted file(s)
+  will be removed from the box.
+
+  Clear - Clears everything in the box for selected files when pushed.
+
+  end - Returns a vector containing all the selected file(s) in the box
+  for selected files or NULL if the box is empty.
 }
 \value{
   \item{fileSelected}{A vector of character strings for the full path

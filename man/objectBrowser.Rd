@@ -8,28 +8,58 @@
   object will be returned. 
 }
 \usage{
-objectBrowser(fun = function(x) TRUE)
+objectBrowser(fun = function(x) TRUE, textToShow = "Select object(s)", nSelect = -1)
 }
 
 \arguments{
   \item{fun}{A function to test whether certain conditions are met by
-    the objects. Only objects that meet the conditions will be displyed.}
+    the objects. Only objects that meet the conditions will be
+    displyed.}
+  \item{textToShow}{A character string for the message to be show on the
+    GUI as an instruction.}
+  \item{nSelect}{An integer for the number of object to select. No
+    limitation if nSelect = -1}
 }
 
 \details{
-  If the selected object is a package, a description of the contents of
-  the package will be returned. If the selected object is a function, a
-  text string of the original code will be returned. Otherwise, the
-  object will be returned.
+  This function will return a list of lists with a "name" and "obj" pair
+  for each object. The "name" will be the name of the object and "obj"
+  will be the value of the object. If the object is a package, a
+  description of the contents of the package will be the value. If the
+  selected object is a function, a text string of the original code will
+  be the value. A function can be passed to impose a filtering mechanism
+  on the objects to be displayed. See function isCharacter for an
+  example of writting a filtering function for objectBrowser.
 
-  See function isCharacter for an example of writting a function for
-  objectBrowser. 
+  The buttons and their expected behavior are listed below:
 
-  The function is at its preliminary stage of development and will be
-  enhanced later.
+  Up - Moves one level up along the search list and displays the content
+  in the box for object names on the left of the GUI.
+
+  Select >> - When objects in the box for object names have been
+  highlighted, clicking "Select >>" will display the highlisted object
+  names in the box for selected objects on the right.
+
+  Reset - Moves back to ".GlobalEnv" which is the default starting point
+  of the system.
+
+  << Remove - When object names in the box for seleted objects have been
+  highlighted and the "<< Remove" button pressed, the hgihlisted object
+  names will be removed from the display.
+
+  Clear <- Removes all the object names from the box for selected
+  objects.
+
+  Cancel - Exits the GUI and returns a NULL when pressed.
+
+  End <- Returns a list of lists with names of the objects in the box
+  for selected objects and their corresponding values or NULL if nothing
+  exists in the box.
+  
 }
 \value{
-  \item{obj}{The selected object.}
+  \item{returnList}{A list of lists with a name and value pair for each
+    object.} 
 }
 \references{Tcltk, R News Vol 1/3. A Primer on the R-Tck/Tk Package.}
 \author{Jianhua (John) Zhang}
