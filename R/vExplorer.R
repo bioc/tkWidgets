@@ -26,41 +26,46 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     packSelected <- function(){
          selectedPkg <<-
              tclvalue(tkget(packViewer,(tkcurselection(packViewer))))
-         writeList(statusBar, paste("Getting vignette names"), TRUE)
-         # Make sure widget gets redrawn
-         Sys.sleep(1)
-         write2VigList(selectedPkg)
-         writeList(statusBar, "Done", TRUE)
+         if(selectedPkg != ""){
+             writeList(statusBar, paste("Getting vignette names"), TRUE)
+             # Make sure widget gets redrawn
+             Sys.sleep(1)
+             write2VigList(selectedPkg)
+             writeList(statusBar, "Done", TRUE)
+         }
     }
     # Writes vignette names to the list box for vignettes
     write2VigList <- function(selectedPkg){
-         checkMe <- .getPackNames(selectedPkg)
-         if(is.null(checkMe)){
-             tkmessageBox(title = "No vignette found",
-                     message = paste("Package", selectedPkg,
-                     "has no vignette"))
-         }else{
+         #checkMe <- .vigOrNot(selectedPkg)
+         #if(is.null(checkMe)){
+         #    tkmessageBox(title = "No vignette found",
+         #            message = paste("Package", selectedPkg,
+         #            "has no vignette"))
+         #}else{
              vigList <<- pkgVignettes(selectedPkg)$docs
              names(vigList) <<- basename(vigList)
-             tkdelete(vigViewer, 0, "end")
-             for(i in names(vigList)){
+             writeList(vigViewer, names(vigList))
+             #tkdelete(vigViewer, 0, "end")
+             #for(i in names(vigList)){
                  #if(!inherits(chunkList, "try-error")){
-                     tkinsert(vigViewer, "end", i)
+             #        tkinsert(vigViewer, "end", i)
                  #}
-             }
-         }
+             #}
+         #}
     }
 
     # Executes when a user clicks a vignette name in the list of Rnw files
     vigSelected <- function(){
         selectedVig <-
              tclvalue(tkget(vigViewer,(tkcurselection(vigViewer))))
-        writeList(statusBar, paste("Loading", selectedVig), TRUE)
-        # Make sure widget gets redrawn
-        Sys.sleep(1)
-        viewVignette(title, selectedPkg, vigList[[selectedVig]], font)
-        writeList(statusBar, "", TRUE)
-#        tkconfigure(vButton, state = "normal")
+        if(selectedVig != ""){
+            writeList(statusBar, paste("Loading", selectedVig), TRUE)
+            # Make sure widget gets redrawn
+            Sys.sleep(1)
+            viewVignette(title, selectedPkg, vigList[[selectedVig]], font)
+            writeList(statusBar, "", TRUE)
+            # tkconfigure(vButton, state = "normal")
+        }
     }
 
     # Executes when a user clicks the view button after selecting a
@@ -115,8 +120,8 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
            expand = FALSE, side = "bottom", fill = "x")
 
     # Populates the list box for package names
-    .popPackList(packViewer, pkgName)
-    if(pkgName != ""){
+    packValid <- .popPackList(packViewer, pkgName)
+    if(packValid && pkgName != ""){
         selectedPkg <- pkgName
         write2VigList(pkgName)
     }
@@ -126,30 +131,59 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     return(invisible())
 }
 
+.vigOrNot <- function(libName){
+    options(show.error.messages = FALSE, warn = -1)
+    tryMe <- list.files(file.path(.libPaths(), libName, "doc"))
+    options(show.error.messages = TRUE, warn = 0)
+    if(inherits(tryMe, "try-error")){
+        return(FALSE)
+    }else{
+        if(length(grep("\\.Rnw", tryMe)) > 0){
+            return(TRUE)
+        }
+    }
+    return(FALSE)
+}
+
 # Check for the availability of vignettes and populate the list box
 # for packages that have a vignette
 .popPackList <- function(packViewer, packName){
+
     if(packName == ""){
-        packs <- sort(.packages(all = TRUE))
+        packs <- .packages(all = TRUE)
     }else{
         packs <- packName
     }
-    tkdelete(packViewer, 0, "end")
-    for(i in packs){
-        if(!is.null(pkgVignettes(i)) &&
-           length(pkgVignettes(i)$docs) > 0){
-            tkinsert(packViewer, "end", i)
-        }
+    goodNames <- sapply(packs, .vigOrNot)
+    goodNames <- names(goodNames[goodNames])
+    if(length(goodNames) > 0){
+        writeList(packViewer, sort(goodNames))
+        return(TRUE)
+    }else{
+         tkmessageBox(title = "No vignette found",
+                      message = "Packages contain no vignette",
+                      icon = "info",
+                      type = "ok")
+        return(FALSE)
     }
+    #tkdelete(packViewer, 0, "end")
+    #for(i in goodNames){
+        #if(!is.null(pkgVignettes(i)) &&
+        #   length(pkgVignettes(i)$docs) > 0){
+    #        tkinsert(packViewer, "end", i)
+        #}
+    #}
 }
 
 # Returns package names that have a vignette
 .getPackNames <- function(packName = ""){
+
     if(packName == ""){
         packNames <- .packages(all = TRUE)
     }else{
         packNames <- packName
     }
+
     goodNames <- NULL
     for(i in packNames){
         eval(call(deparse(substitute(require)), i, TRUE))

@@ -12,7 +12,7 @@ guess.sep <- function(file.name, numLine = 5, seps, isFile = TRUE){
     sep <- NULL
 
     if(missing(seps)){
-        seps <- c(",", ";", "\t", " ")
+        seps <- c(",", ";", "\t", "\\t", " ")
     }#else{
     #    seps <- c(seps, ",", ";", "\t", " ")
     #}
@@ -32,9 +32,6 @@ guess.sep <- function(file.name, numLine = 5, seps, isFile = TRUE){
             sep <- i
             break
         }
-    }
-    if(i == "\\t"){
-        i <- "\t"
     }
     if(!is.null(sep)){
         separator <- sep
