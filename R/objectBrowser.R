@@ -9,7 +9,6 @@ objectBrowser <- function (fun = function(x) TRUE){
     LABELFONT <- "Helvetica 12"
     BUTWIDTH <- 8
 
-    objLevel <- c("Top Level", ".GlobalEnv")
     selectedObj <- NULL
     isPack <- FALSE
     returnObj <- NULL
@@ -19,27 +18,18 @@ objectBrowser <- function (fun = function(x) TRUE){
         tkdestroy(base)
     }
 
-    viewObj <- function(){
-        writeCap(objLevel[length(objLevel)])
-        if(length(objLevel) == 1)
-            writeObj(listView, pickObjs(search(),
-                                         fun = fun))
-        else
-            writeObj(listView, pickObjs(objNames =
-                               ls(env = get(objLevel[length(objLevel)])),
-                                         fun = fun))
-
-        if(length(objLevel) > 1)
-            tkconfigure(upBut, state = "normal")
-        else
-            tkconfigure(upBut, state = "disabled")
+    viewGlobalEnv <- function(){
+        writeObj(listView, pickObjs(objNames = ls(env = get(".GlobalEnv")),
+                                             fun = fun))
+        writeCap(".GlobalEnv")
     }
 
     doEnv <- function (item){
         writeObj(listView,  pickObjs(objNames = ls(env = get(item)),
                                       fun = fun))
-        objLevel <<- c(objLevel, item)
         writeCap(item)
+        if(!is.null(parent.env(get(item))))
+            tkconfigure(upBut, state = "normal")
     }
 
     doPack <- function (index, pack){
@@ -54,21 +44,20 @@ objectBrowser <- function (fun = function(x) TRUE){
         # This a temp function for now. More checking will be inplemented
     }
 
-    doFrame <- function (aFrame){
+    doList <- function (aList){
 
-        if(is.null(ncol(get(item))))
-            towrite <- c("Type: data frame",
-                         paste("Length:", length(get(aFrame))))
+        if(is.null(ncol(get(aList))))
+            towrite <- c("Type: List",
+                         paste("Length:", length(get(aList))))
 
 
-        toWrite <- c("Type: data frame",
-                     paste("Number of columns:", ncol(get(item))),
-                     paste("Number of row(s):", nrow(get(item))),
-                     paste("Column Name(s):"),names(get(item)))
+        toWrite <- c("Type: List",
+                     paste("Number of columns:", ncol(get(aList))),
+                     paste("Number of row(s):", nrow(get(aList))),
+                     paste("Column Name(s):"),names(get(aList)))
 
         writeObj(listView, toWrite)
-        writeCap(aFrame)
-
+        writeCap(aList)
     }
 
     dClick <- function (){
@@ -76,20 +65,6 @@ objectBrowser <- function (fun = function(x) TRUE){
             selectedObj <<- tkget(listView,
                                       tkcurselection(listView))
             goin()
-#            objType <- findObjType(selectedObj)
-#            switch(objType,
-#                "environment" = doEnv(selectedObj),
-#                "package" =  doPack(tkcurselection(listView), selectedObj),
-#                doElse()
-#                   "data.frame" = doObj(selectedObj, "data.frame"),
-#                   "vector" = doObj(selectedObj, "vector"),
-#                   "list" = doObj(selectedObj, "list"),
-#                   "matrix" = doObj(selectedObj, "matrix"),
-#                   "integer" = doObj(selectedObj, "integer"),
-#                   "character" = doObj(selectedObj, "character")
-#                   )
-#            if(length(objLevel) >= 2)
-#                tkconfigure(upBut, state = "normal")
         }
     }
 
@@ -97,13 +72,11 @@ objectBrowser <- function (fun = function(x) TRUE){
         if(!is.null(selectedObj)){
             objType <- findObjType(selectedObj)
             switch(objType,
-                "environment" = doEnv(selectedObj),
-                "package" =  doPack(tkcurselection(listView), selectedObj),
-                doElse()
-#               "data.frame" = doFrame(selectedObj, "data.frame"),
+               "environment" = doEnv(selectedObj),
+               "package" =  doPack(tkcurselection(listView), selectedObj),
+               "list" = doList(selectedObj),
+               doElse()
             )
-            if(length(objLevel) >= 2)
-            tkconfigure(upBut, state = "normal")
             tkconfigure(visitBut, state = "disabled")
             selectedObj <<- NULL
         }
@@ -124,7 +97,7 @@ objectBrowser <- function (fun = function(x) TRUE){
             }else{
                 switch(objType,
                     "environment" = tkconfigure(visitBut,state="normal"),
-                    "data.frame" = tkconfigure(visitBut, state="normal")
+                    "list" = tkconfigure(visitBut, state="normal")
                        )
                 returnList <<- list("name" = selectedObj,
                                     "obj" = get(selectedObj))
@@ -138,23 +111,18 @@ objectBrowser <- function (fun = function(x) TRUE){
     }
 
     up <- function(){
-        if(isPack){
+        if(isPack || selectedObj == ".GlobalEnv" ||
+            is.null (parent.env(selectedObj))){
             writeObj(listView, pickObjs(objNames = search(),
                                              fun = fun))
-            writeCap(objLevel[1])
+            writeCap("Top Level")
+            tkconfigure(upBut, state = "disabled")
         }else{
-            if(length(objLevel) > 2){
-                writeObj(listView, pickObjs(objNames =
-                     ls(env = get(objLevel[length(objLevel) - 1])),
+            writeObj(listView,
+                    pickObjs(objNames = ls(env = get(selectedObj)),
                                              fun = fun))
-                writeCap(objLevel[length(objLevel) - 1])
-                objLevel <<- objLevel[1:(length(objLevel) - 1)]
-            }else{
-                writeObj(listView, pickObjs(objNames = search(),
-                                             fun = fun))
-                writeCap(objLevel[1])
-                tkconfigure(upBut, state = "disabled")
-            }
+            writeCap(selectedObj)
+
         }
     }
 
@@ -206,7 +174,7 @@ objectBrowser <- function (fun = function(x) TRUE){
     tkpack(upBut, activeBut, visitBut, endBut, side = "left")
     tkpack(butFrame)
 
-    viewObj()
+    viewGlobalEnv()
 
     tkwait.window(base)
 
