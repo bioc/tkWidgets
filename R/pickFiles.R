@@ -14,7 +14,7 @@ pickFiles <- function (fileNames, fun = function(x) TRUE,
            tryMe <- hasChar(prefix, "prefix")
            whichOnes <- sapply(fileNames, tryMe)
        }else{
-           tryMe <- hasSuffix(suffix, "suffix")
+           tryMe <- hasChar(suffix, "suffix")
            whichOnes <- sapply(fileNames, tryMe)
        }
    return(c(fileNames[regexpr(exclude, fileNames) > 0],
