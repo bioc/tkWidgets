@@ -2,6 +2,10 @@
 \alias{importPhenoData}
 \alias{createPhenoData}
 \alias{showIOError}
+\alias{sNames4rNames}
+\alias{writePhenoTable}
+\alias{makePhenoData}
+\alias{convert2PData}
 
 \title{A function to input data for a phenoData object}
 \description{
@@ -12,6 +16,10 @@
 importPhenoData(sampleNames)
 createPhenoData(pdata, sampleNames)
 showIOError(what)
+sNames4rNames(pdata, sampleNames)
+writePhenoTable(base, textWidget, pdata, sampleNames, covarNum)
+makePhenoData(pdata, sampleNames, covarNum)
+convert2PData(phenoList)
 }
 
 \arguments{
@@ -24,6 +32,13 @@ showIOError(what)
     for a file ("file"), data frame ("data frame"), or phenoData
     ("phenoData") has been entered to a corresponding entry box on the
     interface}
+  \item{base}{\code{base} an RTcl object for the base window a widget
+    resides}
+  \item{textWidget}{\code{textWidget} an RTcl object for a text box
+    widget}
+  \item{covarNum}{\code{covarNum} an integer for the number of
+    covariates a phenoData object will have}
+  \item{phenoList}{\code{phenoList} a list of lists for tclVar() objects}
 }
 
 \details{
