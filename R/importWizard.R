@@ -17,13 +17,14 @@ importWizard <- function(filename, maxRow = 400){
     assignCState("state1", env = workEnv)
 
     if(!missing(filename)){
-        # Do this if a file name is given
-        argsSet <- setArgsList(filename, workEnv)
-        lineNums <- length(readLines(filename))
+        lineNums <- length(readFileByLines(filename))
+        if(!is.null(lineNums)){
+            argsSet <- setArgsList(filename, workEnv)
+        }
     }else{
         # Otherwise, assign an empty list to argsList and colInfo
         assignArgs(list(), workEnv)
-        setColInfos(env = workEnv)
+        #setColInfos(env = workEnv)
         lineNums <- maxRow
         argsSet <- TRUE
     }
@@ -35,13 +36,27 @@ importWizard <- function(filename, maxRow = 400){
         initImportWizard(workEnv)
     }
 }
+
+readFileByLines <- function(filename){
+    conn <- safeFileOpen(filename)
+    if(inherits(conn, "connection")){
+        lines <- readLines(conn)
+        close(conn)
+        return(lines)
+    }else{
+        tkmessageBox(title = "IO Error",
+                     message = paste("File", filename, "may not be valid"),
+                     icon = "error", type = "ok")
+        return(NULL)
+    }
+}
 # Using function guess.sep to figure out the the header, sep, and data
 # type of a file and sets the argument list and colInfo
 setArgsList <- function(filename, env, isFile = TRUE, init = TRUE){
-    options(show.error.messages = FALSE)
+    options(show.error.messages = FALSE, warn = -1)
     fileInfo <- try(guess.sep(file.name = filename, numLine = 40,
                               isFile = isFile))
-    options(show.error.messages = TRUE)
+    options(show.error.messages = TRUE, warn = 0)
     if(inherits(fileInfo, "try-error")){
         tkmessageBox(title = "Incorrect File Name",
                  message = paste("An error message:\n\n", fileInfo,
@@ -67,10 +82,14 @@ setArgsList <- function(filename, env, isFile = TRUE, init = TRUE){
         assignArgs(argsList, env)
         #setColInfos(fileInfo[["type"]], env)
         if(isFile){
-            fileLines <- readLines(filename)
-            assignLineData(fileLines[1:min(length(fileLines),
+            fileLines <- readFileByLines(filename)
+            if(!is.null(fileLines)){
+                assignLineData(fileLines[1:min(length(fileLines),
                                                getShowNum(env))], env)
-            assignShowNum(min(length(fileLines), getShowNum(env)), env)
+                assignShowNum(min(length(fileLines), getShowNum(env)), env)
+            }else{
+
+            }
         }else{
             assignLineData(filename, env)
         }
@@ -307,7 +326,6 @@ finish <- function(env){
                      message = paste("An error message:\n\n", dataFile,
                      "\nwas generated while reading file ",
                      args[["file"]], "."), icon = "error", type = "ok")
-        return(NULL)
     }else{
         colInfos <- getColInfo(env)
         colNames <- NULL
@@ -381,14 +399,16 @@ setState1TFrame <- function(frame, viewer, delims, env, startList){
     # clicked
     browse <- function(){
         filename <- tclvalue(tkgetOpenFile())
-        writeList(nameEntry, filename, clear = TRUE)
-        argsSet <- setArgsList(filename, env)
-        if(argsSet){
-            showData4State1(viewer, env)
-            if(!is.null(getArgs(env)[["state1"]][["sep"]])){
-                tkselect(delims[["delimit"]])
+        if(filename != ""){
+            writeList(nameEntry, filename, clear = TRUE)
+            argsSet <- setArgsList(filename, env)
+            if(argsSet){
+                showData4State1(viewer, env)
+                if(!is.null(getArgs(env)[["state1"]][["sep"]])){
+                    tkselect(delims[["delimit"]])
+                }
+                popStartLine(startList, env)
             }
-            popStartLine(startList, env)
         }
     }
     # Get the file
@@ -700,13 +720,22 @@ showData4State2 <- function(canvas, env, state = "state2"){
     tempFrame <- tkframe(canvas)
     # Puts n in temporaly
     temp[["nrows"]] = getShowNum(env)
-    dataFile <- do.call("read.table", temp)
-    # For data without a separater
-    if(is.null(ncol(dataFile))){
-        writeColList(1)
+    options(show.error.messages = FALSE)
+    dataFile <- try(do.call("read.table", temp))
+    options(show.error.messages = TRUE)
+    if(inherits(dataFile, "try-error")){
+        tkmessageBox(title = "Import Error",
+                     message = paste("An error message:\n\n", dataFile,
+                     "\nwas generated while reading file ",
+                     args[["file"]], "."), icon = "error", type = "ok")
     }else{
-        for(i in 1:ncol(dataFile)){
-            writeColList(i)
+        # For data without a separater
+        if(is.null(ncol(dataFile))){
+            writeColList(1)
+        }else{
+            for(i in 1:ncol(dataFile)){
+                writeColList(i)
+            }
         }
     }
     tkwindow.create(canvas, "end", window = tempFrame)
@@ -769,17 +798,25 @@ setState3BFrame <- function(frame, env){
     tempFrame <- tkframe(rCanv)
     argsList <- getArgs(env)[["state3"]]
     argsList[["nrows"]] <- getShowNum(env)
-    dataFile <- do.call("read.table", argsList)
-    setColInfos(find.type(dataFile, argsList[["state3"]][["sep"]],
+    options(show.error.messages = FALSE)
+    dataFile <- try(do.call("read.table", argsList))
+    options(show.error.messages = TRUE)
+    if(inherits(dataFile, "try-error")){
+        tkmessageBox(title = "Import Error",
+                     message = paste("An error message:\n\n", dataFile,
+                     "\nwas generated while reading file ",
+                     args[["file"]], "."), icon = "error", type = "ok")
+    }else{
+        setColInfos(find.type(dataFile, argsList[["state3"]][["sep"]],
                           isFile = FALSE), env)
     # Cut to right size of file if longer than maxRow
 #    if(nrow(dataFile) > getShowNum(env)){
 #        dataFile <- dataFile[1:getShowNum(env),]
 #    }
     # Finds the data type for columns
-    colInfos <- getColInfo(env)
-    writeCol4Matrix(tempFrame, dataFile, colInfos, env)
-
+        colInfos <- getColInfo(env)
+        writeCol4Matrix(tempFrame, dataFile, colInfos, env)
+    }
     tkcreate(rCanv, "window", 0, 0, anchor = "nw", window = tempFrame)
 }
 # Create a group of list boxes with entry boxes and a radio button on
@@ -787,9 +824,9 @@ setState3BFrame <- function(frame, env){
 writeCol4Matrix <- function(tempFrame, dataFile, colInfos, env){
     # For text files, row names are hard to guess. Check col value
     # here instead
-    if(ncol(dataFile) > length(colInfos)){
-        dataFile <- dataFile[, 2:ncol(dataFile)]
-    }
+    #if(ncol(dataFile) > length(colInfos)){
+    #    dataFile <- dataFile[, 2:ncol(dataFile)]
+    #}
     writeDataCol <- function(i, data){
         colFrame <- tkframe(tempFrame)
         dropCMD[[i]] <- function(){}
@@ -899,7 +936,8 @@ getMoreArgs <- function(){
     args <- formals(read.table)
 
     args <- args[setdiff(names(args),
-                         c("file", "header", "sep", "skip","quote"))]
+                         c("file", "header", "sep", "skip","quote",
+                           "row.names", "col.names"))]
 
     # Argument fill has to be defined using the value of
     # blank.lines.skip.
@@ -963,3 +1001,5 @@ getName4Data <- function(filename, objType = "object"){
 
     return(temp)
 }
+
+

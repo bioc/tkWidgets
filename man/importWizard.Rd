@@ -22,6 +22,7 @@
 \alias{getName4Data}
 \alias{writeCol4Matrix}
 \alias{popStartLine}
+\alias{readFileByLines}
 
 \title{A widget for importing data to R}
 \description{
@@ -53,6 +54,7 @@ setState3BFrame(frame, env)
 getName4Data(filename, objType)
 writeCol4Matrix(tempFrame, dataFile, colInfos, env)
 popStartLine(startList, env)
+readFileByLines(filename)
 }
 
 \arguments{
