@@ -5,7 +5,9 @@
 # Copyrihgt, 2002, J. Zhang, all rights reserved
 #
 
-vExplorer <- function (title = "BioC Vignettes Explorer", pkgName = ""){
+vExplorer <- function (title = "BioC Vignettes Explorer",
+                       pkgName ="", font = ifelse(.Platform$OS.type
+                                    == "unix", "arial 14", "arial 11")){
 
     require(Biobase) || stop("Package Biobase not available!")
     require(tools) || stop("Package tools not available!")
@@ -58,7 +60,7 @@ vExplorer <- function (title = "BioC Vignettes Explorer", pkgName = ""){
     # vignette
     viewVig <- function(){
         viewVignette(title, selectedPkg, vigList[[selectedVig]]$VigPath,
-                     vigList[[selectedVig]]$PDFpath)
+                     vigList[[selectedVig]]$PDFpath, font)
     }
 
 
@@ -69,31 +71,34 @@ vExplorer <- function (title = "BioC Vignettes Explorer", pkgName = ""){
 
     # List box showing all the packages that have a vignette
     packFrame <- tkframe(listFrame)
-    packName <- tklabel(packFrame, text = "Package List")
+    packName <- tklabel(packFrame, text = "Package List", font = font)
     tkpack(packName, side = "top")
     packViewer <- makeViewer(packFrame, hScroll = TRUE, vScroll = TRUE)
     tkconfigure(packViewer, selectmode = "browse")
+    tkconfigure(packViewer, font = font)
     tkbind(packViewer, "<B1-ButtonRelease>", packSelected)
     tkpack(packFrame, side = "left", expand = TRUE, fill = "both")
 
     # List box for vignettes of a given package
     vigFrame <- tkframe(listFrame)
-    vigName <- tklabel(vigFrame, text = "Vignette List")
+    vigName <- tklabel(vigFrame, text = "Vignette List", font = font)
     tkpack(vigName, side = "top")
     vigViewer <- makeViewer(vigFrame, hScroll = TRUE, vScroll = TRUE)
     tkconfigure(vigViewer, selectmode = "browse")
+    tkconfigure(vigViewer, font = font)
     tkbind(vigViewer, "<B1-ButtonRelease>", vigSelected)
     tkpack(vigFrame, side = "left", expand = TRUE, fill = "both")
 
     # Buttons to view a vignette and end the widget
     vButton <- tkbutton(listFrame, text = "View", width = 8,
-                        command = viewVig)
+                        font = font, command = viewVig)
     tkpack(vButton, side = "left")
 
     # Put the three frames in
     tkpack(listFrame, expand = TRUE, fill = "both", pady = 4, padx = 4)
     # put in the end button
-    endButton <- tkbutton(base, text = "End", width = 8, command = end)
+    endButton <- tkbutton(base, text = "End", width = 8,
+                          font = font, command = end)
     tkpack(endButton, side = "bottom", pady = 4)
 
     # Populates the list box for package names
@@ -146,7 +151,8 @@ vExplorer <- function (title = "BioC Vignettes Explorer", pkgName = ""){
 
 # This window is called by vExplorer for interacting with the code
 # chunks of a vignette
-viewVignette <- function(title, packName, vigPath, pdfPath){
+viewVignette <- function(title, packName, vigPath, pdfPath,
+                         font = "arial 11"){
 
     on.exit(end)
 
@@ -283,7 +289,6 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
 
     # Initilizes the buttons for code chunks
     popChunks <- function(){
-        chunkFrame <- tkframe(chunkCanv)
         if(!is.null(nameNCode)){
             k <- 1
             for(i in names(nameNCode)){
@@ -299,18 +304,19 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
                 body(fun) <- as.call(body)
                 assign(paste("chunkList",k,sep=""), fun)
 
-                buts[[k]] <<- tkbutton(chunkFrame, text= i,
-                                       state = "disabled",
+                buts[[k]] <<- tkbutton(base, text= i,
+                                       state = "disabled", font = font,
                                        command = get(paste("chunkList",
                                        k, sep = "")))
-                tkpack(buts[[k]], expand = TRUE, fill = "x")
                 tkbind(buts[[k]], "<Double-Button-1>", execute)
+                tkwindow.create(chunkText, "end", window = buts[[k]])
+#                tkcreate(chunkText, "window", 5, space, anchor = "nw",
+#                 window = buts[[k]])
+                tkinsert(chunkText, "end", "\n")
                 k <- k + 1
             }
             tkconfigure(buts[[1]], state = "normal")
         }
-        tkcreate(chunkCanv, "window", 5, 5, anchor = "nw",
-                 window = chunkFrame)
     }
 
     base <- tktoplevel()
@@ -319,59 +325,61 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     pNvNames <- paste("Package:", packName, "   Vignette:",
                       gsub(paste(".*", .Platform$file.sep, "(.*)",
                                  sep = ""), "\\1", vigPath))
-    tkpack(tklabel(base, text = pNvNames), pady = 4)
+    tkpack(tklabel(base, text = pNvNames, font = font), pady = 4)
 
     listFrame <- tkframe(base)
-    # Create the viewer for code chunks
+    # Create a text widgets for code chunks
     chunkFrame <- tkframe(listFrame)
-    tkpack(tklabel(chunkFrame, text = chunkOrNot))
-    chunkCanv <-  makeViewer(chunkFrame, vWidth = 130, vHeight = 300,
-                      hScroll = FALSE, vScroll = TRUE, what = "canvas")
-    tkpack(chunkFrame, side = "left")
+    tkpack(tklabel(chunkFrame, text = chunkOrNot, font = font))
+    chunkText <- makeViewer(chunkFrame, vWidth = 18, vHeight = NULL,
+                      hScroll = FALSE, vScroll = TRUE, what = "text")
+    tkconfigure(chunkText)
+    popChunks()
+    tkpack(chunkFrame, side = "left", anchor = "nw")
 
     # Create the viewers for code and results of execution
     codeNRelFrame <- tkframe(listFrame)
     editFrame <- tkframe(codeNRelFrame)
-    tkpack(tklabel(editFrame, text = "R Source Code"))
+    tkpack(tklabel(editFrame, text = "R Source Code", font = font))
     eViewerFrame <- tkframe(editFrame)
-    editViewer <- makeViewer(eViewerFrame, vWidth = 60, vHeight = 5,
+    editViewer <- makeViewer(eViewerFrame, vWidth = 40, vHeight = 4,
                       hScroll = TRUE, vScroll = TRUE, what = "text")
+    tkconfigure(editViewer, font = font)
     tkbind(editViewer, "<KeyRelease>", codeChanged)
     tkpack(eViewerFrame, expand = TRUE, fill = "both")
-    tkpack(tklabel(editFrame, text = "Results of Execution"))
+    tkpack(tklabel(editFrame, text = "Results of Execution", font = font))
     rViewerFrame <- tkframe(editFrame)
-    resultViewer <-  makeViewer(rViewerFrame, vWidth = 60, vHeight = 5,
+    resultViewer <-  makeViewer(rViewerFrame, vWidth = 40, vHeight = 4,
                       hScroll = TRUE, vScroll = TRUE, what = "text")
+    tkconfigure(resultViewer, font = font)
     tkpack(rViewerFrame, expand = TRUE, fill = "both")
     tkpack(editFrame, expand = TRUE, fill = "both")
     tkpack(codeNRelFrame, side = "left", expand = TRUE, fill = "both")
 
     tkpack(listFrame, side = "top", expand = TRUE, fill = "both", padx
-    = 4)
+    = 4, pady = 6)
 
     # Put the buttons in
     butFrame <- tkframe(base)
     pdfButton <- tkbutton(butFrame, text = "View PDF", width = 12,
-                          command = viewPDF)
+                          font = font, command = viewPDF)
     execButton <- tkbutton(butFrame, text = "Execute Code", width = 12,
-                           command = execute)
+                           font = font, command = execute)
     tkconfigure(execButton, state = "disabled")
     expoButton <- tkbutton(butFrame, text = "Export to R", width = 12,
-                           command = export)
+                           font = font, command = export)
     tkconfigure(expoButton, state = "disabled")
     clearButton <- tkbutton(butFrame, text = "Clear", width = 12,
-                            command = clear)
+                            font = font, command = clear)
     tkconfigure(clearButton, state = "disabled")
     tkpack(pdfButton, execButton, expoButton, clearButton, side = "left")
-    tkpack(butFrame, pady = 4)
+    tkpack(butFrame, pady = 6)
     # Put end button separately to avoid accidents
     endButton <- tkbutton(base, text = "End", width = 12,
-                          command = end)
+                          font = font, command = end)
     tkpack(endButton)
 
-    popChunks()
-
-    if(is.null(pdfPath) || is.na(pdfPath)){
+    if(is.null(pdfPath) || is.na(pdfPath) || length(pdfPath) == 0){
         tkconfigure(pdfButton, state = "disabled")
     }
 #    tkconfigure(resultViewer, state = "disabled")

@@ -8,8 +8,9 @@
   code chunks of vignettes.
 }
 \usage{
-vExplorer(title = "BioC Vignettes Browser", pkgName = "")
-viewVignette(title, packName, vigPath, pdfPath)
+vExplorer(title = "BioC Vignettes Browser", pkgName = "",  font =
+ifelse(.Platform$OS.type  == "unix", "arial 14", "arial 11"))
+viewVignette(title, packName, vigPath, pdfPath, font = "arial 11")
 }
 
 \arguments{
@@ -23,6 +24,8 @@ viewVignette(title, packName, vigPath, pdfPath)
     vignette to be explored.}
   \item{pdfPath}{character string for the full path of a pdf file (if
     any) associated with a vignette.}
+  \item{font}{a character string for the name and size of the font to be
+    used for text rendered on the widgets (e. g. "arial 11")}
 }
 \details{
   By default, \code{packNames = ""}, all the installed packages will be

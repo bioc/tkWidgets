@@ -13,7 +13,10 @@ appendSepDir <- function(path = ".") {
      # Separate dirs and files into two groups for better presentation
      dirs <- paste(toCheck[isd$isdir], .Platform$file.sep, sep = "")
      toCheck <- c(dirs, toCheck[!isd$isdir])
+     return(toCheck)
 }
+
+
 
 
 

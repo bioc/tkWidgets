@@ -8,6 +8,8 @@ colInfo-class           Class "colInfo" a class to keep column
 dataViewer              Function to view a data object passed
 dbArgsWidget            Function to build a widget for inputing
                         database arguments
+DPExplorer              Functions constuct a widget to explore BioC's
+                        data packages
 fileBrowser             Simple Interface to View and Pick Files
 fileWizard              A function that import a text file into R
 getLightTW              Function to create a light weight widget
