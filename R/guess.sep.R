@@ -19,10 +19,15 @@ guess.sep <- function(file.name, n = 5, seps = ""){
     toCheck <- readLines(file.name, n = n)
 
     w<-NULL
-    for(i in seps) { w[[i]] <- strsplit(toCheck[2:length(toCheck)], i)}
+
+    for(i in seps) 
+         w[[i]] <- strsplit(toCheck[2:length(toCheck)], i}
+
     v <- lapply(w, function(x) sapply(x, length))
+
     good <- function(x) all(x==x[1]) && x[1] > 1
     found <- sapply(v, good)
+
     sep <- names(found[found])
     if(length(sep) == 1){
         separator <- sep

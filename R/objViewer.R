@@ -8,7 +8,7 @@ objViewer <- function(toView, width = 40, height = 10){
     ok <- function() tkdestroy(base)
 
     base <- tktoplevel()
-    tktitle(base) <- "BioC Object Viewer"
+    tktitle(base) <- "Bioconductor Object Viewer"
 
     boxFrame <- tkframe(base)
     boxView <- makeViewer(boxFrame, vWidth = width,

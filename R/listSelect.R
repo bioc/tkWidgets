@@ -47,6 +47,10 @@ listSelect <-
                        command=function(...)tkyview(can,...))
     tkconfigure(can, yscrollcommand=function(...)tkset(scr,...))
 
+##FIXME: please try to document what is going on in here
+##these long sets of operations are not easy to understand and should
+##be documented somewhat
+
     topFrame <- tkframe(can)
     titlelbl <- tklabel(topFrame, text = topLbl, font = "Helvetica 12")
     tkpack(titlelbl, side = "top", fill = "both", expand = TRUE)
@@ -128,12 +132,5 @@ writeLabel <- function(baseW, typeFun, valueFun){
 
     tkgrid(name, type, view, option)
 }
-
-
-
-
-
-
-
 
 

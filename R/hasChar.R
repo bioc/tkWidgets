@@ -5,11 +5,11 @@
 #
 
 hasPrefix <- function(aPrefix){
-    got <- hasChar(aPrefix, "prefix")
+    hasChar(aPrefix, "prefix")
 }
 
 hasSuffix <- function(aSuffix){
-    got <- hasChar(aSuffix, "suffix")
+    hasChar(aSuffix, "suffix")
 }
 
 hasChar <- function (toCheck, what = ""){

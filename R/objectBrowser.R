@@ -1,3 +1,5 @@
+##FIXME: this is not a good description --
+
 # This function provides the interface to view the objects in the
 # work place. fun = a function that filters objects; textToShow = text
 # to be shown on the widget, nSelect = number of selection can be
@@ -6,6 +8,7 @@
 objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
                           nSelect = -1){
 
+##FIXME: please read the documentation for on.exit to see why this is wrong.
     on.exit(options(show.error.messages = TRUE))
     on.exit(end())
 
@@ -22,6 +25,10 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
     objsInSel <- NULL
     tempObj <- NULL
 
+#please document each of these functions -- describe what it is supposed to
+#do - by the way, I don't think that this does what you think it does
+#there is no way that this can change the value of returnList
+#
     end <- function(){
         if(length(objsInSel) != 0){
             if(nSelect == -1){
@@ -212,6 +219,10 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
         }
     }
 
+##FIXME: please try to document what is being done here
+##there should be a number of logical steps and you should put in
+##some information on each one about what it does
+
     base <- tktoplevel()
     tktitle(base) <- paste("Bioconductor Object Browser")
 
@@ -272,18 +283,4 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
 
     return(returnList)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

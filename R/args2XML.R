@@ -1,5 +1,5 @@
 # This function reads the formal arguments of an R function and then
-# generates an XML document containing the data read.
+# generates an XML document containing those arguments
 #
 # Copyright 2002, J. Zhang, all rights reserved
 #
