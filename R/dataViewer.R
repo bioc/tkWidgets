@@ -14,16 +14,20 @@ dataViewer <- function(data, height = 20, width = 35, save = TRUE){
     boxFrame <- tkframe(base)
 
     # Insert data into the canvas
-    innerFrame <- makeViewer(boxFrame, vWidth = width, vHeight = height,
+    innerFrame <- makeViewer(boxFrame, vWidth = width,
                              vScroll = TRUE, side = "top",
                              hScroll = TRUE, what = "text")
+
     dataFrame <- tkframe(innerFrame)
     for(i in 1:ncol(data)){
-        tempList <- tklistbox(dataFrame, width = 0, background = "white")
+        tempList <- tklistbox(dataFrame, width = 0, height = 0,
+                                             background = "white")
         writeList(tempList, data[,i])
-        tkpack(tempList, side = "left")
+        tkpack(tempList, side = "left", expand = TRUE, fill = "y")
+
 
     }
+#    tkpack(dataFrame)
     tkwindow.create(innerFrame, "0.0", window = dataFrame)
 
     tkpack(boxFrame, side = "top")
