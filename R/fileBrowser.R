@@ -49,7 +49,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         selectedObj <- as.character(tkget(listView,
                                           (tkcurselection(listView))))
         if(regexpr(.Platform$file.sep, selectedObj[1]) >= 1){
-      setwd(file.path(getwd(), selectedObj))
+            setwd(file.path(getwd(), selectedObj))
             write2List(listView,
                      pickFiles(appendSepDir(getwd()), testFun,
                                prefix, suffix))
@@ -89,7 +89,10 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         if(length(selIndex) > 0){
             for(i in selIndex){
                 selObj <- as.character(tkget(listView, i))
-                    fileSelected <<- c(fileSelected,
+                # In case a file name contains a space
+                if(length(selObj > 1))
+                   selObj <- paste(selObj, collapse = " ")
+                fileSelected <<- c(fileSelected,
                                     file.path(getwd(), selObj))
             }
             fileSelected <<- unique(fileSelected)
