@@ -3,16 +3,16 @@
 #
 # Copyright 2002, J. Zhang, all rights reserved.
 
-fileWizard <- function(filename = "", fun = read.table){
+fileWizard <- function(filename = "", fun = read.table, file = "file",
+                       basic = c("header", "sep")){
 
     BOLD12 <- "Helvetica 12 bold"
     NORMAL11 <- "Helvetica 11"
     BOXW <- 20
 
     args <- formals(fun)
-    boxNames <- names(args)
-    boxNames <- boxNames[boxNames != "file"]
-    boxes <- vector(length = length(args))
+    rest <- setdiff(names(args), c(file, basic))
+    boxes <- vector("list")
 
     end <- function(){
          tkdestroy(top)
@@ -26,8 +26,7 @@ fileWizard <- function(filename = "", fun = read.table){
     init <- function(){
         if(!is.null(filename) || !is.na(filename) || filename != ""){
             tkinsert(nameEntry, "0", filename)
-            tkdelete(fileText, 0, "end")
-            tkinsert(fileText, "end", readLines(filename))
+            writeEntry(fileText, readLines(filename))
         }
     }
 
@@ -46,6 +45,21 @@ fileWizard <- function(filename = "", fun = read.table){
         }
     }
 
+    showMore <- function(){
+        writeEntry(restList, rest)
+    }
+
+    update <- function(){
+        cat("workds")
+    }
+
+    argSelected <- function(){
+        selectedArg <<-
+            tclvalue(tkget(restList,(tkcurselection(restList))))
+        writeEntry(restEntry, args[[selectedArg]])
+        tkconfigure(restUp, state = "normal")
+    }
+
     top <- tktoplevel()
     tktitle(top) <- "BioC Text Import Wizard"
 
@@ -60,35 +74,54 @@ fileWizard <- function(filename = "", fun = read.table){
 
     argFrame <- tkframe(top)
     i <- 1
-    while(i <= length(boxNames)){
-        if(i != length(boxNames)){
+    while(i <= length(basic)){
+        if(i != length(basic)){
             frame1 <- tkframe(argFrame)
-            boxes[boxNames[i]] <- tkentry(frame1, width = BOXW)
-            tkpack(tklabel(frame1, text = paste(boxNames[i], ": ",
+            boxes[basic[i]] <<- tkentry(frame1, width = BOXW)
+            tkpack(tklabel(frame1, text = paste(basic[i], ": ",
                             sep = ""), font = NORMAL11), side = "left")
-            tkpack(boxes[boxNames[i]], side = "left")
+            tkpack(boxes[basic[i]], side = "left")
             frame2 <- tkframe(argFrame)
-            boxes[boxNames[i + 1]] <- tkentry(frame2, width = BOXW)
-            tkpack(tklabel(frame2, text = paste(boxNames[i + 1],
+            boxes[[basic[i + 1]]] <<- tkentry(frame2, width = BOXW)
+            tkpack(tklabel(frame2, text = paste(basic[i + 1],
                                    ": ", sep = ""), font =NORMAL11),
                    side = "left")
-            tkpack(boxes[boxNames[i + 1]], side = "left")
+            tkpack(boxes[[basic[i + 1]]], side = "left")
             tkgrid(frame1, frame2)
-            writeEntry(boxes[boxNames[i]], args[[boxNames[i]]])
-            writeEntry(boxes[boxNames[i + 1]], args[[boxNames[i + 1]]])
+            writeEntry(boxes[[basic[i]]], args[[basic[i]]])
+            writeEntry(boxes[[basic[i + 1]]], args[[basic[i + 1]]])
         }else{
             frame1 <- tkframe(argFrame)
-            boxes[boxNames[i]] <- tkentry(frame1, width = BOXW)
-            tkpack(tklabel(frame1, text = paste(boxNames[i], ": ",
+            boxes[[basic[i]]] <<- tkentry(frame1, width = BOXW)
+            tkpack(tklabel(frame1, text = paste(basic[i], ": ",
                             sep = ""), font = NORMAL11), side = "left")
-            tkpack(boxes[boxNames[i]], side = "left")
+            tkpack(boxes[[basic[i]]], side = "left")
             frame2 <- tkframe(argFrame)
             tkgrid(frame1, frame2)
-            writeEntry(boxes[boxNames[i]], args[[boxNames[i]]])
+            writeEntry(boxes[[basic[i]]], args[[basic[i]]])
         }
         i <- (i + 2)
     }
     tkgrid(argFrame, columnspan = 2, sticky = "nw")
+    # Put in the rest of the arguments
+    restFrame <- tkframe(top)
+    restButton <- tkbutton(restFrame, text = "More", width = 8,
+                           command = showMore)
+    tkpack(restButton, side = "left")
+    listFrame <- tkframe(restFrame)
+    restList <- makeViewer(listFrame, vHeight = 1, vWidth = 10,
+                           vScroll = TRUE)
+    tkpack(listFrame, side = "left")
+    tkbind(restList, "<B1-ButtonRelease>", argSelected)
+    restLabel <- tklabel(restFrame, text = "Default:")
+    tkpack(restLabel, side = "left")
+    restEntry <- tkentry(restFrame, width = 15)
+    tkpack(restEntry, side = "left")
+    restUp <- tkbutton(restFrame, text = "Update", width = 8,
+                       command = update)
+    tkpack(restUp, side = "left")
+    tkgrid(restFrame, columnspan = 2)
+    tkconfigure(restUp, state = "disabled")
 
     fileFrame <- tkframe(top)
     fileLabel <- paste("Preview of file:", filename)
@@ -96,17 +129,8 @@ fileWizard <- function(filename = "", fun = read.table){
                             font = NORMAL11)
     tkgrid(previewLabel, pady = 4, padx = 2, sticky = "nw")
     textFrame <- tkframe(fileFrame)
-    fileText <- tklistbox(textFrame, height = 10)
-    vscr <- tkscrollbar(textFrame,
-                        command = function(...) tkyview(fileText, ...))
-    hscr <- tkscrollbar(textFrame, orient = "horizontal",
-                       command = function(...) tkxview(fileText, ...))
-    tkconfigure(fileText,
-                yscrollcommand = function(...) tkset(vscr,...),
-                xscrollcommand = function(...) tkset(hscr, ...))
-    tkpack(vscr, side = "right", fill = "y")
-    tkpack(hscr, side = "bottom", fill = "x")
-    tkpack(fileText, fill = "both", expand = TRUE)
+    fileText <- makeViewer(textFrame, vWidth = 70, vHeight = 15,
+                           vScroll = TRUE, hScroll = TRUE)
     tkgrid(textFrame)
     tkgrid(fileFrame, columnspan = 2, padx = 2)
 
