@@ -125,8 +125,9 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
         selectedPkg <- pkgName
         write2VigList(pkgName)
     }
-
-    tkwait.window(base)
+    if(packValid){
+        tkwait.window(base)
+    }
 
     return(invisible())
 }
