@@ -14,7 +14,7 @@ argsWidget <- function(argsList, defaultNames){
     # Constructs the interface
     # Sets the working environment
     PWEnv <- new.env(hash = TRUE, parent = NULL)
-    pWidgets <- getPWidget(argsList, PWEnv, inst)
+    pWidgets <- getPWidget(argsList, PWEnv)
     widget <- widget(wTitle = "BioC Arguments Widget", pWidgets,
                      funs = list(), preFun = function() {},
                      postFun = function() {}, env = PWEnv,
