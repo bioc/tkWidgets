@@ -10,6 +10,7 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
 
     require(Biobase) || stop("Package Biobase not available!")
     require(tools) || stop("Package tools not available!")
+    require(DynDoc) || stop("Package DynDoc not available!")
 
     on.exit(tkdestroy(base))
     PLATFORM <- .Platform$OS.type
