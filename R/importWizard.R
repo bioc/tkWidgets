@@ -879,8 +879,17 @@ getName4Data <- function(filename, getFocus = TRUE){
     }
     # Save the data
     save <- function(){
-        temp <<- tclvalue(var)
-        end()
+        if(tclvalue(var) == ""){
+            tkmessageBox(title = paste("Input Error"),
+                         message = paste("You have not typed in a name",
+                         "to save the object under.",
+                         "Please type in a name to the entry box."),
+                         icon = "error",
+                         type = "ok")
+        }else{
+            temp <<- tclvalue(var)
+            end()
+        }
     }
     # Do not save the data
     noSave <- function(){
@@ -911,3 +920,4 @@ getName4Data <- function(filename, getFocus = TRUE){
 
     return(temp)
 }
+
