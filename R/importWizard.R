@@ -739,6 +739,11 @@ setState3BFrame <- function(frame, env){
 # Create a group of list boxes with entry boxes and a radio button on
 # top to allow for user inputs.
 writeCol4Matrix <- function(tempFrame, dataFile, colInfos, env){
+    # For text files, row names are hard to guess. Check col value
+    # here instead
+    if(ncol(dataFile) > length(colInfos)){
+        dataFile <- dataFile[, 2:ncol(dataFile)]
+    }
     writeDataCol <- function(i, data){
         colFrame <- tkframe(tempFrame)
         dropCMD[[i]] <- function(){}

@@ -30,7 +30,7 @@ importPhenoData <- function(sampleNames = NULL){
 
     getPData <- function(what, desc = NULL){
         if(what == "file"){
-            pdata <- importWizard(getFocus = TRUE)[["data"]]
+            pdata <- importWizard()[["data"]]
             if(is.null(pdata)){
                 return(invisible())
             }
@@ -74,7 +74,7 @@ importPhenoData <- function(sampleNames = NULL){
         tempData <- createPData(pdata, varList)
         if(!is.null(tempData)){
             newPhenoData <<- tempData
-            filename <- getName4Data()
+            filename <- getName4Data("phenodata", objType = "phenoData")
             if(!is.null(filename)){
                 .GlobalEnv[[filename]] <- newPhenoData
             }
@@ -102,7 +102,8 @@ importPhenoData <- function(sampleNames = NULL){
     tktitle(base) <- "BioC Read phenoData"
 
     tkpack(tklabel(base, text = paste("Please make a selection using",
-                         "the buttons below:")), side = "top",
+                         "the buttons below:"),
+                         font = "Helvetica 11 bold"), side = "top",
                    expand = FALSE, pady = 8, padx = 5)
 
     # Frame for read from file
@@ -386,8 +387,11 @@ createPData <- function(pdata, varList){
     base <- tktoplevel()
     tktitle(base) <- "BioC PhenoData Wizard"
 
+    tkpack(tklabel(base, text = "Enter and Editor Data",
+                   font = "Helvetica 11 bold"), side = "top",
+           pady = 5, padx = 5, expand = FALSE)
     tkpack(tklabel(base, text = paste("Please enter pheno data using",
-                        "the table below:")), pady = 5)
+                        "the table below:")))
     noteFrame <- tkframe(base, borderwidth = 2, relief = "groove")
     tkpack(tklabel(noteFrame, text = paste("Cells in the first row",
                               "show covariate names and cells in the",
@@ -396,7 +400,7 @@ createPData <- function(pdata, varList){
                          "names) are edit-able."),
                    justify = "left"),
                   side = "top", expand = FALSE, pady = 5)
-    tkpack(noteFrame, side = "top", expand = FALSE, padx = 5)
+    tkpack(noteFrame, side = "top", expand = FALSE, padx = 5, pady = 5)
 
     # A text widget to keep phenoData entries
     dataFrame <- tkframe(base)
@@ -516,8 +520,11 @@ getCovarDesc <- function(varList){
     base <- tktoplevel()
     tktitle(base) <- "BioC PhenoData Wizard"
 
+    tkpack(tklabel(base, text = "Describe Variables",
+                   font = "Helvetica 11 bold"), side = "top",
+           pady = 5)
     tkpack(tklabel(base, text = paste("Please enter/edit a short textual",
-                         "description for each covariate")), pady = 5)
+                         "description for each covariate")), pady = 2)
 
     # A text widget to keep description entries
     dataFrame <- tkframe(base)
@@ -526,7 +533,7 @@ getCovarDesc <- function(varList){
                            vScroll = TRUE, what = "text", side = "left")
     tkpack(dataText, side = "top", expand = TRUE, fill = "both")
     tkpack(dataFrame, side = "top", expand = TRUE, fill = "both",
-           padx = 5)
+           padx = 5, pady = 5)
 
     butFrame <- tkframe(base)
     backBut <- tkbutton(butFrame, text = "Cancel", width = 8,
