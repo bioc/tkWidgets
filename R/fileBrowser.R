@@ -17,19 +17,20 @@ fileBrowser <- function (path = ""){
     }
 
     inList <- function(){
-
-        item <- tkget(listView, tkcurselection(listView))
-        if(regexpr(Platform()$file.sep, item) >= 1){
-	    path <<- paste(path, Platform()$file.sep,
+        if(tkcurselection(listView) != ""){
+            item <- tkget(listView, tkcurselection(listView))
+            if(regexpr(Platform()$file.sep, item) >= 1){
+	        path <<- paste(path, Platform()$file.sep,
                            gsub(Platform()$file.sep, "\\", item),
                            sep = "")
-            doPath()
-            writeDir(listView, list.files(path), path)
-	    writeCap(path)
-            if(currentNode >= 2)
-                tkconfigure(upBut, state = "normal")
-        }else
-	    fileSelected <<- item
+                doPath()
+                writeDir(listView, list.files(path), path)
+	        writeCap(path)
+                if(currentNode >= 2)
+                    tkconfigure(upBut, state = "normal")
+            }else
+	        fileSelected <<- item
+        }
     }
 
     doPath <- function(){
