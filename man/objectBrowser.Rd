@@ -8,8 +8,7 @@
   will be returned as a list. 
 }
 \usage{
-objectBrowser(env = .GlobalEnv,fun = noAuto, textToShow = "Select
-object(s)", nSelect = -1) 
+objectBrowser(env = .GlobalEnv,fun = noAuto, textToShow = "Select object(s)", nSelect = -1)  
 }
 \arguments{
   \item{fun}{function to test whether certain conditions are met by
