@@ -237,6 +237,14 @@ There are other widgets that are used by specific packages that may
 not be of general interest. These widgets are thus not included in the
 examples.
 
+\section{Session Information}
+
+The version number of R and packages loaded for generating the vignette were:
+
+<<echo=FALSE,results=tex>>=
+sessionInfo()
+@
+
 \end{document}
 
 

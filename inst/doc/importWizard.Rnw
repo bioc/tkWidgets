@@ -147,6 +147,14 @@ importWizard is driven by the interface. Users only need
 to type "importWizard()" or "importWizard(filename)" to begin the
 importing process.
 
+\section{Session Information}
+
+The version number of R and packages loaded for generating the vignette were:
+
+<<echo=FALSE,results=tex>>=
+sessionInfo()
+@
+
 \end{document}
 
 
