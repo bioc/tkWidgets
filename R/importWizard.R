@@ -101,16 +101,21 @@ initImportWizard <- function(env){
     # A list to be returned that contains an argument list and data
     # imported using read.table
     dataList <- NULL
+    # A variable to keep the frame that is currently displayed
+    currentFrame <- NULL
+
     on.exit(end())
     # Destroy the window
     end <- function(){
         tkdestroy(top)
     }
     nextState <- function(){
-        changeState(canvas, backBut, nextBut, env, TRUE)
+        currentFrame <<- changeState(currentFrame, canvas,
+                                              backBut, nextBut, env, TRUE)
     }
     preState <- function(){
-        changeState(canvas, backBut, nextBut, env, FALSE)
+        currentFrame <<- changeState(currentFrame, canvas,
+                                              backBut, nextBut, env, FALSE)
     }
     finishClicked <- function(){
         dataList <<- finish(env)
@@ -122,10 +127,9 @@ initImportWizard <- function(env){
     tktitle(top) <- "BioC Data Import Wizard"
     # Set the empty canvas that will be filled later
     canvas <- getTopCan(top, env)
-    stateID <- tkcreate(canvas, "window", 0, 0, anchor = "nw",
-                                    window = getState1Frame(canvas, env))
-    # The ID is stored for later access
-    assignSID(stateID, env)
+    # Sets current frame to state1 now
+    currentFrame <- getAFrame(canvas, env)
+    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = currentFrame)
     ## The bottom frame contains the buttons that allow users to
     ## navigate the importing process
     butFrame <- tkframe(top)
@@ -156,7 +160,8 @@ getTopCan <- function(base, env){
     return(canvas)
 }
 # Changes the state and thus the interface
-changeState <- function(canvas, backBut, nextBut, env, forward = TRUE){
+changeState <- function(oldFrame, canvas, backBut,
+                                            nextBut, env, forward = TRUE){
     # Sets the current state
     setNewState(env, backBut, nextBut, forward)
     if(forward){
@@ -164,12 +169,12 @@ changeState <- function(canvas, backBut, nextBut, env, forward = TRUE){
     }else{
         dropArgs(env)
     }
+    newFrame <- getAFrame(canvas, env)
     # Changes the interface accordingly
-    tkdelete(canvas, getSID(env))
-    assignSID(NULL, env)
-    stateID <- tkcreate(canvas, "window", 0, 0, anchor = "nw",
-                                    window = getAFrame(canvas, env))
-    assignSID(stateID, env)
+    tkdestroy(oldFrame)
+    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = newFrame)
+
+    return(newFrame)
 }
 # Sets the string for the new state (next or previous) and
 # actviates/inactivates buttons depending on the state
@@ -420,6 +425,9 @@ setSepRadios <- function(frame, env, state = "state2"){
             temp <- getArgs(env)
             temp[[state]][["sep"]] <- tclvalue(sepVar)
             assignArgs(temp, env)
+            tkconfigure(otherEntry, state = "disabled")
+        }else{
+            tkconfigure(otherEntry, state = "normal")
         }
     }
     sepEntered <- function(){
@@ -451,7 +459,7 @@ setSepRadios <- function(frame, env, state = "state2"){
                               variable = sepVar, value = "other",
                               width = 9, anchor = "nw",
                                         command = sepButFun)
-    otherEntry <- tkentry(sepFrame, width = 11)
+    otherEntry <- tkentry(sepFrame, width = 11, state = "disabled")
     tkbind(otherEntry, "<KeyRelease>", sepEntered)
     # Second row with an entry box for delimiters other those given here
     tkgrid(sepButs[["space"]], sepButs[["other"]], otherEntry)
@@ -571,6 +579,9 @@ setState3BFrame <- function(frame, env){
     nameCMD <- list()
     typeCMD <- list()
     colList <- list()
+    # Gets the colInfo object
+    colInfos <- getColInfo(env)
+
     rCanv <-  makeViewer(frame, vWidth = 700, vHeight = 280,
                        vScroll = TRUE, hScroll = TRUE,
                        what = "canvas", side = "top")
@@ -600,6 +611,10 @@ setState3BFrame <- function(frame, env){
         tkpack(dropCheck[[i]], side = "top")
         nameEntry[[i]] <- tkentry(colFrame, width = colWidth)
         writeList(nameEntry[[i]], colnames(dataFile)[i])
+        # Also updates the value of colInfos
+        temp <- colInfos[[i]]
+        name(temp) <- colnames(dataFile)[i]
+        colInfos[[i]] <- temp
         nameCMD[[i]] <- function(){}
         body <- list(as.name("{"), substitute(eval(setColName(j,
                                       nameEntry[[j]], env)), list(j = i)))
@@ -621,6 +636,8 @@ setState3BFrame <- function(frame, env){
         tkpack(colFrame, side = "left")
     }
     tkcreate(rCanv, "window", 0, 0, anchor = "nw", window = tempFrame)
+    # Sets values for colInfo object
+    assignColInfo(colInfos, env)
 }
 # Set the value of slot 'drop' of a colInfo object
 dropColumn <- function(index, env){
