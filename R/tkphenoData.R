@@ -180,7 +180,7 @@ tkphenoData <- function(sampleNames){
 
     tkwait.window(tt3)
 
-    pd.matrix <- matrix(0,nrow=length(sampleNames),ncol=get("NumCovar",eerieEnv))
+    pd.matrix <- matrix(NA,nrow=length(sampleNames),ncol=get("NumCovar",eerieEnv))
     rownames(pd.matrix) <- sampleNames
 
     c.names <- array("",get("NumCovar",eerieEnv))
@@ -189,7 +189,7 @@ tkphenoData <- function(sampleNames){
     colnames(pd.matrix) <- c.names
     for(i in 1:length(sampleNames)){
       for(j in 1:get("NumCovar",eerieEnv)){
-        pd.matrix[i,j] <- as.numeric(tclvalue(get("cov.lst",eerieEnv)[[i]][[j]]))}}
+        pd.matrix[i,j] <- tclvalue(get("cov.lst",eerieEnv)[[i]][[j]])}}
 
     desc.matrix <- matrix("",nrow=get("NumCovar",eerieEnv),ncol=1)
     rownames(desc.matrix) <- c.names
