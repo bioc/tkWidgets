@@ -57,7 +57,8 @@ pW1 <- list(Name="AAA", Value="bbb", toText=function(x) paste(x,collapse
 buttonText = "Browse") 
 
 pW2 <- list(Name="BBB", Value="x,y,z", toText=function(x) paste(x,
-sep=","), fromText=NULL, canEdit=TRUE, buttonFun = ls,  buttonText = "List")
+collapse=","), fromText=NULL, canEdit=TRUE, buttonFun = ls,  
+buttonText = "List")
 
 pW3 <- list(Name="CCC", Value="ccc",toText=function(x) paste(x, collapse
 = ","), fromText=NULL, canEdit=TRUE, buttonFun=NULL,  buttonText=NULL)

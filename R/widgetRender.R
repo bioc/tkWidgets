@@ -17,6 +17,7 @@ widgetRender <- function (iWidget, tkTitle) {
 
     require(tcltk) || stop("tcltk is not available.")
 
+    PFRAME <- parent.frame(1)
     CANCEL <- FALSE
     END <- FALSE
     cancel <- function() {
@@ -34,7 +35,7 @@ widgetRender <- function (iWidget, tkTitle) {
     eFrame <- tkframe(base)
 
 
-    ## funciton that gets called at the end and gets the
+    ## function that gets called at the end and gets the
     ## values from the entry boxes
     getEntryValues <- function(){
         entryList
@@ -74,15 +75,16 @@ widgetRender <- function (iWidget, tkTitle) {
     for(i in 1:length(wList)) {
         fun <- function() {}
         body <- list(as.name("{"),
-                     substitute(rval <- WbuttonFun(wList[[i]])(),
+                     substitute(rval <-
+                                eval(as.call(list(WbuttonFun(wList[[i]]))),
+                                             env=PFRAME),
                                      list(i=i)),
-                     substitute(text <- WtoText(wList[[i]])(rval),
+                     substitute(mytext <- WtoText(wList[[i]])(rval),
                                 list(i=i)),
                      substitute(tkdelete(entryList[[i]], 0, "end"),
                                 list(i=i)),
-                     substitute(tkinsert(entryList[[i]], 0, text),
+                     substitute(tkinsert(entryList[[i]], 0, mytext),
                                 list(i=i)),
-#                     substitute(WValue(wList[[i]]) <<- rval, list(i=i))
                      substitute(iWidget <<-
                                 WListNewValue(iWidget, i, rval), list(i = i))
                      )
