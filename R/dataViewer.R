@@ -33,7 +33,7 @@ dataViewer <- function(data, caption = "", save = TRUE){
         }
         tempList <- tklistbox(tempFrame, width = 0,
                               height = 0, background = "white")
-        writeList(tempList, data[,i])
+        writeList(tempList, as.vector(data[,i]))
         tkpack(tempList, side = "left", expand = TRUE, fill = "both")
         tkpack(tempFrame, side = "left", expand = TRUE, fill = "both")
     }
