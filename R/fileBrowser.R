@@ -142,7 +142,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
 
     writeCap <- function(toWrite)
-	tkconfigure(caption, text = paste("Current:", toWrite))
+	tkconfigure(caption, text = toWrite)
 
     if(path == "")
         path <- getwd()
@@ -156,9 +156,9 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkpack(canvas, side = "top", fill = "both")
 
     topFrame <- tkframe(canvas)
-    caption <- tklabel(topFrame, text = paste("Current:", path),
-                       font = LABELFONT)
-    tkpack(caption)
+    dir <- tklabel(topFrame, text = "Directory: ", font = LABELFONT)
+    caption <- tkbutton(topFrame, text = path, width = 50)
+    tkgrid(dir, caption)
     tkcreate(canvas, "window", (CANWIDTH/2), (OFFSET + LABELHEIGHT/2),
 	     anchor = "center", window = topFrame)
 
@@ -182,7 +182,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkbind(listView, "<B1-ButtonRelease>", selInDir)
     writeDir(listView, pickFiles(dirsNFiles(path), testFun,
                                  prefix, suffix))
-    tkcreate(canvas, "window", OFFSET, (LABELHEIGHT + OFFSET),
+    tkcreate(canvas, "window", OFFSET, (LABELHEIGHT + OFFSET + 10),
 	     anchor = "nw", window = leftFrame)
 
     rightFrame <- tkframe(canvas)
@@ -202,7 +202,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid(remBut, clearBut)
     tkgrid.configure(remBut, sticky = "e")
     tkgrid.configure(clearBut, sticky = "w")
-    tkcreate(canvas, "window", (CANWIDTH/2 + OFFSET), (LABELHEIGHT + OFFSET),
+    tkcreate(canvas, "window", (CANWIDTH/2 + OFFSET),
+             (LABELHEIGHT + OFFSET + 10),
 	     anchor = "nw", window = rightFrame)
 
     botFrame <- tkframe(canvas)
