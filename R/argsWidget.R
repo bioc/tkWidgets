@@ -14,7 +14,7 @@ argsWidget <- function(argsList, defaultNames){
     # Constructs the interface
     # Sets the working environment
     PWEnv <- new.env(hash = TRUE, parent = NULL)
-    pWidgets <- getPWidget(argsList, PWEnv)
+    pWidgets <- getPWidget(argsList, PWEnv, inst)
     widget <- widget(wTitle = "BioC Arguments Widget", pWidgets,
                      funs = list(), preFun = function() {},
                      postFun = function() {}, env = PWEnv,
@@ -41,6 +41,7 @@ getPWidget <- function(argsList, PWEnv){
     # Figures out the width for lables
     lWidth <- max(nchar(names(argsList)))
     pWidgets <- list()
+
     for(i in names(argsList)){
         tempList <- list()
         # Creates radio buttons with TRUE and FALSE if the default
