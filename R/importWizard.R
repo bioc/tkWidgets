@@ -8,7 +8,7 @@
 #
 # Copyright 2002, J. Zhang, all rights reserved.
 
-importWizard <- function(filename, maxRow = 400, getFocus = TRUE){
+importWizard <- function(filename, maxRow = 400){
 
     # Creates an environment to make some variables available to all
     # related functions
@@ -17,7 +17,6 @@ importWizard <- function(filename, maxRow = 400, getFocus = TRUE){
     assignCState("state1", env = workEnv)
     # Number of row to be displayed
     assignShowNum(maxRow, env = workEnv)
-    workEnv[["focus"]] <- getFocus
 
     if(!missing(filename)){
         # Do this if a file name is given
@@ -74,8 +73,7 @@ setArgsList <- function(filename, env, isFile = TRUE, init = TRUE){
 }
 # Set the temp data read as lines with a maxmun number
 assignLineData <- function(lineData, env){
-    env[["lineData"]] <<- lineData
-    #assign("lineData", lineData, env = env)
+    assign("lineData", lineData, env = env)
 }
 # Get the temp data stroed as lines with a maxmun number
 getLineData <- function(env){
@@ -83,24 +81,21 @@ getLineData <- function(env){
 }
 # Set and get methods for argument list
 assignArgs <- function(value, env){
-    env[["argsList"]] <<- value
-    #assign("argsList", value, env = env)
+    assign("argsList", value, env = env)
 }
 getArgs <- function(env){
     env$argsList
 }
 # Set and get methods for number to show in the interface
 assignShowNum <- function(value, env){
-    env[["showNum"]] <<- value
-    #assign("showNum", value, env)
+    assign("showNum", value, env)
 }
 getShowNum <- function(env){
     env$showNum
 }
 # Set and get methods for current state to keep track of the state
 assignCState <- function(value, env){
-    env[["currentState"]] <<- value
-    #assign("currentState", value, env)
+    assign("currentState", value, env)
 }
 getCState <- function(env){
     env$currentState
@@ -108,8 +103,7 @@ getCState <- function(env){
 # Set and get methods for colInfo that is a list of colInfo objects to
 # keep column name, type, and drop info
 assignColInfo <- function(value, env){
-    env[["colInfos"]] <<- value
-    #assign("colInfos", value, env)
+    assign("colInfos", value, env)
 }
 getColInfo <- function(env){
     env$colInfos
@@ -137,14 +131,11 @@ initImportWizard <- function(env){
     # A variable to keep the frame that is currently displayed
     currentFrame <- NULL
 
+    on.exit(end())
     # Destroy the window
     end <- function(){
-        if(env[["focus"]]){
-            tkgrab.release(top)
-        }
         tkdestroy(top)
     }
-    on.exit(end())
     nextState <- function(){
         args <- getArgs(env)
         if(is.null(args[["state1"]][["file"]])){
@@ -206,9 +197,6 @@ initImportWizard <- function(env){
     tkpack(butFrame, pady = 10, fill = "y", expand = TRUE)
 
     args <- getArgs(env)
-    if(env[["focus"]]){
-        tkgrab.set(top)
-    }
     tkwait.window(top)
     return(invisible(dataList))
 }
@@ -336,8 +324,7 @@ finish <- function(env){
             names(dataFile) <- colNames
         }
         if(!is.null(dataName)){
-            .GlobalEnv[[dataName]] <<- dataFile
-            #assign(dataName, dataFile, env = .GlobalEnv)
+            assign(dataName, dataFile, env = .GlobalEnv)
         }
         return(list(args = args, data = dataFile))
     }
@@ -380,23 +367,16 @@ setState1BFrame <- function(frame, env){
 # Sets the top frame for state1
 setState1TFrame <- function(frame, viewer, delims, env){
     fName <- tclVar()
-
-    # Populate the list box for data read in
-    popList <- function(){
-        showData4State1(viewer, env)
-        if(!is.null(getArgs(env)[["state1"]][["sep"]])){
-            tkselect(delims[["delimit"]])
-        }
-    }
     # Populate the entry box for file name when the brose button is
     # clicked
     browse <- function(){
         filename <- tclvalue(tkgetOpenFile())
-        if(filename != ""){
-            writeList(nameEntry, filename, clear = TRUE)
-            argsSet <- setArgsList(filename, env)
-            if(argsSet){
-                popList()
+        writeList(nameEntry, filename, clear = TRUE)
+        argsSet <- setArgsList(filename, env)
+        if(argsSet){
+            showData4State1(viewer, env)
+            if(!is.null(getArgs(env)[["state1"]][["sep"]])){
+                tkselect(delims[["delimit"]])
             }
         }
     }
@@ -404,7 +384,10 @@ setState1TFrame <- function(frame, viewer, delims, env){
     getFile <- function(){
         argsSet <- setArgsList(tclvalue(fName), env)
         if(argsSet){
-            popList()
+            showData4State1(viewer, env)
+            if(!is.null(getArgs(env)[["state1"]][["sep"]])){
+                tkselect(delims[["delimit"]])
+            }
         }
     }
 
@@ -414,7 +397,6 @@ setState1TFrame <- function(frame, viewer, delims, env){
     tkpack(label1, side = "left")
     # An entry box to hold the result of fileBrowser
     nameEntry <- tkentry(nameFrame, width = 20, textvariable = fName)
-    #tkbind(nameEntry, "<KeyPress-Enter>", getFile)
     # If a file name is given, fill the widget with data
     if(!is.null(getArgs(env)[["state1"]][["file"]])){
         writeList(nameEntry, getArgs(env)[["state1"]][["file"]], clear = TRUE)
@@ -462,7 +444,6 @@ showData4State1 <- function(widget, env){
 }
 # Sets the mid frame for state1
 setState1MFrame <- function(frame, env, dataViewer){
-    #skipNum <- tclVar("0")
     # Executed when values in start at row list box is clicked
     startClicked <- function(){
         setSkip(startList, env)
@@ -494,27 +475,13 @@ setState1MFrame <- function(frame, env, dataViewer){
                                 value = "fixed", variable = delimit,
                                 anchor = "nw")
     tkpack(fixedRadio, anchor = "w", expand = TRUE, fill = "x")
-    tkpack(leftPan, side = "top", anchor = "w", fill = "x", expand = TRUE)
-
-    #skipFrame <- tkframe(frame)
-    #dropFrame <- tkframe(skipFrame)
-    #dList <- dropdownList(dropFrame, as.character(1:20), skipNum, 3,
-    #             tclvalue(skipNum), TRUE)
-    #tkbind(dList, "<B1-ButtonRelease>", startClicked)
-    #skipLab <- tklabel(skipFrame, text = "Start import at line: ")
-    #tkpack(skipLab, side = "left", expand = FALSE)
-    #tkpack(dropFrame, side = "left", expand = TRUE, fill = "x")
-    #tkpack(tkbutton(dropFrame, text = "Apply", width = 15,
-    #                command = startClicked), side = "left", expand = FALSE)
-    #tkpack(skipFrame, side = "top", pady = 5, padx = 5, expand = FALSE)
-
+    tkpack(leftPan, side = "left", anchor = "w", fill = "x", expand = TRUE)
     rightPan <- tkframe(frame)
     paraLabel2 <- tklabel(rightPan, text = "Start import at row:")
     tkpack(paraLabel2, side = "left", anchor = "ne")
     startFrame <- tkframe(rightPan)
     startList <- makeViewer(startFrame, vWidth = 2, vHeight = 1,
                             what  = "list", side = "top")
-    tkconfigure(startList, exportselection = FALSE)
     tkconfigure(startList, selectmode = "single")
     tkbind(startList, "<B1-ButtonRelease>", startClicked)
     writeList(startList, 1:99, clear = TRUE)
@@ -529,7 +496,7 @@ setState1MFrame <- function(frame, env, dataViewer){
 setSkip <- function(widget, env, state = "state1"){
     temp <- getArgs(env)
     temp[[state]][["skip"]] <- as.numeric(as.character(tkget(widget,
-                                            tkcurselection(widget)))) - 1
+                                 tkcurselection(widget)))) - 1
     assignArgs(temp, env)
 }
 # Gets a frame for state2
@@ -868,8 +835,7 @@ getMoreArgs <- function(){
     args <- formals(read.table)
 
     args <- args[setdiff(names(args),
-                         c("file", "header", "sep", "skip","quote",
-                           "row.names", "col.names", "colClasses"))]
+                         c("file", "header", "sep", "skip","quote"))]
 
     # Argument fill has to be defined using the value of
     # blank.lines.skip.
@@ -878,36 +844,21 @@ getMoreArgs <- function(){
 }
 # This function provides the interface for uers to decide whether to
 # save the imported data in the global environment
-getName4Data <- function(filename, getFocus = TRUE){
+getName4Data <- function(filename){
     # Gets ride of the separaters
-    if(missing(filename) || is.null(filename)){
-        temp <- ""
-    }else{
-        temp <- gsub(paste("^.*", .Platform$file.sep,
+    temp <- gsub(paste("^.*", .Platform$file.sep,
                                   "(.*)", sep = ""), "\\1", filename)
-         temp <- strsplit(temp, "\\.")[[1]][1]
-    }
+    # Gets ride of the extensions
+    temp <- strsplit(temp, "\\.")[[1]][1]
     var <- tclVar(temp)
     # Destroy the window
     end <- function(){
-        if(getFocus){
-            tkgrab.release(top)
-        }
         tkdestroy(top)
     }
     # Save the data
     save <- function(){
-        if(tclvalue(var) == ""){
-            tkmessageBox(title = paste("Input Error"),
-                         message = paste("You have not typed in a name",
-                         "to save the object under.",
-                         "Please type in a name to the entry box."),
-                         icon = "error",
-                         type = "ok")
-        }else{
-            temp <<- tclvalue(var)
-            end()
-        }
+        temp <<- tclvalue(var)
+        end()
     }
     # Do not save the data
     noSave <- function(){
@@ -931,11 +882,7 @@ getName4Data <- function(filename, getFocus = TRUE){
     tkpack(noSaveBut, saveBut, side = "left")
     tkpack(butFrame, side = "top", pady = 5, padx = 5)
 
-    if(getFocus){
-        tkgrab.set(top)
-    }
     tkwait.window(top)
 
     return(temp)
 }
-
