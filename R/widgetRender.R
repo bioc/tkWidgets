@@ -1,3 +1,9 @@
+# This function creates a widget based on the requirements passed as a
+# list of lists.
+# iWidget: a list of lists defining the appearance and behavour of the
+# primitive widgets such entry boxex, buttons, ...
+# tkTitle: text to be appear in the title bar of the widgets.
+#
 widgetRender <- function (iWidget, tkTitle) {
     LABELFONT <- "Helvetica 12"
     ENTRYWIDTH <- 50
@@ -9,13 +15,12 @@ widgetRender <- function (iWidget, tkTitle) {
 
     if(is.null(wList) || is.na(wList) )
         stop("Either wList or/and funName is null or empty")
+    require(tcltk) || stop("tcltk is not available.")
 
     if(!is.null(WpreFun(iWidget)))
-        WpreFun(iWidget)
+        tt <- eval(WpreFun(iWidget)())
     if(!is.null(WpostFun(iWidget)))
-        on.exit(WpostFun(iWidget))
-
-    require(tcltk) || stop("tcltk is not available.")
+        on.exit(eval(WpostFun(iWidget)()))
 
     PFRAME <- parent.frame(1)
     CANCEL <- FALSE
@@ -31,7 +36,6 @@ widgetRender <- function (iWidget, tkTitle) {
 
     base <- tktoplevel()
     tktitle(base) <- tkTitle
-
     eFrame <- tkframe(base)
 
     ## function that gets called at the end and updates the
@@ -40,10 +44,12 @@ widgetRender <- function (iWidget, tkTitle) {
         for(i in 1:length(wList) ) {
             if(!BUTTONLAST[[i]]){
                 if(!is.null(WfromText(wList[[i]]))){
-                     eval(substitute(WLValue(iWidget, i) <<-
-                                     WfromText(wList[[i]])
-                                     (tclvalue(entryValue[[i]])),
-                                     list(i = i)))
+#                     eval(substitute(WLValue(iWidget, i) <<-
+#                                     WfromText(wList[[i]])
+#                                     (tclvalue(entryValue[[i]])),
+#                                     list(i = i)))
+                     WLValue(iWidget, i) <<- WfromText(wList[[i]])
+                                     (tclvalue(entryValue[[i]]))
                 }else{
                      WLValue(iWidget, i) <<- tclvalue(entryValue[[i]])
                 }
