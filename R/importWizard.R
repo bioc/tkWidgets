@@ -306,10 +306,10 @@ finish <- function(env){
             if(dropOrNot(colInfos[[i]])){
                 colToDrop <- c(colToDrop, i)
             }else{
-                switch(type(colInfos[[i]]),
+                switch(colType(colInfos[[i]]),
                    "Character" = dataFile[, i] <- as.character(dataFile[, i]),
                    "Numeric" = dataFile[, i] <- as.numeric(dataFile[, i]))
-                colNames <- c(colNames, name(colInfos[[i]]))
+                colNames <- c(colNames, colName(colInfos[[i]]))
             }
         }
         # Drop the columns
@@ -741,10 +741,10 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos, env){
         temp <- colInfos[[i]]
         if(!is.null(colnames(data))){
             writeList(nameEntry[[i]], colnames(data))
-            name(temp) <- colnames(data)
+            colName(temp) <- colnames(data)
         }else{
             writeList(nameEntry[[i]], paste("V", i, sep = ""))
-            name(temp) <- paste("V", i, sep = "")
+            colName(temp) <- paste("V", i, sep = "")
         }
         colInfos[[i]] <<- temp
         nameCMD[[i]] <- function(){}
@@ -754,7 +754,7 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos, env){
             tkbind(nameEntry[[i]], "<KeyRelease>", nameCMD[[i]])
         tkpack(nameEntry[[i]], side = "top", fill = "x", expand = TRUE)
         typeEntry[[i]] <- tkentry(colFrame, width = 0)
-        writeList(typeEntry[[i]], type(colInfos[[i]]))
+        writeList(typeEntry[[i]], colType(colInfos[[i]]))
         typeCMD[[i]] <- function(){}
         body <- list(as.name("{"), substitute(eval(setColType(j,
                                       typeEntry[[j]], env)), list(j = i)))
@@ -763,7 +763,8 @@ writeCol4Matrix <- function(tempFrame, dataFile, colInfos, env){
         tkpack(typeEntry[[i]], side = "top", fill = "x", expand = TRUE)
         colList[[i]] <- tklistbox(colFrame, width = 0,
                                   height = 0, background = "white")
-        tkinsert(colList[[i]], "end", data)
+        writeList(colList[[i]], data)
+#        tkinsert(colList[[i]], "end", data)
         tkpack(colList[[i]], side = "top", fill = "x", expand = TRUE)
         tkpack(colFrame, side = "left", fill = "both", expand = TRUE)
     }
@@ -805,7 +806,7 @@ setColName <- function(index, entryBox, env){
     colInfos <- getColInfo(env)
     entry <- as.character(tkget(entryBox))
     temp <- colInfos[[index]]
-    name(temp) <- entry
+    colName(temp) <- entry
     colInfos[[index]] <- temp
     assignColInfo(colInfos, env)
 }
@@ -814,7 +815,7 @@ setColType <- function(index, entryBox, env){
     colInfos <- getColInfo(env)
     entry <- as.character(tkget(entryBox))
     temp <- colInfos[[index]]
-    type(temp) <- entry
+    colType(temp) <- entry
     colInfos[[index]] <- temp
     assignColInfo(colInfos, env)
 }
