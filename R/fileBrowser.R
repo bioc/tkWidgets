@@ -3,7 +3,8 @@
 #
 
 fileBrowser <- function (path = "", testFun = function(x) TRUE,
-                         prefix = NULL, suffix = NULL){
+                         prefix = NULL, suffix = NULL,
+                         textToShow = "Choose file(s) to be read in."){
 
     require(tcltk) || stop("tcl/tk library not available")
 
@@ -23,6 +24,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     currentFile <- NULL
     selIndex <- NULL
     fileIndex <- NULL
+    nextY <- NULL
 
     end <- function(){
         tkdestroy(base)
@@ -158,8 +160,10 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     topFrame <- tkframe(canvas)
     dir <- tklabel(topFrame, text = "Directory: ", font = LABELFONT)
     caption <- tkbutton(topFrame, text = path, width = 50)
+    instruct <- tklabel(topFrame, text = textToShow, font = "Helvetica 11")
     tkgrid(dir, caption)
-    tkcreate(canvas, "window", (CANWIDTH/2), (OFFSET + LABELHEIGHT/2),
+    tkgrid(instruct, columnspan = 2)
+    tkcreate(canvas, "window", (CANWIDTH/2), (2 * OFFSET + LABELHEIGHT/2),
 	     anchor = "center", window = topFrame)
 
     leftFrame <- tkframe(canvas)
@@ -182,7 +186,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkbind(listView, "<B1-ButtonRelease>", selInDir)
     writeDir(listView, pickFiles(dirsNFiles(path), testFun,
                                  prefix, suffix))
-    tkcreate(canvas, "window", OFFSET, (LABELHEIGHT + OFFSET + 10),
+    tkcreate(canvas, "window", OFFSET, (LABELHEIGHT + 2 * OFFSET + 10),
 	     anchor = "nw", window = leftFrame)
 
     rightFrame <- tkframe(canvas)
@@ -203,7 +207,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid.configure(remBut, sticky = "e")
     tkgrid.configure(clearBut, sticky = "w")
     tkcreate(canvas, "window", (CANWIDTH/2 + OFFSET),
-             (LABELHEIGHT + OFFSET + 10),
+             (LABELHEIGHT + 2 * OFFSET + 10),
 	     anchor = "nw", window = rightFrame)
 
     botFrame <- tkframe(canvas)

@@ -9,8 +9,7 @@
   for the selected files. 
 }
 \usage{
-fileBrowser(path="", testFun = function(x) TRUE,
-                         prefix = NULL, suffix = NULL)
+fileBrowser(path="", testFun = function(x) TRUE, prefix = NULL, suffix = NULL,textToShow = "Choose file(s) to be read in.")
 }
 
 \arguments{
@@ -22,6 +21,8 @@ fileBrowser(path="", testFun = function(x) TRUE,
     names that do not have that prefix as part of their names.}
   \item{suffix}{A character string for a suffix used to screen out file
     names that do not have that suffix as part of their names.}
+  \item{textToShow}{A character string to be shown on the GUI to given
+    instructions to users.}
 }
 \details{
   When a path is viewed, files will be displayed as they are and
