@@ -150,7 +150,7 @@ importPhenoData <- function(sampleNames = NULL){
     tkgrab.set(base)
     tkwait.window(base)
 
-    return(newPhenoData)
+    return(invisible(newPhenoData))
 }
 
 # Read a data frame from a specified file
