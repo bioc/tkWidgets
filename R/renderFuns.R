@@ -1,7 +1,9 @@
-##they provide a well defined interface whose underlying implementation 
-##can easily be altered for other widget packages
-# These are the functions used by widgetRender
-##FIXME: could you document what they do please?
+# Function widgetRender takes a list of a widget list that has a name,
+# value, ... buttonText, and buttonFun as shown below plus a
+# prefunction, postfunction, and a few buttons. The functions listed
+# here provide a defined interface for accessing and manipulate these
+# values. The functions are currently temporary and will be modified
+# for better names.
 
 WName <- function(x) x$Name
 WValue <- function(x) x$Value
