@@ -1,0 +1,41 @@
+##test function for the Widget builder
+
+## R. Gentleman, Copyright 2002, all rights reserved
+## Functionality for primary widgets
+##Slots:
+##Name
+##Value
+##toText
+##fromText
+##buttonFun
+##buttonText
+##canEdit
+
+  pW1 <- list(Name="AAA", Value="bbb",
+              toText=function(x) paste(x,collapse = ","),
+              fromText=NULL, canEdit=TRUE, buttonFun = fileBrowser,
+              buttonText = "Browse")
+
+  pW2 <- list(Name="BBB", Value="x,y,z", toText=function(x) paste(x, sep=","),
+            fromText=NULL, canEdit=TRUE, buttonFun = ls,
+           buttonText = "List")
+
+  pW3 <- list(Name="CCC", Value="ccc",
+              toText=function(x) paste(x, collapse = ","),
+              fromText=NULL, canEdit=TRUE, buttonFun=NULL,
+              buttonText=NULL)
+
+  widget1 <- list(wList = list(a = pW1, b = pW2, c = pW3),
+                  preFun = function() "Hi Jianhua",
+                  postFun = function() "Bye Jianhua")
+
+#
+  x <- widgetRender(widget1, "HI")
+
+
+
+
+
+
+
+
