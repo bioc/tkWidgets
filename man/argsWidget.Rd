@@ -77,7 +77,8 @@ getTrueNullNa(toFormat)
 \seealso{\code{\link{basicPW-class}}}
 \examples{
   if(interactive()){
-      argsWidget(formals("list.files"))
+      argsWidget(list("Entry with default" = "default",
+                      "Entry without default" = ""))
   }
 }
 \keyword{interface}

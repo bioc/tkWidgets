@@ -5,7 +5,7 @@
 # Copyright 2002, J. Zhang, all rights reserved
 #
 
-argsWidget <- function(argsList, defaultNames){
+argsWidget <- function(argsList, defaultNames = c("OK", "Cancel")){
 
     # Arguments that are functions
     funcs <- getSymbol(argsList)
