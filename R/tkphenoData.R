@@ -144,21 +144,13 @@ tkphenoData <- function(sampleNames){
 
     ###### JZ add this to save the phenoData object to .Global Env
     saveFrame <- tkframe(win.fr, background = "white")
-#    pdFileName <- NULL
-#    browse <- function(){
-#        pdFileName <- tclvalue(tkgetSaveFile())
-#        tkdelete(pdNameEntry, 0, "end")
-#        tkinsert(pdNameEntry, "end", pdFileName)
-#    }
     tkpack(tklabel(saveFrame, text = "Save as", background = "white"),
            side = "left", expand = FALSE)
-    pdName <- tclVar()
+    pdName <- tclVar("")
     pdNameEntry <- tkentry(saveFrame, width = 40, textvariable = pdName,
                            background = "white")
     tkpack(pdNameEntry, side = "left", expand = TRUE, fill = "x")
-#    tkpack(tkbutton(saveFrame, text = "Browse", width = 5, command = browse,
-#                    background = "white"), side = "left", expand = FALSE)
-    tkgrid(saveFrame, columnspan = j + 4)
+    tkgrid(saveFrame, pady = 5, columnspan = j + 4)
     ######
 
     ## JZ modified the layout a little bit
@@ -231,7 +223,9 @@ tkphenoData <- function(sampleNames){
     names(pd.info) <- c("pData", "varLabels")
 
     assign("pd.info",pd.info,eerieEnv)
-    assign(tclvalue(pdName), pd.info, .GlobalEnv)
+    if(tclvalue(pdName) != ""){
+        assign(tclvalue(pdName), pd.info, .GlobalEnv)
+    }
 }
 
 

@@ -66,7 +66,7 @@ tkSampleNames <- function(...,filenames=character(0)){
 
 
   for(i in 1:NumSamples){
-    array.name.lst[[i]] <-tklabel(win.fr, text=filenames[i])
+    array.name.lst[[i]] <-tklabel(win.fr, text=filenames[[i]])
     tkconfigure(array.name.lst[[i]], background = "white")
     tkgrid(array.name.lst[[i]], row = (i+2), column = 1)
     tkgrid.configure(array.name.lst[[i]], sticky = "e")
