@@ -86,10 +86,17 @@ fileBrowser <- function (path = ""){
     doObj <- function (item, objType){
         fileOrObj <<- objType
 
+        if(is.null(ncol(get(item))))
+            towrite <- c(paste("Type:", objType),
+                         paste("Length:", length(get(item))),
+                         "Select a read tool from the menu to view.")
+
+
         toWrite <- c(paste("Type:", objType),
-                         paste("Number of columns:", ncol(get(item))),
-                         paste("Number of row(s):", nrow(get(item))),
-                         paste("Column Name(s):"),names(get(item)))
+                     paste("Number of columns:", ncol(get(item))),
+                     paste("Number of row(s):", nrow(get(item))),
+                     paste("Column Name(s):"),names(get(item)),
+                     "Select a read tool from the menu to view.")
 
         writeObj(listView, toWrite)
         writeCap(paste("Object View:", item))
