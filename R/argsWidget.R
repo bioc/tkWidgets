@@ -5,7 +5,7 @@
 # Copyright 2002, J. Zhang, all rights reserved
 #
 
-argsWidget <- function(argsList){
+argsWidget <- function(argsList, defaultNames){
 
     # Arguments that are functions
     funcs <- getSymbol(argsList)
@@ -17,7 +17,8 @@ argsWidget <- function(argsList){
     pWidgets <- getPWidget(argsList, PWEnv)
     widget <- widget(wTitle = "BioC Arguments Widget", pWidgets,
                      funs = list(), preFun = function() {},
-                     postFun = function() {}, env = PWEnv)
+                     postFun = function() {}, env = PWEnv,
+                     defaultNames = defaultNames)
     if(!is.null(widget)){
         # Returns the input values
         for(i in names(argsList)){
