@@ -35,7 +35,9 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
              vigList <<- getPkgVigList(path)
              tkdelete(vigViewer, 0, "end")
              for(i in names(vigList)){
-                 tkinsert(vigViewer, "end", i)
+                 if(!inherits(chunkList, "try-error")){
+                     tkinsert(vigViewer, "end", i)
+                 }
              }
              tkconfigure(vButton, state = "disabled")
          }
@@ -98,15 +100,19 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     tkwait.window(base)
 }
 
+# Check for the availability of vignettes and populate the list box
+# for packages that have a vignette
 .popPackList <- function(packViewer){
     packs <- .packages(all = TRUE)
     for(i in packs){
-        if(!is.null(pkgVignettes(i))){
+        if(!is.null(pkgVignettes(i)) &&
+           length(pkgVignettes(i)$docs) > 0){
             tkinsert(packViewer, "end", i)
         }
     }
 }
 
+# Returns package names that have a vignette
 .getPackNames <- function(packName = ""){
     if(packName == ""){
         packNames <- .packages(all = TRUE)
@@ -126,6 +132,8 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     return(goodNames)
 }
 
+# This window is called by vExplorer for interacting with the code
+# chunks of a vignette
 viewVignette <- function(title, packName, vigPath, pdfPath){
 
     on.exit(end)
@@ -135,15 +143,17 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     codeVersion <- NULL
     newCode <- FALSE
     executed <- NULL
+    chunkOrNot <- "Code Chunk"
 
     chunkList <- getVignetteCode(vigPath)
 
-    # In case something wrong with Stangle
     if(is.null(chunkList)){
-        tkmessageBox(title = "No code chunk found",
-                     message = paste(gsub(".*/(.*)", "\\1", vigPath),
-                     "does not contain any code chunk"))
-        return()
+        chunkOrNot <- "No Code Chunk"
+        nameNCode <- NULL
+#        tkmessageBox(title = "No code chunk found",
+#                     message = paste(gsub(".*/(.*)", "\\1", vigPath),
+#                     "does not contain any code chunk"))
+#        return()
     }else{
         nameNCode <- .getNameNCode(chunkList)
 #        codeVersion[[1]] <- chunkList
@@ -168,11 +178,12 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
         tkdelete(resultViewer, 0, "end")
     }
 
-    # Executed when a user clicks the vire PDF button
+    # Executed when a user clicks the view PDF button
     viewPDF <- function(){
         openPDF(pdfPath)
     }
-
+    # Shows the code chunk in a text box that allows the user to
+    # editor the code chunk in the box but not to the actual code chunk
     showCode <- function(chunkName){
         tkdelete(editViewer, "1.0", "end")
         for(i in nameNCode[[chunkName]]){
@@ -181,9 +192,9 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
         tkconfigure(execButton, state = "normal")
         tkconfigure(clearButton, state = "normal")
     }
-
+    # Executes whatever that is in the text box for code chunk
     execute <- function(){
-        if(selectedChunk == 1 || any(executed == (selectedChunk - 1))){
+#        if(selectedChunk == 1 || any(executed == (selectedChunk - 1))){
             if(newCode){
                 tempCode <- tclvalue(tkget(editViewer, "1.0", "end"))
                 tempChunk <-
@@ -194,29 +205,41 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
 #                tkconfigure(backButton, state = "normal")
             }else{
                 result <- evalChunk(chunkList, selectedChunk)
+#                modButton(buts[[selectedChunk]], "libhtblue")
+                tkconfigure(buts[[selectedChunk]], relief = "sunken",
+                            state = "active")
+                if(selectedChunk != 1){
+                    tkconfigure(buts[[selectedChunk - 1]], state = "normal")
+                }
+                if(selectedChunk < length(buts)){
+                    tkconfigure(buts[[selectedChunk + 1]], state = "normal")
+                }
+
             }
             tkdelete(resultViewer,0, "end")
             tkinsert(resultViewer, 0, result)
-            modButton(buts[[selectedChunk]], "blue")
+#            modButton(buts[[selectedChunk]], "blue")
             executed <<- unique(c(executed, selectedChunk))
-        }else{
-             tkmessageBox(title = "Execution failed",
-                     message = "Code chunks need to be executed in order")
-        }
+#        }else{
+#             tkmessageBox(title = "Execution failed",
+#                     message = "Code chunks need to be executed in order")
+#        }
     }
 
-    # Executes when a user modifies the code chunk
+    # keeps track of code modification done
     codeChanged <- function(){
         newCode <<- TRUE
     }
 
-    # Executes when a user clicks the Clear button
+    # Cleans the boxes for code chunk and result of execution
     clear <- function(){
         tkdelete(editViewer, "1.0", "end")
         tkdelete(resultViewer, 0, "end")
         for(i in 1:length(buts)){
-            modButton(buts[[i]], "green")
+            tkconfigure(buts[[i]], state = "disabled", relief = "raised")
+#            modButton(buts[[i]], "green")
         }
+        tkconfigure(buts[[1]], state = "normal")
         tkconfigure(execButton, state = "disabled")
         tkconfigure(clearButton, state = "disabled")
         executed <<- NULL
@@ -232,24 +255,30 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     # Initilizes the buttons for code chunks
     popChunks <- function(){
         chunkFrame <- tkframe(chunkCanv)
-        k <- 1
-        for(i in names(nameNCode)){
-            # Create button functions
-            fun <- function() {}
-            body <- list(as.name("{"),
-                         substitute(showCode(j),
-                                    list(j = k)),
-                         substitute(selectedChunk <<- j,
-                                    list(j = k)))
-            body(fun) <- as.call(body)
-            assign(paste("chunkList",k,sep=""), fun)
+        if(!is.null(nameNCode)){
+            k <- 1
+            for(i in names(nameNCode)){
+                # Create button functions
+                tempBut <- substitute(buts[[j]], list(j = k))
 
-            buts[[k]] <<- tkbutton(chunkFrame, text= i, width = 23,
-                                   background = "green",
-                             command = get(paste("chunkList", k, sep = "")))
-            tkpack(buts[[k]])
-            tkbind(buts[[k]], "<Double-Button-1>", execute)
-            k <- k + 1
+                fun <- function() {}
+                body <- list(as.name("{"),
+                             substitute(showCode(j),
+                                        list(j = k)),
+                             substitute(selectedChunk <<- j,
+                                        list(j = k)))
+                body(fun) <- as.call(body)
+                assign(paste("chunkList",k,sep=""), fun)
+
+                buts[[k]] <<- tkbutton(chunkFrame, text= i, width = 23,
+                                       state = "disabled",
+                                       command = get(paste("chunkList",
+                                       k, sep = "")))
+                tkpack(buts[[k]])
+                tkbind(buts[[k]], "<Double-Button-1>", execute)
+                k <- k + 1
+            }
+            tkconfigure(buts[[1]], state = "normal")
         }
         tkcreate(chunkCanv, "window", 5, 5, anchor = "nw",
                  window = chunkFrame)
@@ -267,7 +296,7 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
 
     # Create the viewer for code chunks
     chunkFrame <- tkframe(base)
-    tkpack(tklabel(chunkFrame, text = "Code Chunk"))
+    tkpack(tklabel(chunkFrame, text = chunkOrNot))
     chunkCanv <-  makeViewer(chunkFrame, vWidth = 200, vHeight = 455,
                       hScroll = FALSE, vScroll = TRUE, what = "canvas")
 

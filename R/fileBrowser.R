@@ -53,7 +53,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                            gsub(.Platform$file.sep, "\\", selectedObj),
                            sep = "")
             doPath()
-            writeDir(listView,
+            write2List(listView,
                      pickFiles(appendSepDir(path), testFun,
                                prefix, suffix))
             writeCap(path)
@@ -119,6 +119,12 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         currentNode <<- length(nodes)
     }
 
+    write2List <- function (listBox, toWrite){
+        tkdelete(listBox, 0, "end")
+        tkinsert(listBox, "end", toWrite)
+    }
+
+
 #    fileUP <- function (){
 #        if(currentNode > 2)
 #	    path <<- paste(nodes[1:(currentNode - 1)],
@@ -140,7 +146,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 			  sep = "", collapse = .Platform$file.sep)
         if(currentNode == 2)
             path <<- .Platform$file.sep
-        writeDir(listView, pickFiles(appendSepDir(path), testFun,
+        write2List(listView, pickFiles(appendSepDir(path), testFun,
                                          prefix, suffix))
         writeCap(path)
         currentNode <<- currentNode - 1
@@ -208,7 +214,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkconfigure(listView, selectmode = "extended", font = LABELFONT2)
     tkbind(listView, "<Double-Button-1>", inList)
     tkbind(listView, "<B1-ButtonRelease>", selInDir)
-    writeDir(listView, pickFiles(appendSepDir(path), testFun,
+    write2List(listView, pickFiles(appendSepDir(path), testFun,
                                  prefix, suffix))
     # Put the list box for selected file names and the associated buttons
     rightFrame <- tkframe(base)

@@ -9,12 +9,10 @@ appendSepDir <- function(path = ".") {
 
      if (length(toCheck) == 0) return("")
 
-     toCheck <- list.files(path)
      isd <- file.info(file.path(path, toCheck))
-     toCheck <- paste(toCheck,
-                      ifelse(isd$isdir, .Platform$file.sep, ""),
-                      sep="")
-     toCheck
+     # Separate dirs and files into two groups for better presentation
+     dirs <- paste(toCheck[isd$isdir], .Platform$file.sep, sep = "")
+     toCheck <- c(dirs, toCheck[!isd$isdir])
 }
 
 

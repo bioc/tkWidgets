@@ -7,18 +7,21 @@
 pickFiles <- function (fileNames, fun = function(x) TRUE,
                        prefix = NULL, suffix = NULL,
                        exclude = .Platform$file.sep){
-    if(is.null(prefix) && is.null(suffix)){
-       whichOnes <- sapply(fileNames, fun)
-    }else
-       if(!is.null(prefix)){
-           tryMe <- hasChar(prefix, "prefix")
-           whichOnes <- sapply(fileNames, tryMe)
-       }else{
-           tryMe <- hasChar(suffix, "suffix")
-           whichOnes <- sapply(fileNames, tryMe)
-       }
-   return(c(fileNames[regexpr(exclude, fileNames) > 0],
-            fileNames[whichOnes]))
+
+    unTouched <- fileNames[regexpr(exclude, fileNames) > 0]
+    rest <- setdiff(fileNames, unTouched)
+
+    rest <- rest[sapply(rest, fun)]
+
+    if(!is.null(prefix)){
+        tryMe <- hasChar(prefix, "prefix")
+        rest <- rest[sapply(rest, tryMe)]
+    }
+    if(!is.null(suffix)){
+        tryMe <- hasChar(suffix, "suffix")
+        rest <- sapply(rest, tryMe)
+    }
+   return(c(unTouched, rest))
 }
 
 
