@@ -163,6 +163,7 @@ changeState <- function(canvas, env, forward = TRUE){
     }
     # Changes the interface accordingly
     tkdelete(canvas, getSID(env))
+    assignSID(NULL, env)
     stateID <- tkcreate(canvas, "window", 0, 0, anchor = "nw",
                                     window = getAFrame(canvas, env))
     assignSID(stateID, env)
@@ -212,20 +213,27 @@ finish <- function(env){
            "state1" = args <- getArgs(env)[["state1"]],
            "state2" = args <- getArgs(env)[["state2"]],
            "state3" = args <- getArgs(env)[["state3"]])
-    print(args)
+
     dataFile <- do.call("read.table", args)
     colInfos <- getColInfo(env)
     colNames <- NULL
     for(i in 1:length(colInfos)){
         if(drop(colInfos[[i]])){
             dataFile <- dataFile[, -i]
-        }
-        switch(type(colInfos[[i]]),
+        }else{
+            switch(type(colInfos[[i]]),
                "Character" = dataFile[, i] <- as.character(dataFile[, i]),
                "Numeric" = dataFile[, i] <- as.numeric(dataFile[, i]))
-        colNames <- c(colNames, name(colInfos[[i]]))
+            colNames <- c(colNames, name(colInfos[[i]]))
+        }
     }
-    names(dataFile) <- colNames
+    # In case there is only one column left
+    if(is.null(ncol(data))){
+        dataFile <- data.frame(matrix(dataFile, ncol = 1))
+        names(dataFile) <- colNames
+    }else{
+        names(dataFile) <- colNames
+    }
     return(list(args = args, data = dataFile))
 }
 # Gets the frame containing the interface for the top frame of
@@ -554,9 +562,9 @@ setState3BFrame <- function(frame, env){
         writeList(nameEntry[[i]], colnames(dataFile)[1])
         nameCMD[[i]] <- function(){}
         body <- list(as.name("{"), substitute(eval(setColName(j,
-                                           nameEntry, env)), list(j = i)))
+                                      nameEntry[[i]], env)), list(j = i)))
         body(nameCMD[[i]]) <- as.call(body)
-        tkbind(nameEntry[[i]], "<KeyPress>", nameCMD[[i]])
+        tkbind(nameEntry[[i]], "<KeyRelease>", nameCMD[[i]])
         tkpack(nameEntry[[i]], side = "top")
         typeEntry[[i]] <- tkentry(colFrame, width = colWidth)
         writeList(typeEntry[[i]], type(colInfos[[i]]))
@@ -564,7 +572,7 @@ setState3BFrame <- function(frame, env){
         body <- list(as.name("{"), substitute(eval(setColType(j,
                                       typeEntry[[i]], env)), list(j = i)))
         body(typeCMD[[i]]) <- as.call(body)
-        tkbind(typeEntry[[i]], "<KeyPress>", typeCMD[[i]])
+        tkbind(typeEntry[[i]], "<KeyRelease>", typeCMD[[i]])
         tkpack(typeEntry[[i]], side = "top")
         colList[[i]] <- tklistbox(colFrame, width = (colWidth),
                                    height = 0, background = "white")
@@ -577,25 +585,32 @@ setState3BFrame <- function(frame, env){
 # Set the value of slot 'drop' of a colInfo object
 dropColumn <- function(index, env){
     colInfos <- getColInfo(env)
+    temp <- colInfos[[index]]
     if(drop(colInfos[[index]])){
-        colInfos[[index]] <- drop(colInfos[[index]]) <- FALSE
+        temp <- colInfos[[index]]
+        drop(temp) <- FALSE
     }else{
-        colInfos[[index]] <- drop(colInfos[[index]]) <- TRUE
+        drop(temp) <- TRUE
     }
+    colInfos[[index]] <- temp
     assignColInfo(colInfos, env)
 }
 # Set the value of slot (column) 'name' of a colInfo object
 setColName <- function(index, entryBox, env){
     colInfos <- getColInfo(env)
     entry <- as.character(tkget(entryBox))
-    colInfos[[index]] <- name(colInfos[[index]]) <- entry
+    temp <- colInfos[[index]]
+    name(temp) <- entry
+    colInfos[[index]] <- temp
     assignColInfo(colInfos, env)
 }
 # Set the value of slot 'type' of a colInfo object
 setColType <- function(index, entryBox, env){
     colInfos <- getColInfo(env)
     entry <- as.character(tkget(entryBox))
-    colInfos[[index]] <- type(colInfos[[index]]) <- entry
+    temp <- colInfos[[index]]
+    type(temp) <- entry
+    colInfos[[index]] <- temp
     assignColInfo(colInfos, env)
 }
 # Show the data read in using readLines for state1
