@@ -1,16 +1,15 @@
 \name{importPhenoData}
 \alias{importPhenoData}
-\alias{createPhenoData}
+\alias{createPData}
 \alias{writePDRowNames}
 \alias{writePhenoTable}
 \alias{makePhenoData}
 \alias{convert2PData}
 \alias{getPDFromFile}
-\alias{getPDFromObj}
-\alias{getNameWidget}
+\alias{getOBJWidget}
 \alias{objExists}
-\alias{readFileByUserArgs}
 \alias{getSNCNums}
+\alias{getCovarDesc}
 
 \title{Functions to input data for a phenoData object}
 \description{
@@ -19,18 +18,16 @@
 }
 \usage{
 importPhenoData(sampleNames)
-createPhenoData(pdata)
+createPData(pdata, varList)
 writePDRowNames(pdata, sampleNames)
 writePhenoTable(base, textWidget, pdata)
 makePhenoData(pdata)
 convert2PData(phenoList)
 getPDFromFile()
-getPDFromObj(type = c("data.frame", "phenoData"))
-getNameWidget(what = c("file", "object"), type = NULL)
+getOBJWidget(type = NULL)
 objExists(name, type = NULL)
-readFileByUserArgs(fileName, keep = c("file", "header", "sep", "nrows",
-"skip", "strip.white", "comment.char"))
 getSNCNums(sampleNames)
+getCovarDesc(varList)
 }
 
 \arguments{
@@ -39,10 +36,6 @@ getSNCNums(sampleNames)
     the same as the number of rows of an existing file or data frame if
     a phenoData object is to be created based on a file or data frame}
   \item{pdata}{\code{pdata} a data frame for the experimental data}
-  \item{what}{\code{what} a character string to indicate whether a name
-    for a file ("file"), data frame ("data frame"), or phenoData
-    ("phenoData") has been entered to a corresponding entry box on the
-    interface}
   \item{base}{\code{base} an RTcl object for the base window a widget
     resides}
   \item{textWidget}{\code{textWidget} an RTcl object for a text box
@@ -51,12 +44,10 @@ getSNCNums(sampleNames)
     objects}
   \item{type}{\code{type} a character string for the class of a object
     e. g. data.frame, phenoData}
-  \item{name}{\code{name} a character string for the name of an object
-    in .GlobalEnv}
-  \item{fileName}{\code{fileName} a character string for the name of
-    file to be read using read.table}
-  \item{keep}{\code{keep} a vector of character strings for the formal
-    arguments of read.table that require user inputs through a widget}
+  \item{name}{\code{name} a character string for the name of an object}
+  \item{varList}{\code{varList} a list of characters with names
+    being coavraite names and values being short descriptions of
+    covariate names}
 }
 
 \details{

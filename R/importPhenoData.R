@@ -16,13 +16,13 @@ importPhenoData <- function(sampleNames = NULL){
     #fileName <- tclVar()
     #objName <- tclVar()
     #phenoName <- tclVar()
-    pdata <- NULL
     varLabels <- NULL
     phenodata <- NULL
     newPhenoData <- NULL
 
     end <- function(){
-         tkdestroy(base)
+        tkgrab.release(base)
+        tkdestroy(base)
     }
     on.exit(end())
 
@@ -31,26 +31,32 @@ importPhenoData <- function(sampleNames = NULL){
         end()
     }
 
-    getPData <- function(what){
+    getPData <- function(what, desc = NULL){
         if(what == "file"){
-            pdata <- getPDFromFile()
+            pdata <- importWizard(getFocus = TRUE)[["data"]]
             if(is.null(pdata)){
                 return(invisible())
             }
-            colnames(pdata) <- paste("Covar", 1:ncol(pdata), sep = "")
+            #colnames(pdata) <- paste("Covar", 1:ncol(pdata), sep = "")
             if(is.null(sampleNames)){
                 rownames(pdata) <- paste("Sample", 1:nrow(pdata), sep = "")
             }
+            varList <- list()
+            varList[colnames(pdata)] <- ""
         }else if (what == "df"){
-            pdata <- getPDFromObj("data.frame")
+            pdata <- getOBJWidget("data.frame")
             if(is.null(pdata)){
                 return(invisible())
             }
+            varList <- list()
+            varList[colnames(pdata)] <- ""
         }else if (what == "pd"){
-            pdata <- getPDFromObj("phenoData")
+            pdata <- getOBJWidget("phenoData")
             if(is.null(pdata)){
                 return(invisible())
             }
+            varList <- varLabels(pdata)
+            pdata <- pData(pdata)
         }else{
             sampleNCov <- getSNCNums(sampleNames)
             if(is.null(sampleNCov)){
@@ -62,14 +68,37 @@ importPhenoData <- function(sampleNames = NULL){
             if(is.null(sampleNames)){
                 rownames(pdata) <- paste("Sample", 1:nrow(pdata), sep = "")
             }
+            varList <- list()
+            varList[colnames(pdata)] <- ""
         }
         if(!is.null(sampleNames)){
             pdata <- writePDRowNames(pdata, sampleNames)
         }
-        newPhenoData <<- createPhenoData(pdata)
-        if(!is.null(newPhenoData)){
+        tempData <- createPData(pdata, varList)
+        if(!is.null(tempData)){
+            newPhenoData <<- tempData
             end()
         }
+        #if(!is.null(newPData)){
+        #    varList <- getCovarDesc(varList)
+        #    if(!is.null(varList)){
+        #        options(show.error.messages = FALSE)
+        #        tryMe <- try(new("phenoData", pData=data.frame(newPData),
+        #                         varLabels=varList))
+        #        options(show.error.messages = TRUE)
+        #        if(inherits(tryMe, "try-error")){
+        #            tkmessageBox(title = paste("Data Error"),
+        #               message = paste("I can't create a phenoData object.",
+        #               "Perhaps the numbers of covariates and their",
+        #               "descriptions do not match."),
+        #               icon = "error",
+        #               type = "ok")
+        #        }else{
+        #            newPhenoData <<- tryMe
+        #            end()
+        #        }
+        #    }
+        #}
     }
 
     readFile <- function(){
@@ -108,8 +137,7 @@ importPhenoData <- function(sampleNames = NULL){
     tkpack(tkbutton(dfFrame, text = "Read From Object", width = 18,
                 command = readDF), side = "left", expand = FALSE)
     tkpack(tklabel(dfFrame, text = paste("Create a phenoData object",
-                              "using an existing data frame in",
-                              ".GlobalEnv")),
+                              "using an existing data frame")),
            side = "left", expand = FALSE)
     tkpack(dfFrame, side = "top", anchor = "w", pady = 2, padx = 5)
     # Frame for editing phenoData
@@ -117,7 +145,7 @@ importPhenoData <- function(sampleNames = NULL){
     tkpack(tkbutton(epFrame, text = "Edit phenoData", width = 18,
                 command = readPheno), side = "left", expand = FALSE)
     tkpack(tklabel(epFrame, text = paste("Editing an existing phenoData",
-                              "object in .GlobalEnv")),
+                              "object")),
            side = "left", expand = FALSE)
     tkpack(epFrame, side = "top", anchor = "w", pady = 2, padx = 5)
 
@@ -132,6 +160,7 @@ importPhenoData <- function(sampleNames = NULL){
     tkpack(tkbutton(base, text = "Cancel", command = cancel, width = 15),
            side = "top", anchor = "center", expand = FALSE, pady = 10)
 
+    tkgrab.set(base)
     tkwait.window(base)
 
     return(newPhenoData)
@@ -161,26 +190,25 @@ getPDFromFile <- function(){
     return(pdata)
 }
 # Read a data frame from a data frame or phenoData object
-getPDFromObj <- function(type = c("data.frame", "phenoData")){
-    type <- match.arg(type)
+#getPDFromObj <- function(type = c("data.frame", "phenoData")){
+#    type <- match.arg(type)
 
-    fileName <- getNameWidget("object", type)
-    if(is.null(fileName)){
-        return(NULL)
-    }
+#    fileName <- getNameWidget("object", type)
+#    if(is.null(fileName)){
+#        return(NULL)
+#    }
 
-    if(type == "data.frame"){
-        return(.GlobalEnv[[fileName]])
-    }else{
-        return(pData(.GlobalEnv[[fileName]]))
-    }
-}
+#    if(type == "data.frame"){
+#        return(.GlobalEnv[[fileName]])
+#    }else{
+#        return(pData(.GlobalEnv[[fileName]]))
+#    }
+#}
 
-# A widget to read in the name of a file or object
-getNameWidget <- function(what = c("file", "object"), type = NULL){
+# A widget to read in the name of an object
+getOBJWidget <- function(type = NULL){
+    toReturn <- NULL
     fileName <- tclVar("")
-
-    what <- match.arg(what)
 
     end <- function(){
         if(tclvalue(fileName) == ""){
@@ -190,15 +218,16 @@ getNameWidget <- function(what = c("file", "object"), type = NULL){
                          icon = "error",
                          type = "ok")
         }else{
-            if(ifelse(what == "file", file.exists(tclvalue(fileName)),
-                      objExists(tclvalue(fileName), type))){
+            if(objExists(tclvalue(fileName))){
+                toReturn <<- get(tclvalue(fileName))
                 tkgrab.release(base)
                 tkdestroy(base)
             }else{
                 tkmessageBox(title = paste("Reading Error"),
-                          message = paste("You may have entered an invalid",
-                          "name or the name of the object is not of",
-                          "class data.frame/phenoData. Please try again."),
+                    message = paste("I can't continue because:",
+                    "\n 1. You may have entered an invalid name or",
+                    "\n 2. the name of the object is not of",
+                    "class data.frame/phenoData.\nPlease try again."),
                           icon = "error",
                           type = "ok")
             }
@@ -208,33 +237,30 @@ getNameWidget <- function(what = c("file", "object"), type = NULL){
     cancel <- function(){
         tkgrab.release(base)
         tkdestroy(base)
-        fileName <<- tclVar("")
+        toReturn <<- NULL
     }
     on.exit(cancel())
 
     browse <- function(){
-        if(what == "file"){
-            tclvalue(fileName) <<- tclvalue(tkcmd("tk_getOpenFile"))
-        }else{
-            filter <- function(x, env = .GlobalEnv){
-                if(class(env[[x]]) == type)
-                    return(TRUE)
-                else
-                    return(FALSE)
-            }
-            obj <- objectBrowser(nSelect = 1, fun = filter)
-            if(!is.null(obj)){
-                tclvalue(fileName) <<- names(obj)
-            }
+        filter <- function(x, env = .GlobalEnv){
+            if(class(env[[x]]) == type)
+                return(TRUE)
+            else
+                return(FALSE)
         }
-        end()
+        obj <- objectBrowser(nSelect = 1, fun = filter)
+        if(!is.null(obj)){
+            toReturn <<- obj[[1]]
+        }
+        tkgrab.release(base)
+        tkdestroy(base)
     }
 
     base <- tktoplevel()
     tktitle(base) <- "BioC Input Widget"
 
     readFrame <- tkframe(base)
-    tkpack(tklabel(readFrame, text = "File name:", width = 14,
+    tkpack(tklabel(readFrame, text = "Object name:", width = 14,
                    justify = "left"), side = "left", expand = FALSE)
     tkpack(tkentry(readFrame, width = 50, textvariable = fileName),
            side = "left", expand = TRUE, fill = "x")
@@ -254,11 +280,7 @@ getNameWidget <- function(what = c("file", "object"), type = NULL){
 
     tkwait.window(base)
 
-    if(tclvalue(fileName) == ""){
-        return(NULL)
-    }else{
-        return(tclvalue(fileName))
-    }
+    return(toReturn)
 }
 
 # Check to see if an object exists in .GlobalEnv
@@ -278,27 +300,27 @@ objExists <- function(name, type = NULL){
     }
 }
 # Get the arguments for read.table using a widget
-readFileByUserArgs <- function(fileName, keep = c("file", "header", "sep",
-                          "nrows", "skip", "strip.white", "comment.char")){
-    args <- formals("read.table")[keep]
-    args[["file"]] <- tclvalue(fileName)
-    args <- argsWidget(args, inst = paste("I have trouble figuring out",
-                             "the \\arguments for you. Please set the",
-                             "arguments for function read.table"))
-    options(show.error.messages = FALSE)
-    tryMe<- try(do.call("read.table", as.list(args)))
-    options(show.error.messages = TRUE)
-    if(inherits(tryMe, "try-error")){
-        tkmessageBox(title = paste(what, "read.table error"),
-                     message = paste("read.table failed because of",
-                     tryMe[1]),
-                     icon = "error",
-                     type = "ok")
-        return(NULL)
-    }else{
-        return(tryMe)
-    }
-}
+#readFileByUserArgs <- function(fileName, keep = c("file", "header", "sep",
+#                          "nrows", "skip", "strip.white", "comment.char")){
+#    args <- formals("read.table")[keep]
+#    args[["file"]] <- tclvalue(fileName)
+#    args <- argsWidget(args, inst = paste("I have trouble figuring out",
+#                             "the \\arguments for you. Please set the",
+#                             "arguments for function read.table"))
+#    options(show.error.messages = FALSE)
+#    tryMe<- try(do.call("read.table", as.list(args)))
+#    options(show.error.messages = TRUE)
+#    if(inherits(tryMe, "try-error")){
+#        tkmessageBox(title = paste(what, "read.table error"),
+#                     message = paste("read.table failed because of",
+#                     tryMe[1]),
+#                     icon = "error",
+#                     type = "ok")
+#        return(NULL)
+#    }else{
+#        return(tryMe)
+#    }
+#}
 
 # Get the number of samples and covariates from a user through a widget
 getSNCNums <- function(sampleNames){
@@ -381,19 +403,38 @@ writePDRowNames <- function(pdata, sampleNames){
 
 # This widget is called by importPhenoData when uses decide to create
 # a phenoData object based on a file, a data frame, or phenoData object
-createPhenoData <- function(pdata){
-    phenoObj <- NULL
+createPData <- function(pdata, varList){
+    newPhenoData <- NULL
     phenoList <- NULL
 
     end <- function(){
+        newPhenoData <<- NULL
         tkgrab.release(base)
         tkdestroy(base)
     }
     on.exit(end())
     # When the continus button is clicked, create a phenoData object
     cont <- function(){
-        phenoObj <<- convert2PData(phenoList)
-        end()
+        newPData <- convert2PData(phenoList)
+        phenoList <- getCovarDesc(varList)
+        if(!is.null(phenoList)){
+            options(show.error.messages = FALSE)
+            tryMe <- try(new("phenoData", pData=data.frame(newPData),
+                             varLabels=phenoList))
+            options(show.error.messages = TRUE)
+            if(inherits(tryMe, "try-error")){
+                tkmessageBox(title = paste("Data Error"),
+                       message = paste("I can't create a phenoData object.",
+                       "Perhaps the numbers of covariates and their",
+                       "descriptions do not match."),
+                       icon = "error",
+                       type = "ok")
+            }else{
+                newPhenoData <<- tryMe
+                tkgrab.release(base)
+                tkdestroy(base)
+            }
+        }
     }
     # When user decides to add new samples or covariates, reconstruct
     # pdata and update the table for user inputs
@@ -407,7 +448,7 @@ createPhenoData <- function(pdata){
     tkpack(tklabel(noteFrame, text = paste("Cells in the first row",
                               "show covariate names. \nCells in the",
                          "the first column show sample names.",
-                         "\nEmpty cells right below covariate names are for",
+                         "\nEmpty cells below covariate names are for",
                          "entries for descriptions of covariates.",
                          "\nValues in all cells are edit-able."),
                    justify = "left"),
@@ -434,9 +475,10 @@ createPhenoData <- function(pdata){
 
     phenoList <- writePhenoTable(base, dataText, pdata)
 
+
     tkwait.window(base)
 
-    return(phenoObj)
+    return(newPhenoData)
 }
 # Write data contained by pdata to the text widget containing the
 # table for user inputs
@@ -453,7 +495,7 @@ writePhenoTable <- function(base, textWidget, pdata){
             }else{
                 style <- "sunken"
             }
-            if(i <= 2 && j == 1 ){
+            if(i == 1  && j == 1 ){
                 state <- "disabled"
             }else{
                 state <- "normal"
@@ -471,7 +513,7 @@ writePhenoTable <- function(base, textWidget, pdata){
 
 # Constructs a matrix containing user input data
 makePhenoData <- function(pdata){
-        temp <- rbind(c("", colnames(pdata)), rep("", ncol(pdata) + 1),
+        temp <- rbind(c("", colnames(pdata)),
                       cbind(rownames(pdata), as.matrix(pdata)))
     return(as.matrix(temp))
 }
@@ -492,18 +534,18 @@ convert2PData <- function(phenoList){
     }
     #pdata <- pdata[, pdata[1,] != "Delete"]
     #pdata <- pdata[pdata[,1] != "Delete",]
-    varlist <- as.list(pdata[2, 2:ncol(pdata)])
-    rnames <- pdata[3:nrow(pdata), 1]
+    #varlist <- as.list(pdata[2, 2:ncol(pdata)])
+    rnames <- pdata[2:nrow(pdata), 1]
     cnames <- pdata[1, 2:ncol(pdata)]
-    pdata <- pdata[-(1:2), -1]
+    pdata <- pdata[-1, -1]
     if(is.null(nrow(pdata))){
         pdata <- data.frame(matrix(pdata, ncol = 1))
     }
     rownames(pdata) <- rnames
     colnames(pdata) <- cnames
-    names(varlist) <- as.character(1:length(varlist))
-
-    return(new("phenoData", pData=data.frame(pdata), varLabels=varlist))
+    #names(varlist) <- as.character(1:length(varlist))
+#    return(new("phenoData", pData=data.frame(pdata), varLabels=varlist))
+    return(pdata)
 }
 
 # Function that add new rows/columns to pdata
@@ -524,6 +566,64 @@ convert2PData <- function(phenoList){
 #    return(temp)
 #}
 
+# A widget that takes user inputs for covariate descriptions
+# varList - a list with names being covariate names and values
+# being a short description of the covariate
+getCovarDesc <- function(varList){
+    toReturn <- list()
+    covarDesc <- list()
+
+    end <- function(){
+        temp <- sapply(covarDesc, tclvalue)
+        toReturn[names(temp)] <<- temp
+        tkgrab.release(base)
+        tkdestroy(base)
+    }
+    on.exit(end())
+
+    cancel <- function(){
+        toReturn <<- NULL
+        tkgrab.release(base)
+        tkdestroy(base)
+    }
+    base <- tktoplevel()
+    tktitle(base) <- "BioC PhenoData Wizard"
+
+    tkpack(tklabel(base, text = paste("Please enter/edit a short textual",
+                         "description for each covariate")), pady = 5)
+
+    # A text widget to keep description entries
+    dataFrame <- tkframe(base)
+    dataText <- makeViewer(dataFrame, vWidth = 85, vHeight = 16,
+                           hScroll = TRUE,
+                           vScroll = TRUE, what = "text", side = "left")
+    tkpack(dataText, side = "top", expand = TRUE, fill = "both")
+    tkpack(dataFrame, side = "top", expand = TRUE, fill = "both",
+           padx = 5)
+
+    butFrame <- tkframe(base)
+    backBut <- tkbutton(butFrame, text = "Cancel", width = 8,
+                        command = cancel)
+    contBut <- tkbutton(butFrame, text = "Continue", width = 8,
+                    command = end)
+    tkgrid(contBut, backBut, padx = 20)
+    tkpack(butFrame, expand = FALSE, fill = "x", padx = 5, pady = 5)
+
+    for(i in names(varList)){
+        tkinsert(dataText, "end", paste(i, " "))
+        covarDesc[[i]] <- tclVar(varList[[i]])
+        tempEntry <- tkentry(base, textvariable = covarDesc[[i]],
+                             width = 60)
+        tkwindow.create(dataText, "end", window = tempEntry)
+        tkinsert(dataText, "end", "\n")
+    }
+
+    tkgrab.set(base)
+
+    tkwait.window(base)
+
+    return(toReturn)
+}
 
 
 

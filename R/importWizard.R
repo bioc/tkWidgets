@@ -8,7 +8,7 @@
 #
 # Copyright 2002, J. Zhang, all rights reserved.
 
-importWizard <- function(filename, maxRow = 400){
+importWizard <- function(filename, maxRow = 400, getFocus = TRUE){
 
     # Creates an environment to make some variables available to all
     # related functions
@@ -17,6 +17,7 @@ importWizard <- function(filename, maxRow = 400){
     assignCState("state1", env = workEnv)
     # Number of row to be displayed
     assignShowNum(maxRow, env = workEnv)
+    workEnv[["focus"]] <- getFocus
 
     if(!missing(filename)){
         # Do this if a file name is given
@@ -136,11 +137,14 @@ initImportWizard <- function(env){
     # A variable to keep the frame that is currently displayed
     currentFrame <- NULL
 
-    on.exit(end())
     # Destroy the window
     end <- function(){
+        if(env[["focus"]]){
+            tkgrab.release(top)
+        }
         tkdestroy(top)
     }
+    on.exit(end())
     nextState <- function(){
         args <- getArgs(env)
         if(is.null(args[["state1"]][["file"]])){
@@ -202,6 +206,9 @@ initImportWizard <- function(env){
     tkpack(butFrame, pady = 10, fill = "y", expand = TRUE)
 
     args <- getArgs(env)
+    if(env[["focus"]]){
+        tkgrab.set(top)
+    }
     tkwait.window(top)
     return(invisible(dataList))
 }
@@ -377,12 +384,14 @@ setState1TFrame <- function(frame, viewer, delims, env){
     # clicked
     browse <- function(){
         filename <- tclvalue(tkgetOpenFile())
-        writeList(nameEntry, filename, clear = TRUE)
-        argsSet <- setArgsList(filename, env)
-        if(argsSet){
-            showData4State1(viewer, env)
-            if(!is.null(getArgs(env)[["state1"]][["sep"]])){
-                tkselect(delims[["delimit"]])
+        if(filename != ""){
+            writeList(nameEntry, filename, clear = TRUE)
+            argsSet <- setArgsList(filename, env)
+            if(argsSet){
+                showData4State1(viewer, env)
+                if(!is.null(getArgs(env)[["state1"]][["sep"]])){
+                    tkselect(delims[["delimit"]])
+                }
             }
         }
     }
@@ -850,7 +859,7 @@ getMoreArgs <- function(){
 }
 # This function provides the interface for uers to decide whether to
 # save the imported data in the global environment
-getName4Data <- function(filename){
+getName4Data <- function(filename, getFocus = TRUE){
     # Gets ride of the separaters
     temp <- gsub(paste("^.*", .Platform$file.sep,
                                   "(.*)", sep = ""), "\\1", filename)
@@ -859,6 +868,9 @@ getName4Data <- function(filename){
     var <- tclVar(temp)
     # Destroy the window
     end <- function(){
+        if(getFocus){
+            tkgrab.release(top)
+        }
         tkdestroy(top)
     }
     # Save the data
@@ -888,6 +900,9 @@ getName4Data <- function(filename){
     tkpack(noSaveBut, saveBut, side = "left")
     tkpack(butFrame, side = "top", pady = 5, padx = 5)
 
+    if(getFocus){
+        tkgrab.set(top)
+    }
     tkwait.window(top)
 
     return(temp)
