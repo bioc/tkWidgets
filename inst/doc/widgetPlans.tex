@@ -1,0 +1,89 @@
+\documentclass{article}
+
+\begin{document}
+
+\title{RFC: Widget Plans}
+\maketitle
+
+
+\section*{Some ideas}
+
+Here are some simple ideas for building widgets. While this document
+lives in the tkWidgets directory (for now) the plan is not to be
+limited by that functionality. Gtk and other things -- Java etc,
+seem like reasonable targets.
+
+Let's start with some definitions.
+
+A primitive widget (pwidget) is simply a set of linked interactive
+tools.
+Some examples:
+\begin{itemize}
+\item A text string, a type--in box and a button.
+\item A set of linked radio buttons
+\item A set of linked check boxes
+\item A button -- can have an arbitrary R function associated with it.
+\end{itemize}
+
+A widget is an ordered collection (list) of pwidgets.
+These get rendered in a single dialog box.
+The default values are given by the input list and on exit the state
+of the different pwidgets is recorded in the list, which is returned.
+A widget can have two hooks, these are not rendered. One is a
+pre--rendering hook (a function that takes no arguments) and if
+present is run before the widget is rendered.
+A post--rendering hook which is run when the user pushes the
+\verb+end+ button (but not the \verb+cancel+ button?).
+
+Widgets are rendered by the \verb+renderWidget+ function.
+It returns the widget with
+the users changes recorded or NULL if the cancel button was pushed.
+Should we return an exit state indicator and the widget in all cases?
+The rendered widget has an \verb+end+ button and a \verb+cancel+
+button.
+
+In the not to distant future the pwidgets will be implemented as S4
+classes. This will give them more structure. In the first
+implementation they will be lists. However, we will attempt to use an
+abstract data type implementation that should let us reuse much of the
+code when the methods and classes are implemented.
+
+Next we introduce the concept of {\em chained widgets},
+\verb+cWidgets+. 
+Basically this is simply a list of widgets that will be rendered
+sequentially. 
+The \verb+cWidgets+ will also have pre and post rendering hooks (these
+happen once for the entire process).
+
+The widgets will have the buttons described in each widget in the list
+and additionally \verb+previous+, \verb+next+, \verb+end+ and
+\verb+cancel+ buttons.
+A counter to indicate state is maintained and used for navigation.
+
+We need to decide how to run the pre and post widget hooks when the
+different buttons are pushed (does \verb+next+ run the hook or does
+any exit from the widget?).
+
+If the user pushes \verb+cancel+ the whole thing exits (again, we need
+some decision about what gets returned). Here one might want to return
+both the exit status and the list of widgets actually visited.
+
+
+\section*{Some specifics}
+
+An example of what seems to be easy and useful is the following.
+We can have a list of the form
+\begin{verbatim}
+list(Wtype="Typein", Name="aaa", Value=NULL, Button=fileBrowser)
+\end{verbatim}
+This would get rendered as a typein box with name \verb+aaa+. The box
+would initially be empty since \verb+Value+ was set to \verb+NULL+
+(maybe it should be the empty string). There is a button off the end
+of the box that is linked to the \verb+fileBrowser+ function.
+This button when clicked will evaluate the \verb+fileBrowser+ function
+and put its return value into the typein box.
+
+Then when the widget function returns this value is stored in the
+\verb+Value+ slot.
+
+\end{document}
