@@ -73,15 +73,20 @@ importPhenoData <- function(sampleNames = NULL){
         }
         tempData <- createPData(pdata, varList)
         if(!is.null(tempData)){
+            #names(varList) <- colnames(tempData)
+            #phenoList <- getCovarDesc(varList, pdata)
+            #tempPheno <- constPhenoData(tempData, varList)
+            #if(!is.null(tempPheno)){
+            #    newPhenoData <<- tempPheno
             newPhenoData <<- tempData
-            filename <- getName4Data("phenodata", objType = "phenoData")
-            if(!is.null(filename)){
-                .GlobalEnv[[filename]] <- newPhenoData
-            }
-            end()
+                filename <- getName4Data("phenodata", objType = "phenoData")
+                if(!is.null(filename)){
+                    .GlobalEnv[[filename]] <- newPhenoData
+                }
+                end()
+            #}
         }
     }
-
     readFile <- function(){
         getPData("file")
     }
@@ -361,6 +366,7 @@ createPData <- function(pdata, varList){
     # When the continus button is clicked, create a phenoData object
     cont <- function(){
         newPData <- convert2PData(phenoList)
+        names(varList) <- colnames(newPData)
         phenoList <- getCovarDesc(varList)
         if(!is.null(phenoList)){
             options(show.error.messages = FALSE)
@@ -376,6 +382,7 @@ createPData <- function(pdata, varList){
                        type = "ok")
             }else{
                 newPhenoData <<- tryMe
+                #newPhenoData <<- newPData
                 tkgrab.release(base)
                 tkdestroy(base)
             }

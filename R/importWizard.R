@@ -55,7 +55,7 @@ setArgsList <- function(filename, env, isFile = TRUE, init = TRUE){
             temp[["file"]] <- filename
             temp[["header"]] <- fileInfo[["header"]]
             temp[["sep"]] <- fileInfo[["separator"]]
-            temp[["quote"]] <- ""
+            #chrNBothtemp[["quote"]] <- ""
             # Reassign fill with the value of blank.lines.skip
             temp[["fill"]] <- !temp[["blank.lines.skip"]]
             argsList[["state1"]] <- as.list(temp)
@@ -429,18 +429,18 @@ setState1TFrame <- function(frame, viewer, delims, env, startList){
 }
 # Show the data read in using readLines for state1
 showData4State1 <- function(widget, env){
-     skip <- getArgs(env)[["state1"]][["skip"]]
-     if(!is.null(skip)){
+     #skip <- getArgs(env)[["state1"]][["skip"]]
+     #if(!is.null(skip)){
          dataFile <- getLineData(env)
-         showNum <- getShowNum(env)
-         if(length(dataFile) > showNum){
-             dataFile <- dataFile[(skip + 1):showNum]
-         }else{
-             dataFile <- dataFile[(skip + 1):length(dataFile)]
-         }
-     }else{
-         dataFile <- getLineData(env)
-     }
+     #    showNum <- getShowNum(env)
+     #    if(length(dataFile) > showNum){
+     #        dataFile <- dataFile[(skip + 1):showNum]
+     #    }else{
+     #        dataFile <- dataFile[(skip + 1):length(dataFile)]
+     #    }
+     #}#else{
+      #   dataFile <- getLineData(env)
+     #}
      # Preventing the header to be shown
      if(getArgs(env)[["state1"]][["header"]]){
          dataFile <- dataFile[2:length(dataFile)]
@@ -462,18 +462,19 @@ setState1MFrame <- function(frame, env, dataViewer){
         if(length(args) != 0 && args[["state1"]][["file"]] != ""){
             setSkip(startList, env)
             #args <- getArgs(env)
-            skip <- as.numeric(as.character(tkget(startList,
-                                 tkcurselection(startList)))) - 1
+            #skip <- as.numeric(as.character(tkget(startList,
+            #                     tkcurselection(startList)))) - 1
             #skip <- as.numeric(args[["state1"]][["skip"]])
-            assignShowNum((getShowNum(env) + skip), env)
-            dataFile <- getLineData(env)
-            showNum <- getShowNum(env)
-            if(length(dataFile) > showNum){
-                dataFile <- dataFile[(skip + 1):showNum]
-            }else{
-                dataFile <- dataFile[(skip + 1):length(dataFile)]
-            }
-            setArgsList(args[["state1"]][["file"]], env, TRUE, FALSE)
+
+            #assignShowNum((getShowNum(env) + skip), env)
+            #dataFile <- getLineData(env)
+            #showNum <- getShowNum(env)
+            #if(length(dataFile) > showNum){
+            #    dataFile <- dataFile[(skip + 1):showNum]
+            #}else{
+            #    dataFile <- dataFile[(skip + 1):length(dataFile)]
+            #}
+            #setArgsList(args[["state1"]][["file"]], env, TRUE, FALSE)
             #        showData4State1(dataViewer, env)
         }
     }
@@ -890,7 +891,7 @@ whatDeli <- function(delimiter){
            " " = return("space"),
            "," = return("comma"),
            "\n" = return("newline"),
-           stop("Unknown delimiter"))
+           return("other"))
 }
 # This function generates a widget using widgetTools to collect all
 # the arguments for read.table that are not yet collected by importWizard
