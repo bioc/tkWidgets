@@ -1,7 +1,7 @@
 # This widget allows users to explore an R package.
 #
 
-pExplorer <- function (pkgName = ""){
+pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
 
     pkgNames <- list.files(file.path(R.home(), "library"))
 
@@ -10,9 +10,13 @@ pExplorer <- function (pkgName = ""){
     }else{
         selection <- tclVar(pkgName)
     }
+    if(pkgPath == ""){
+        pkgPath <- .libPaths()[1]
+        baseDir <- file.path(.libPaths()[1], tclvalue(selection))
+    }else{
+        baseDir <- file.path(pkgPath, tclvalue(selection))
+    }
 
-    baseDir <- file.path(file.path(R.home(), "library",
-                                   tclvalue(selection)))
     curDir <- baseDir
 
     end <- function(){
@@ -20,7 +24,11 @@ pExplorer <- function (pkgName = ""){
     }
     on.exit(end())
     writePkgDirs <- function(){
-        writeList(listView, getPkgContents(tclvalue(selection)))
+        writeList(listView, getPkgContents(pkgPath,
+                                           tclvalue(selection), exclude))
+        tkconfigure(contViewer, state = "normal")
+        tkdelete(contViewer, "0.0", "end")
+        tkconfigure(contViewer, state = "disabled")
     }
     # When a user double clicks an item in the list box,
     # populate the list box with new files if the item is a directory
@@ -77,6 +85,16 @@ pExplorer <- function (pkgName = ""){
 
     base <- tktoplevel()
     tktitle(base) <- paste("BioC Package Explorer")
+#    pathFrame <- tkframe(base)
+#    tkpack(tklabel(pathFrame, text = "Package path:"), side = "left",
+#           expand = FALSE)
+#    pathEntry <- tkentry(pathFrame, width = 20, textvariable = path)
+#    tkpack(pathEntry, side = "left", expand = TRUE, fill = "x")
+#    pathBut <- tkbutton(pathFrame, text = "Browse", width = 10,
+#                        command = setPath)
+#    tkpack(pathBut, side = "left", expand = FALSE)
+#    tkpack(pathFrame, side = "top", expand = FALSE, fill = "x",
+#           pady = 5, padx = 5)
     # A drop down list box that allows users to pick a package
     topFrame <- tkframe(base)
     tkpack(tklabel(topFrame, text = "Package to explore:"), side = "left",
@@ -135,12 +153,13 @@ pExplorer <- function (pkgName = ""){
     return(invisible())
 }
 
-getPkgContents <- function(pkgName){
-    pkgNames <- list.files(file.path(R.home(), "library"))
+getPkgContents <- function(pkgPath, pkgName, exclude = getExclude()){
+    pkgNames <- list.files(pkgPath, pkgName)
     if(!any(pkgNames == pkgName)){
         return(paste(pkgName, "is not in the R library"))
     }else{
-        return(appendSepDir(file.path(R.home(), "library", pkgName)))
+        return(setdiff(appendSepDir(file.path(pkgPath, pkgName)),
+                       exclude))
     }
 }
 
@@ -160,7 +179,9 @@ getFileContents <- function(fileName){
     return(readLines(fileName))
 }
 
-
+getExclude <- function(){
+    return(c("Meta/", "html/", "latex/", "INDEX"))
+}
 
 
 

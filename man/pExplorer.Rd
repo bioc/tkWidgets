@@ -2,21 +2,29 @@
 \alias{pExplorer}
 \alias{getPkgContents}
 \alias{getFileContents}
+\alias{getExclude}
 \title{A widget to explore R packages}
 \description{
   This widget allows users to explore R packages in the R library and
   try the example code.
 }
 \usage{
-pExplorer(pkgName = "")
-getPkgContents(pkgName)
+pExplorer(pkgName = "", pkgPath = "", exclude = getExclude())
+getPkgContents(pkgPath, pkgName, exclude = getExclude())
 getFileContents(fileName)
+getExclude()
 }
 \arguments{
+  \item{pkgPath}{\code{pkgPath} a character string for the path where R
+    packages are loacted}
   \item{pkgName}{\code{pkgName} a character string for name of an R
     package to be explored}
   \item{fileName}{\code{fileName} a character string for the name
-    (including path) of a file of interest} 
+    (including path) of a file of interest}
+  \item{exclude}{\code{exclude} a vector of character strings containing
+    the directory or file names that will not be available for
+    explorering. Package names have to have a system file separator
+    appanded to the end (e. g. "/" under Unix)}
 }
 \details{
   With or without a package name, the widget will have all the installed
@@ -38,7 +46,7 @@ getFileContents(fileName)
 \seealso{\code{\link{eExplorer}}}
 \examples{
     require("tkWidgets") || stop("tkWidgets not available")
-    getPkgContents("tkWidgets")
+    getPkgContents(.libPaths(), "tkWidgets")
     getFileContents(list.files(file.path(.path.package("tkWidgets"),
         "help"), full.name = TRUE)[1])
     if(interactive()){
