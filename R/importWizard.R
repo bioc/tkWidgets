@@ -129,8 +129,7 @@ initImportWizard <- function(env){
     canvas <- getTopCan(top, env)
     # Sets current frame to state1 now
     currentFrame <- getAFrame(canvas, env)
-    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = currentFrame,
-             expand = TRUE)
+    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = currentFrame)
     ## The bottom frame contains the buttons that allow users to
     ## navigate the importing process
     butFrame <- tkframe(top)
