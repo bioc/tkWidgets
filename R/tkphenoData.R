@@ -107,30 +107,30 @@ tkphenoData <- function(sampleNames){
 
     array.entry.lst <- tklabel(win.fr, text="Sample Names")
     tkconfigure(array.entry.lst, background = "white")
-    tkgrid(array.entry.lst, row = 2, col = 2)
+    tkgrid(array.entry.lst, row = 2, column = 2)
 
 
     for(j in 1:get("NumCovar",eerieEnv)) {
       cb.lst <- tklabel(win.fr, text = tclvalue(get("cov.name.lst",eerieEnv)[[j]]))
       tkconfigure(cb.lst, background = "white")
-      tkgrid(cb.lst, row = 2, col = (j+3))
+      tkgrid(cb.lst, row = 2, column = (j+3))
     }
 
     for(i in 1:get("NumSamples",eerieEnv)){
       array.name.lst <-tklabel(win.fr, text=paste("Array",i))
       tkconfigure(array.name.lst, background = "white")
-      tkgrid(array.name.lst, row = (i+2), col = 1)
+      tkgrid(array.name.lst, row = (i+2), column = 1)
 
 
       array.entry.lst [[i]]<- tkentry(win.fr, width = 30, textvariable = get("var.lst",eerieEnv)[[i]])
       tkconfigure(array.entry.lst[[i]], background = "white")
-      tkgrid(array.entry.lst[[i]], row = (i+2), col = 2)
+      tkgrid(array.entry.lst[[i]], row = (i+2), column = 2)
       tkgrid.configure(array.entry.lst[[i]], sticky = "e")
 
       for(j in 1:get("NumCovar",eerieEnv)){
         cb.lst[[j]] <- tkentry(win.fr, width=6,textvariable = get("cov.lst",eerieEnv)[[i]][[j]])
         tkconfigure(cb.lst[[j]], background = "white")
-        tkgrid(cb.lst[[j]], row = (i+2), col=(j+3))
+        tkgrid(cb.lst[[j]], row = (i+2), column =(j+3))
       }
     }
 
@@ -172,8 +172,8 @@ tkphenoData <- function(sampleNames){
     })
 
     tkconfigure(finish.but, background = "white")
-    tkgrid(back.but, row = (get("NumSamples",eerieEnv) + 6),col = 2)
-    tkgrid(finish.but, row = (get("NumSamples",eerieEnv) + 6), col = 3)
+    tkgrid(back.but, row = (get("NumSamples",eerieEnv) + 6),column = 2)
+    tkgrid(finish.but, row = (get("NumSamples",eerieEnv) + 6), column = 3)
     tkgrid.configure(back.but, sticky = "e")
     tkgrid.configure(finish.but, sticky = "w")
 
@@ -288,23 +288,23 @@ tkphenoData <- function(sampleNames){
 
       cov.label <-tklabel(win.fr, text=paste("Cov",i))
       tkconfigure(cov.label, background = "white")
-      tkgrid(cov.label, row = (i+2), col = 1)
+      tkgrid(cov.label, row = (i+2), column = 1)
 
       cov.entry.lst[[i]] <- tkentry(win.fr, width = 30, textvariable = get("cov.name.lst",eerieEnv)[[i]])
       tkconfigure(cov.entry.lst[[i]], background = "white")
-      tkgrid(cov.entry.lst[[i]], row = (i+2), col = 2)
+      tkgrid(cov.entry.lst[[i]], row = (i+2), column = 2)
 
       covtop.label <-tklabel(win.fr, text="Covariate Names")
       tkconfigure(covtop.label, background = "white")
-      tkgrid(covtop.label, row=2, col=2)
+      tkgrid(covtop.label, row=2, column = 2)
 
       desc.label <- tklabel(win.fr, text = "Description")
       tkconfigure(desc.label, background = "white")
-      tkgrid(desc.label, row=2, col=3)
+      tkgrid(desc.label, row=2, column = 3)
 
       desc.entry[[i]] <- tkentry(win.fr, width = 30, textvariable = get("desc.lst",eerieEnv)[[i]])
       tkconfigure(desc.entry[[i]], background = "white")
-      tkgrid(desc.entry[[i]], row = (i+2), col = 3)
+      tkgrid(desc.entry[[i]], row = (i+2), column = 3)
     }
 
 
@@ -342,8 +342,8 @@ tkphenoData <- function(sampleNames){
 
     tkgrid(space.label2,row = (get("NumCovariates",eerieEnv) + 5))
     tkgrid(space.label3,row = (get("NumCovariates",eerieEnv) + 6))
-    tkgrid(but1,row = (get("NumCovariates",eerieEnv) + 7),col = 2)
-    tkgrid(but2,row = (get("NumCovariates",eerieEnv) + 7), col = 3)
+    tkgrid(but1,row = (get("NumCovariates",eerieEnv) + 7),column = 2)
+    tkgrid(but2,row = (get("NumCovariates",eerieEnv) + 7), column = 3)
     tkgrid.configure(but1,sticky="e")
     tkgrid.configure(but2,sticky="w")
 
@@ -424,11 +424,11 @@ tkphenoData <- function(sampleNames){
 
     tkgrid(space.label1, row =1)
     tkgrid(space.label2, row =2)
-    tkgrid(NumCovariates.label, row = 3, col = 1)
-    tkgrid(NumCovariates.entry, row = 3, col =2)
+    tkgrid(NumCovariates.label, row = 3, column = 1)
+    tkgrid(NumCovariates.entry, row = 3, column =2)
     tkgrid(space.label3, row =4)
     tkgrid(space.label4, row =5)
-    tkgrid(but1, row = 6, col = 1)
+    tkgrid(but1, row = 6, column = 1)
     tkgrid(space.label5, row =7)
 
     tkwait.window(tt1)
