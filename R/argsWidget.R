@@ -14,10 +14,18 @@ argsWidget <- function(argsList){
     # Defines the widget components
     for(i in names(argsList)){
         tempList <- list()
-        label <- label(name = "label", value = i, width = lWidth,
-                                                           env = PWEnv)
-        eval(substitute(j <- entryBox(name = j, value = argsList[j],
+        # Creates radio buttons with TRUE and FALSE if the default
+        # value for an argument is either a TRUE or FALSE
+        if(is.logical(argsList[[i]]) && !is.na(argsList[[i]])){
+            eval(substitute(j <- radioButton(name = j,
+                     value = c("TRUE" = TRUE,"FALSE" = FALSE),
+                     env = PWEnv), list(j = i)))
+        }else{
+            eval(substitute(j <- entryBox(name = j, value = argsList[j],
                                  width = 15, env = PWEnv), list(j = i)))
+        }
+        label <- label(name = "label", value = i,
+                                             width = lWidth, env = PWEnv)
         tempList[["label"]] <- label
         tempList[["entry"]] <- get(i)
         pWidgets[[i]] <- tempList

@@ -230,6 +230,7 @@ finish <- function(env){
     dataFile <- do.call("read.table", args)
     colInfos <- getColInfo(env)
     colNames <- NULL
+    dataName <- getName4Data(args[["file"]])
     for(i in 1:length(colInfos)){
         if(drop(colInfos[[i]])){
             dataFile <- dataFile[, -i]
@@ -246,6 +247,9 @@ finish <- function(env){
         names(dataFile) <- colNames
     }else{
         names(dataFile) <- colNames
+    }
+    if(!is.null(dataName)){
+        assign(dataName, dataFile, env = .GlobalEnv)
     }
     return(list(args = args, data = dataFile))
 }
@@ -679,4 +683,47 @@ getMoreArgs <- function(){
     args[["fill"]] <- !args[["blank.lines.skip"]]
     return(argsWidget(args))
 }
+# This function provides the interface for uers to decide whether to
+# save the imported data in the global environment
+getName4Data <- function(filename){
+    # Gets ride of the separaters
+    temp <- gsub(paste("^.*", .Platform$file.sep,
+                                  "(.*)", sep = ""), "\\1", filename)
+    # Gets ride of the extensions
+    temp <- strsplit(temp, "\\.")[[1]][1]
+    var <- tclVar(temp)
+    # Destroy the window
+    end <- function(){
+        tkdestroy(top)
+    }
+    # Save the data
+    save <- function(){
+        temp <<- tclvalue(var)
+        end()
+    }
+    # Do not save the data
+    noSave <- function(){
+        temp <<- NULL
+        end()
+    }
+    ## Set up the interface
+    top <- tktoplevel()
+    nameFrame <- tkframe(top)
+    tktitle(top) <- "BioC Data Import Wizard"
+    inst <- tklabel(nameFrame, text = paste("Save data in .GlobalEnv as:"))
+    tkpack(inst, side = "left")
+    nameEntry <- tkentry(nameFrame, width = 10, textvariable = var)
+    tkpack(nameEntry, side = "left")
+    tkpack(nameFrame, side = "top", pady = 5, padx = 5)
+    butFrame <- tkframe(top)
+    noSaveBut <- tkbutton(butFrame, text = "Do'nt Save", width = 10,
+                       command = noSave)
+    saveBut <- tkbutton(butFrame, text = "Save", width = 10,
+                        command = save)
+    tkpack(noSaveBut, saveBut, side = "left")
+    tkpack(butFrame, side = "top", pady = 5, padx = 5)
 
+    tkwait.window(top)
+
+    return(temp)
+}
