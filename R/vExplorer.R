@@ -186,6 +186,9 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     # editor the code chunk in the box but not to the actual code chunk
     showCode <- function(chunkName){
         tkdelete(editViewer, "1.0", "end")
+        tkconfigure(resultViewer, state = "normal")
+        tkdelete(resultViewer, "1.0", "end")
+        tkconfigure(resultViewer, state = "disabled")
         for(i in nameNCode[[chunkName]]){
             tkinsert(editViewer, "end", paste(i, "\n", sep = ""))
         }
@@ -217,8 +220,10 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
                 }
 
             }
-            tkdelete(resultViewer,0, "end")
-            tkinsert(resultViewer, 0, result)
+            tkdelete(resultViewer, "1.0", "end")
+            tkconfigure(resultViewer, state = "normal")
+            tkinsert(resultViewer, "end", result)
+            tkconfigure(resultViewer, state = "disabled")
 #            modButton(buts[[selectedChunk]], "blue")
 #            executed <<- unique(c(executed, selectedChunk))
 #        }else{
@@ -235,7 +240,9 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     # Cleans the boxes for code chunk and result of execution
     clear <- function(){
         tkdelete(editViewer, "1.0", "end")
-        tkdelete(resultViewer, 0, "end")
+        tkconfigure(resultViewer, state = "normal")
+        tkdelete(resultViewer, "1.0", "end")
+        tkconfigure(resultViewer, state = "disabled")
         for(i in 1:length(buts)){
             tkconfigure(buts[[i]], state = "disabled", relief = "raised")
 #            modButton(buts[[i]], "green")
@@ -312,7 +319,8 @@ viewVignette <- function(title, packName, vigPath, pdfPath){
     tkpack(tklabel(editFrame, text = "Results of Execution"))
     rViewerFrame <- tkframe(editFrame)
     resultViewer <-  makeViewer(rViewerFrame, vWidth = 50, vHeight = 12,
-                      hScroll = TRUE, vScroll = TRUE)
+                      hScroll = TRUE, vScroll = TRUE, what = "text")
+    tkconfigure(resultViewer, state = "disabled")
     tkpack(rViewerFrame)
 
     tkgrid(chunkFrame, editFrame, pady = 10, padx = 10)
