@@ -39,7 +39,7 @@ widgetRender <- function (iWidget, tkTitle) {
     getEntryValues <- function(){
         for(i in 1:length(wList) ) {
             if(!BUTTONLAST[[i]]){
-                if(!is.null(WfromText(wList))){
+                if(!is.null(WfromText(wList[[i]]))){
                      eval(substitute(WLValue(iWidget, i) <<-
                                      WfromText(wList[[i]])
                                      (tclvalue(entryValue[[i]])),
@@ -56,17 +56,28 @@ widgetRender <- function (iWidget, tkTitle) {
         fun <- function() {}
         body <- list(as.name("{"),
                      substitute(rval <-
-                                eval(as.call(list(WbuttonFun(wList[[i]]))),
+                                eval(as.call(list(WbuttonFun(wList[[j]]))),
                                              env=PFRAME),
-                                     list(i=i)),
-                     substitute(mytext <- WtoText(wList[[i]])(rval),
-                                list(i=i)),
-                     substitute(tkdelete(entryList[[i]], 0, "end"),
-                                list(i=i)),
-                     substitute(tkinsert(entryList[[i]], 0, mytext),
-                                list(i=i)),
-                     substitute(WLValue(iWidget, i) <<- rval,
-                                list(i = i))
+                                     list(j=i)),
+                     substitute(mytext <- WtoText(wList[[j]])(rval),
+                                list(j=i)),
+
+                     substitute(if(!WcanEdit(wList[[j]]))
+                                tkconfigure(entryList[[j]],state = "normal"),
+                                list(j=i)),
+                     substitute(tkdelete(entryList[[j]], 0, "end"),
+                                list(j=i)),
+                     substitute(tkinsert(entryList[[j]], 0, mytext),
+                                list(j=i)),
+                     substitute(if(!WcanEdit(wList[[j]]))
+                                tkconfigure(entryList[[j]],
+                                            state = "disabled"),
+                                list(j=i)),
+
+                     substitute(BUTTONLAST[[j]] <<- TRUE, list(j=i)),
+
+                     substitute(WLValue(iWidget, j) <<- rval,
+                                list(j = i))
                      )
 
         body(fun) <- as.call(body)
@@ -81,15 +92,20 @@ widgetRender <- function (iWidget, tkTitle) {
         label <- tklabel(eFrame, text = WName(pW), font = LABELFONT)
         entryValue[[i]] <- tclVar()
         BUTTONLAST[[i]] <- TRUE
+
         entryList[[i]] <- tkentry(eFrame,
                                   textvariable = entryValue[[i]],
                                   width=ENTRYWIDTH)
+
         eval(substitute(tkbind(entryList[[i]], "<KeyPress>",
                kpress <- function() BUTTONLAST[[i]] <<- FALSE), list(i = i)))
 
         if( !is.null(WValue(pW))){
             tkinsert(entryList[[i]], 0, WValue(pW))
         }
+
+        if(!WcanEdit(wList[[i]]))
+           tkconfigure(entryList[[i]], state = "disabled")
 
         if(is.null(WbuttonFun(pW)))
             browse <- tklabel(eFrame, text = "  ")
