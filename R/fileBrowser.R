@@ -55,6 +55,13 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         }
     }
 
+    selInSelection <- function(){
+         if(tkcurselection(selectView) != "")
+             tkconfigure(remBut, state = "normal")
+         else
+             tkconfigure(remBut, state = "disabled")
+    }
+
     selectAFile <- function(){
          if(tkcurselection(listView) != ""){
              selObj <- tkget(listView, tkcurselection(listView))
@@ -119,6 +126,12 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
   	tkdelete(aView, 0, "end")
         if(!is.null(toWrite))
             tkinsert(aView, 0,  gsub(".*/(.*)", "\\1", toWrite))
+        if(length(toWrite) > 0)
+            tkconfigure(clearBut, state = "normal")
+        else{
+            tkconfigure(clearBut, state = "disabled")
+            tkconfigure(remBut, state = "disabled")
+        }
     }
 
     writeCap <- function(toWrite)
@@ -153,7 +166,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     upBut <- tkbutton(leftFrame, text = "Up", width = BUTWIDTH,
 		      command = up)
     selectBut <- tkbutton(leftFrame, text = "Select >>", width = BUTWIDTH,
-		      command = selectAFile)
+		      state = "disabled", command = selectAFile)
     tkgrid(upBut, selectBut)
     tkgrid.configure(upBut, sticky = "e")
     tkgrid.configure(selectBut, sticky = "w")
@@ -173,10 +186,11 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     selectView <- makeView(sViewFrame, vWidth = BOXWIDTH,
                            vHeight = BOXHEIGHT)
     tkgrid(sViewFrame, columnspan = 2)
+    tkbind(selectView, "<B1-ButtonRelease>", selInSelection)
     remBut <- tkbutton(rightFrame, text = "<< Remove", width = BUTWIDTH,
-		      command = dropSelection)
+		      state = "disabled", command = dropSelection)
     clearBut <- tkbutton(rightFrame, text = "Clear", width = BUTWIDTH,
-		      command = clearSelection)
+		      state = "disabled", command = clearSelection)
     tkgrid(remBut, clearBut)
     tkgrid.configure(remBut, sticky = "e")
     tkgrid.configure(clearBut, sticky = "w")
