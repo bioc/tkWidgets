@@ -34,13 +34,13 @@ dataViewer <- function(data, caption = "", save = TRUE){
         tempList <- tklistbox(tempFrame, width = 0,
                               height = 0, background = "white")
         writeList(tempList, data[,i])
-        tkpack(tempList, side = "left", expand = TRUE, fill = "y")
-        tkpack(tempFrame, side = "left")
+        tkpack(tempList, side = "left", expand = TRUE, fill = "both")
+        tkpack(tempFrame, side = "left", expand = TRUE, fill = "both")
     }
 
     tkcreate(innerFrame, "window", 0, 0, anchor = "nw", window = dataFrame)
 
-    tkpack(boxFrame, side = "top")
+    tkpack(boxFrame, side = "top", expand = TRUE, fill = "both")
 
     botFrame <- tkframe(base)
     if(save){

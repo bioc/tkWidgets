@@ -12,7 +12,7 @@
    the argument list.
 }
 \usage{
-argsWidget(argsList)
+argsWidget(argsList, defaultNames)
 getPWidget(argsList, PWEnv)
 formatArg(toFormat)
 getSymbol(args)
@@ -31,6 +31,9 @@ getTrueNullNa(toFormat)
   \item{args}{\code{args} arguments to be formated}
   \item{funcs}{\code{funcs} a list containing the arguments that are
     functions}
+  \item{defaultNames}{\code{defaultNames} a vector of character strings
+    of length 2 for two default buttons to be rendered. The first one is
+    to end the process and the second to abort the process}
 }
 \details{
   \code{\link{argsWidget}} builds a widget with widget elements to allow
