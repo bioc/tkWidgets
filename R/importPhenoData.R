@@ -79,30 +79,10 @@ importPhenoData <- function(sampleNames = NULL){
             newPhenoData <<- tempData
             filename <- getName4Data()
             if(!is.null(filename)){
-                .GlobalEnv[[filename]] <<- newPhenoData
+                .GlobalEnv[[filename]] <- newPhenoData
             }
             end()
         }
-        #if(!is.null(newPData)){
-        #    varList <- getCovarDesc(varList)
-        #    if(!is.null(varList)){
-        #        options(show.error.messages = FALSE)
-        #        tryMe <- try(new("phenoData", pData=data.frame(newPData),
-        #                         varLabels=varList))
-        #        options(show.error.messages = TRUE)
-        #        if(inherits(tryMe, "try-error")){
-        #            tkmessageBox(title = paste("Data Error"),
-        #               message = paste("I can't create a phenoData object.",
-        #               "Perhaps the numbers of covariates and their",
-        #               "descriptions do not match."),
-        #               icon = "error",
-        #               type = "ok")
-        #        }else{
-        #            newPhenoData <<- tryMe
-        #            end()
-        #        }
-        #    }
-        #}
     }
 
     readFile <- function(){
@@ -193,21 +173,6 @@ getPDFromFile <- function(){
     }
     return(pdata)
 }
-# Read a data frame from a data frame or phenoData object
-#getPDFromObj <- function(type = c("data.frame", "phenoData")){
-#    type <- match.arg(type)
-
-#    fileName <- getNameWidget("object", type)
-#    if(is.null(fileName)){
-#        return(NULL)
-#    }
-
-#    if(type == "data.frame"){
-#        return(.GlobalEnv[[fileName]])
-#    }else{
-#        return(pData(.GlobalEnv[[fileName]]))
-#    }
-#}
 
 # A widget to read in the name of an object
 getOBJWidget <- function(type = NULL){
@@ -303,28 +268,6 @@ objExists <- function(name, type = NULL){
         return(FALSE)
     }
 }
-# Get the arguments for read.table using a widget
-#readFileByUserArgs <- function(fileName, keep = c("file", "header", "sep",
-#                          "nrows", "skip", "strip.white", "comment.char")){
-#    args <- formals("read.table")[keep]
-#    args[["file"]] <- tclvalue(fileName)
-#    args <- argsWidget(args, inst = paste("I have trouble figuring out",
-#                             "the \\arguments for you. Please set the",
-#                             "arguments for function read.table"))
-#    options(show.error.messages = FALSE)
-#    tryMe<- try(do.call("read.table", as.list(args)))
-#    options(show.error.messages = TRUE)
-#    if(inherits(tryMe, "try-error")){
-#        tkmessageBox(title = paste(what, "read.table error"),
-#                     message = paste("read.table failed because of",
-#                     tryMe[1]),
-#                     icon = "error",
-#                     type = "ok")
-#        return(NULL)
-#    }else{
-#        return(tryMe)
-#    }
-#}
 
 # Get the number of samples and covariates from a user through a widget
 getSNCNums <- function(sampleNames){
@@ -552,24 +495,6 @@ convert2PData <- function(phenoList){
 #    return(new("phenoData", pData=data.frame(pdata), varLabels=varlist))
     return(pdata)
 }
-
-# Function that add new rows/columns to pdata
-#modPData <- function(pdata, rowOrCol, addNum){
-#    if(rowOrCol == "Covariates" && addNum > 0){
-#        temp <- cbind(pdata,
-#                      matrix("", nrow  = nrow(pdata),
-#                             ncol = addNum))
-#        colnames(temp) <- c(colnames(pdata), paste("Covar",
-#                       (ncol(pdata) + 1):(ncol(pdata) + addNum), sep = ""))
-#
-#    }else{
-#        temp <- rbind(as.matrix(pdata), matrix("",nrow = addNum,
-#                                               ncol = ncol(pdata)))
-#        rownames(temp) <- c(rownames(pdata), cbind(paste("Sample",
-#                      (nrow(pdata) + 1):(nrow(pdata) + addNum), sep = "")))
-#    }
-#    return(temp)
-#}
 
 # A widget that takes user inputs for covariate descriptions
 # varList - a list with names being covariate names and values
