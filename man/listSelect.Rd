@@ -2,6 +2,7 @@
 \alias{listSelect}
 \alias{writeSelBox}
 \alias{writeBut}
+\alias{writeLabel}
 \title{Functions that make a widget with selection boxes based on user
   specifications} 
 \description{
@@ -13,6 +14,7 @@ listSelect(aList, topLbl = "Select Elements From The Following List",
 typeFun = stdType, valueFun = objViewer)
 writeSelBox(baseW, aList, typeFun = NULL, valueFun = NULL)
 writeBut(baseW, butList, butWidth = 6)
+writeLabel(baseW, typeFun, valueFun)
 }
 
 \arguments{

@@ -1,0 +1,41 @@
+WName                   Accessors functions for primitive widget
+                        objects.
+dirsNFiles              This function lists file and directories (with
+                        a system path separator) for a given path.
+fileBrowser             An simple interface to view files and pick one
+                        as the return.
+findObjType             A function that determines the type of the
+                        object represented by a passed name.
+getActiveEnv            A function to get the active environment.
+getContent              Functions to return a representation of an R
+                        object passed
+hasPrefix               An utility function for tkWidgets.
+hasSuffix               An utility function for tkWidgets.
+isCharacter             A function to determine if a given name is for
+                        a character object.
+listSelect              Functions that make a widget with selection
+                        boxes based on user specifications
+makeView                A function to put a scrollable list box into a
+                        tkWidget.
+nameToObjList           A function to convert a vector of object names
+                        to a list of lists with name and object pairs.
+objViewer               A function to show the content of the passed
+                        argument on a widget
+objectBrowser           A function to view the objects in the work
+                        space.
+pickFiles               A functions to pick elements from a given
+                        vector of strings based on predefined
+                        condition.
+pickObjs                A function that determines what to be sent to a
+                        widget for display.
+stdType                 Functions that provide default behaviors for
+                        typeFun and valueFun functions of listSelect
+                        function
+values.Widget           Functions dealing with the names and values of
+                        a widget created by using the function
+                        widgetRender.
+widgetRender            A function to render a tk widget based on the
+                        specifications passed as a list.
+writeDir
+writeObj                A function to write object lists to a given
+                        list box.
