@@ -23,18 +23,23 @@ objectBrowser<- function (fun = function(x) TRUE,
     objsInSel <- NULL
 
     end <- function(){
-        if(nSelect == -1){
-            returnList <<- nameToObjList(objsInSel)
-            tkdestroy(base)
-        }else{
-            if(nSelect != length(objsInSel)){
-                tkmessageBox(title = "Wrong number", message =
-                       paste("You can only select", nSelect, "object(s)"),
-                       icon = "warning", type = "ok")
-            }else{
+        if(length(objsInSel) != 0){
+            if(nSelect == -1){
                 returnList <<- nameToObjList(objsInSel)
                 tkdestroy(base)
+            }else{
+                if(nSelect != length(objsInSel)){
+                    tkmessageBox(title = "Wrong number", message =
+                       paste("You can only select", nSelect, "object(s)"),
+                       icon = "warning", type = "ok")
+                }else{
+                    returnList <<- nameToObjList(objsInSel)
+                    tkdestroy(base)
+                }
             }
+        }else{
+            returnList <<- NULL
+            tkdestroy(base)
         }
     }
 
@@ -232,7 +237,7 @@ objectBrowser<- function (fun = function(x) TRUE,
     butFrame <- tkframe(leftFrame)
     upBut <- tkbutton(butFrame, text = "Up", width = BUTWIDTH,
 		      command = up)
-    activeBut <- tkbutton(butFrame, text = "Reset", width = BUTWIDTH,
+    activeBut <- tkbutton(butFrame, text = "Back", width = BUTWIDTH,
 		      command = getAct)
     selectBut <- tkbutton(butFrame, text = "Select >>", width = BUTWIDTH,
                           command = selectObj, state = "disabled")
@@ -254,7 +259,7 @@ objectBrowser<- function (fun = function(x) TRUE,
 		      command = clearSelection, state = "disabled")
     canBut <- tkbutton(butFrame2, text = "Cancel", width = BUTWIDTH,
                        command = cancel)
-    endBut <- tkbutton(butFrame2, text = "End", width = BUTWIDTH,
+    endBut <- tkbutton(butFrame2, text = "Finish", width = BUTWIDTH,
 		       command = end)
     tkgrid(removeBut, clearBut)
     tkgrid(canBut, endBut)
