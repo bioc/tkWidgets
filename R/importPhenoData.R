@@ -19,6 +19,7 @@ importPhenoData <- function(sampleNames = NULL){
     cancel <- function(){
         end()
     }
+    # Read from file using read.table and create a phenoData.
     readFile <- function(){
         if(tclvalue(fileName) == ""){
             showIOError("file")
@@ -51,6 +52,7 @@ importPhenoData <- function(sampleNames = NULL){
             }
         }
     }
+    # Read from an existing data from in .GlobalEnv and create a phenoData
     readObj <- function(){
         if(tclvalue(objName) == ""){
             showIOError("data frame")
@@ -67,6 +69,8 @@ importPhenoData <- function(sampleNames = NULL){
             }
         }
     }
+    # Modify pData of an existing phenoData in .GlobalEnv and create a
+    # phenoData. If no name is provided, create a new one
     editObj <- function(){
         if(tclvalue(phenoName) == ""){
             yesno <- tkmessageBox(title = "New phenoData",
@@ -103,10 +107,11 @@ importPhenoData <- function(sampleNames = NULL){
             }
         }
     }
-
+    # Get (browse) the name of a file to be read in by read.table
     brows <- function(){
         tclvalue(fileName) <<- tclvalue(tkcmd("tk_getOpenFile"))
     }
+    # Get (browse) the name of an existing data frame
     browseObj <- function(){
         filter <- function(x, env = .GlobalEnv){
             if(is.data.frame(env[[x]]))
@@ -120,6 +125,7 @@ importPhenoData <- function(sampleNames = NULL){
             pdata <<- obj[[1]]
         }
     }
+    # Get (browse) the name of an existing phenoData object
     browsePheno <- function (){
         filter <- function(x, env = .GlobalEnv){
             if(class(env[[x]]) == "phenoData")
@@ -236,6 +242,8 @@ sNames4rNames <- function(pdata, sampleNames){
     return(pdata)
 }
 
+# This widget is called by importPhenoData when uses decide to create
+# a phenoData object based on a file, a data frame, or phenoData object
 createPhenoData <- function(pdata, sampleNames){
     phenoObj <- NULL
     phenoList <- NULL
@@ -253,11 +261,13 @@ createPhenoData <- function(pdata, sampleNames){
         tkdestroy(base)
     }
     on.exit(end())
-
+    # When the continus button is clicked, create a phenoData object
     cont <- function(){
         phenoObj <<- convert2PData(phenoList)
         end()
     }
+    # When user decides to add new samples or covariates, reconstruct
+    # pdata and update the table for user inputs
     changeCovar <- function(){
         if(tclvalue(rowOrCol) == "Covariates"){
             covarNum <<- covarNum + as.numeric(tclvalue(addNum))
@@ -327,7 +337,8 @@ createPhenoData <- function(pdata, sampleNames){
 
     return(phenoObj)
 }
-# Write data contained by pdata to the text widget
+# Write data contained by pdata to the text widget containing the
+# table for user inputs
 writePhenoTable <- function(base, textWidget, pdata, sampleNames,
                             covarNum){
     phenoMat <- makePhenoData(pdata, sampleNames, covarNum)
@@ -368,7 +379,7 @@ writePhenoTable <- function(base, textWidget, pdata, sampleNames,
     return(values)
 }
 
-
+# Constructs a matrix containing user input data
 makePhenoData <- function(pdata, sampleNames, covarNum){
     if(!is.null(pdata)){
         #if(covarNum == ncol(pdata)){
@@ -404,6 +415,8 @@ makePhenoData <- function(pdata, sampleNames, covarNum){
     return(as.matrix(temp))
 }
 
+# Conver values in a matrix containing user input data to a phenoData
+# object
 convert2PData <- function(phenoList){
     pdata <- NULL
     varlist <- list()
