@@ -13,9 +13,6 @@ importPhenoData <- function(sampleNames = NULL){
         stop()
     }
 
-    #fileName <- tclVar()
-    #objName <- tclVar()
-    #phenoName <- tclVar()
     varLabels <- NULL
     phenodata <- NULL
     newPhenoData <- NULL

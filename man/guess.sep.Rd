@@ -3,6 +3,7 @@
 \alias{guess.header}
 \alias{find.type}
 \alias{charOrNum}
+\alias{getRowNames}
 
 \title{Automatically determines whether a data file has a header and
   what delimiter is used to separate data columns}
@@ -16,6 +17,7 @@ guess.sep(file.name, numLine = 5, seps = "", isFile = TRUE)
 guess.header(twoLines, sep)
 find.type(file.name, sep, header = FALSE, numLine = 5)
 charOrNum(vect)
+getRowNames(file.name, sep, header, skip)
 }
 
 \arguments{
@@ -37,6 +39,8 @@ charOrNum(vect)
     headers}
   \item{isFile}{\code{isFile} a boolean that is TRUE when
     \code{file.name} is a file or FALSE an object}
+  \item{skip}{\code{skip} an integer for the number of lines to be
+    skiped using \code{\link{read.table}}}
 }
 \details{
   guess.sep calls \code{\link{guess.sep}} and \code{\link{find.type}} to

@@ -5,54 +5,59 @@
 # Copyright 2002, J. Zhang, all rights reserved
 #
 
-guess.sep <- function(file.name, numLine = 5, seps = "", isFile = TRUE){
+guess.sep <- function(file.name, numLine = 5, seps, isFile = TRUE){
 
     separator <- ""
     header <- FALSE
+    sep <- NULL
 
-    if(seps == ""){
-        seps <- c(" ", ",", ";", "\t")
-    }else{
-        seps <- c(" ", ",", ";", "\t", seps)
-    }
+    if(missing(seps)){
+        seps <- c(",", ";", "\t", " ")
+    }#else{
+    #    seps <- c(seps, ",", ";", "\t", " ")
+    #}
 
     if(isFile){
         toCheck <- readLines(file.name, n = numLine)
-        for(i in seps[seps != " "]){
-            toCheck <- gsub(paste(" *", i, "| *", i, " *|", i, " *",
-                                  sep = ""), gsub(" *", "", i), toCheck)
-        }
     }else{
         toCheck <- file.name
     }
 
-    w<-NULL
-
-    for(i in seps)
-         w[[i]] <- strsplit(toCheck[2:length(toCheck)], i)
-
-    v <- lapply(w, function(x) sapply(x, length))
-
     good <- function(x) all(x==x[1]) && x[1] > 1
-    found <- sapply(v, good)
 
-    sep <- names(found[found])
-    if(length(sep) == 1){
+    for(i in seps){
+        w <- strsplit(toCheck[2:length(toCheck)], i)
+        v <- sapply(w, length)
+        if(good(v)){
+            sep <- i
+            break
+        }
+    }
+
+    if(!is.null(sep)){
         separator <- sep
         if(length(unlist(strsplit(toCheck[1], separator)))
-                                              == v[[separator]][1] - 1){
+                    == length(unlist(strsplit(toCheck[2], separator))) - 1){
             header <- TRUE
+            colNames <- gsub("\"", "",
+                              unlist(strsplit(toCheck[1], separator)))
+            skip <- 0
+            rowNames <- getRowNames(file.name, separator, header, skip)
         }else{
-            header <- guess.header(toCheck[1:2], separator)
+            headerNSkip <- guess.header(toCheck[1:2], separator)
+            header <- headerNSkip[["header"]]
+            skip <- headerNSkip[["skip"]]
+            colNames <- headerNSkip[["colNames"]]
+            rowNames <- getRowNames(file.name, separator, header, skip)
         }
-
         type <- find.type(file.name, separator, header, numLine)
-        return(list(header = header, separator = separator, type = type))
+        return(list(header = header, separator = separator, skip = skip,
+                    col.names = colNames, row.names = rowNames, type = type))
     }else{
         # New line is always the separator
-        return(list(header = FALSE, separator = "\n",
-                    type = find.type(toCheck[2:length(toCheck)],
-                    header = FALSE)))
+        return(list(header = FALSE, separator = "\n", col.names = NA,
+                    row.names = NA, skip = 0,
+                    type = find.type(file.name, sep = "\n", header = FALSE)))
     }
 }
 
@@ -77,18 +82,20 @@ guess.header <- function(twoLines, sep){
     scndLine[!is.na(scndLine)] <- "num"
 
     if(!setequal(firstLine, scndLine)){
-        return(TRUE)
+        return(list(header = TRUE, skip = 1,
+            colNames = gsub("\"", "",  unlist(strsplit(twoLines[1], sep)))))
     }else{
-        if(any(!is.na(firstLine))){
-            return(FALSE)
-        }
-        return(FALSE)
+        #if(any(!is.na(firstLine))){
+        #    return(list(header = FALSE, skip = 0))
+        #}
+        return(list(header = FALSE, skip = 0, colNames = NA))
     }
 }
 
 find.type <- function(file.name, sep, header = FALSE, numLine = 5){
 
-    line <- read.table(file.name, sep = sep, header = header, nrows = numLine)
+    line <- as.matrix(read.table(file.name, sep = sep, header = header,
+                       nrows = numLine, as.is = TRUE))
 
     types <- NULL
     for(i in 1:nrow(line)){
@@ -97,7 +104,7 @@ find.type <- function(file.name, sep, header = FALSE, numLine = 5){
     if(nrow(unique(types)) == 1){
         return(types[1,])
     }else{
-        return("Not detected")
+        return(rep("Character", ncol(types)))
     }
 }
 
@@ -110,3 +117,9 @@ charOrNum <- function(vect){
     temp[!is.na(temp) & temp != "Character"] <- "Numeric"
     return(temp)
 }
+
+getRowNames <- function(file.name, sep, header, skip){
+    data <- read.table(file.name, sep = sep, header = header, skip = skip)
+    return(rownames(data))
+}
+
