@@ -141,13 +141,13 @@ eExplorer <- function(pkgName, font = "arial 13"){
     editFrame <- tkframe(codeNRelFrame)
     tkpack(tklabel(editFrame, text = "R Source Code", font = font))
     eViewerFrame <- tkframe(editFrame)
-    editViewer <- makeViewer(eViewerFrame, vWidth = 50, vHeight = 15,
+    editViewer <- makeViewer(eViewerFrame, vWidth = 50, vHeight = 10,
                       hScroll = TRUE, vScroll = TRUE, what = "text")
     tkconfigure(editViewer, font = font)
     tkconfigure(editViewer, state = "disabled")
 #    tkbind(editViewer, "<KeyRelease>", codeChanged)
     tkpack(eViewerFrame, expand = TRUE, fill = "both")
-    tkpack(tklabel(editFrame, text = "Output window", font = font))
+    tkpack(tklabel(editFrame, text = "Display window", font = font))
     rViewerFrame <- tkframe(editFrame)
     resultViewer <-  makeViewer(rViewerFrame, vWidth = 50, vHeight = 10,
                       hScroll = TRUE, vScroll = TRUE, what = "text")
@@ -191,6 +191,8 @@ getExCode <- function(pkgName){
     if(inherits(tryMe, "try-error")){
         return(NULL)
     }
+    # Make sure only to deal with files with an R extension
+    tryMe <- tryMe[grep("\\.R", tryMe)]
     if(length(tryMe) == 0){
         return(NULL)
     }
