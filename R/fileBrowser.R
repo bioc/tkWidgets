@@ -43,7 +43,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
     # When a user double clicks a file name in the list box for file names,
     # remembers the file name and path for that name and write the
-    # contents to the list box if the name is a directory.
+    # contents to the list box if the name in a directory.
     inList <- function(){
         selectedObj <- as.character(tkget(listView,(tkcurselection(listView))))
         if(regexpr(.Platform$file.sep, selectedObj) >= 1){
