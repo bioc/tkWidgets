@@ -54,8 +54,8 @@ Objects can be created by calls of the form \code{new("colInfo", ...)}.
 
 \examples{
   test <- colInfo("info1", "character", FALSE)
-  name(test)
-  type(test)
+  colName(test)
+  colType(test)
   dropOrNot(test)
 }
 \keyword{classes}

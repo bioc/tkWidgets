@@ -3,22 +3,22 @@
 # type - data type for a column
 # dropOrNot - a boolean indicating whether the column will be droped
 
-    setClass("colInfo", representation(name = "character",
-                                       type = "character",
+    setClass("colInfo", representation(colName = "character",
+                                       colType = "character",
                                        dropOrNot = "logical"))
     # Set the get methods
-    if(!isGeneric("name")){
-        setGeneric("name",
-                   function(object) standardGeneric("name"))
+    if(!isGeneric("colName")){
+        setGeneric("colName",
+                   function(object) standardGeneric("colName"))
     }
-    setMethod("name", "colInfo",
-              function(object) object@name)
-    if(!isGeneric("type")){
-        setGeneric("type",
-                   function(object) standardGeneric("type"))
+    setMethod("colName", "colInfo",
+              function(object) object@colName)
+    if(!isGeneric("colType")){
+        setGeneric("colType",
+                   function(object) standardGeneric("colType"))
     }
-    setMethod("type", "colInfo",
-              function(object) object@type)
+    setMethod("colType", "colInfo",
+              function(object) object@colType)
     if(!isGeneric("dropOrNot")){
         setGeneric("dropOrNot",
                    function(object) standardGeneric("dropOrNot"))
@@ -26,18 +26,18 @@
     setMethod("dropOrNot", "colInfo",
               function(object) object@dropOrNot)
     # Define the replace methods
-    if(!isGeneric("name<-")){
-        setGeneric("name<-", function(object, value)
-                   standardGeneric("name<-"))
+    if(!isGeneric("colName<-")){
+        setGeneric("colName<-", function(object, value)
+                   standardGeneric("colName<-"))
     }
-    setReplaceMethod("name", "colInfo", function(object, value){
-                  object@name <- value; object})
-    if(!isGeneric("type<-")){
-        setGeneric("type<-", function(object, value)
-                   standardGeneric("type<-"))
+    setReplaceMethod("colName", "colInfo", function(object, value){
+                  object@colName <- value; object})
+    if(!isGeneric("colTyype<-")){
+        setGeneric("colType<-", function(object, value)
+                   standardGeneric("colType<-"))
     }
-    setReplaceMethod("type", "colInfo", function(object, value){
-                  object@type <- value; object})
+    setReplaceMethod("colType", "colInfo", function(object, value){
+                  object@colType <- value; object})
     if(!isGeneric("dropOrNot<-")){
         setGeneric("dropOrNot<-", function(object, value)
                    standardGeneric("dropOrNot<-"))
@@ -46,5 +46,5 @@
                   object@dropOrNot <- value; object})
 
 colInfo <- function(name, type, drop){
-    new("colInfo", name = name, type = type, dropOrNot = drop)
+    new("colInfo", colName = name, colType = type, dropOrNot = drop)
 }
