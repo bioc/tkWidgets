@@ -1,10 +1,10 @@
 Package: tkWidgets
-Version: 1.0.3
+Version: 1.2.2
 Date: 2002-4-10
 Title: R based tk widgets 
 Author: J. Zhang <jzhang@jimmy.harvard.edu>
 Maintainer: J. Zhang <jzhang@jimmy.harvard.edu>
-Depends: R (>= 1.6.1), tcltk
+Depends: R (>= 1.6.1), widgetTools
 Description: Widgets to provide user interfaces. 
   Tcltk should have been installed for the widgets to run. 
 Keyword: graphics
