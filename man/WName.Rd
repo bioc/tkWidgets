@@ -2,7 +2,7 @@
 \title{Accessors for Primitive Widget Objects}
 \alias{WName}
 \alias{WValue}
-\alias{"WValue<-"}
+\alias{WValue<-}
 \alias{WtoText}
 \alias{WfromText}
 \alias{WcanEdit}
@@ -11,11 +11,12 @@
 \alias{WwList}
 \alias{"WwList<-"}
 \alias{WLValue}
-\alias{"WLValue<-"}
+\alias{WLValue<-}
 \alias{WRButtons}
 \alias{WpreFun}
 \alias{WpostFun}
 \alias{WEnd}
+\alias{"WValue<-"}
 \description{
   Currently primitive widget objects (\code{pwidget}s) are implemented
   as \code{\link{list}}s, but this will change.  Users should only rely
@@ -42,7 +43,6 @@ WEnd{x}
 \arguments{
   \item{x}{list of lists with a Name, Value, toText, fromText,
     canEdit, buttonText, buttonFun, preFun, postFun element.}
-  \item{name}{character string for the name of the list to be returned}
   \item{index}{integer or character string as an index or name for
     the list in the first list of a list of lists for a widget.}
   \item{value}{An \R data type that is going to be used to update the value.}
