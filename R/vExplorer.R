@@ -122,6 +122,8 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     }
 
     tkwait.window(base)
+
+    return(invisible())
 }
 
 # Check for the availability of vignettes and populate the list box
@@ -164,7 +166,10 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
 # This window is called by vExplorer for interacting with the code
 # chunks of a vignette
 viewVignette <- function(title, packName, vigPath, font = "arial 11"){
-
+    end <- function(){
+        tkgrab.release(base)
+        tkdestroy(base)
+    }
     on.exit(end)
 
     selectedChunk <- NULL
@@ -188,9 +193,6 @@ viewVignette <- function(title, packName, vigPath, font = "arial 11"){
 #        codeVersion[[1]] <- chunkList
     }
 
-    end <- function(){
-        tkdestroy(base)
-    }
     # Not implemented now but will be later
     back <- function(){
         if(length(codeVersion) > 1){
@@ -397,6 +399,8 @@ viewVignette <- function(title, packName, vigPath, font = "arial 11"){
     endButton <- tkbutton(base, text = "End", width = 12,
                           font = font, command = end)
     tkpack(endButton)
+
+    tkgrab.set(base)
 
 #    if(is.null(pdfPath) || is.na(pdfPath) || length(pdfPath) == 0){
 #        tkconfigure(pdfButton, state = "disabled")

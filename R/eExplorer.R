@@ -181,6 +181,8 @@ eExplorer <- function(pkgName, font = "arial 13"){
     tkpack(endButton)
 
     tkwait.window(base)
+
+    return(invisible())
 }
 
 getExCode <- function(pkgName){
