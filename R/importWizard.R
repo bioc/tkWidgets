@@ -330,6 +330,10 @@ setState1TFrame <- function(frame, viewer, delims, env){
 # Show the data read in using readLines for state1
 showData4State1 <- function(widget, env){
      dataFile <- readLines(getArgs(env)[["state1"]][["file"]])
+     # Preventing the header to be shown
+     if(getArgs(env)[["state1"]][["header"]]){
+         dataFile <- dataFile[2:length(dataFile)]
+     }
      # determines how many lines to show
      if(length(dataFile) > getShowNum(env)){
          writeList(widget, paste(1:getShowNum(env), ": ",
