@@ -227,3 +227,4 @@ getHelpFile <- function(pkgName, fileName){
         return(tryMe)
     }
 }
+
