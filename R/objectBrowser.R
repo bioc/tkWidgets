@@ -2,20 +2,27 @@
 # work place.
 #
 
-objectBrowser <- function (fun = function(x) TRUE){
+objectBrowser<- function (fun = function(x) TRUE,
+                           textToShow = "Select object(s)"){
 
     require(tcltk) || stop("tcl/tk library not available")
     on.exit(options(show.error.messages = TRUE))
+    on.exit(end())
 
-    LABELFONT <- "Helvetica 12"
+    LABELFONT1 <- "Helvetica 12 bold"
+    LABELFONT2 <- "Helvetica 11"
     BUTWIDTH <- 8
 
     selectedObj <- NULL
     isPack <- FALSE
     returnObj <- NULL
     returnList <- NULL
+    selIndex <- NULL
+    objIndex <- NULL
+    objsInSel <- NULL
 
     end <- function(){
+        returnList <<- nameToObjList(objsInSel)
         tkdestroy(base)
     }
 
@@ -78,32 +85,26 @@ objectBrowser <- function (fun = function(x) TRUE){
                "list" = doList(selectedObj),
                doElse()
             )
-            tkconfigure(visitBut, state = "disabled")
+            tkconfigure(selectBut, state = "disabled")
             selectedObj <<- NULL
         }
     }
 
 
     sClick <- function () {
-#        if(tkcurselection(listView) != ""){
-            selectedObj <<- as.character(tkget(listView,
-                                      tkcurselection(listView)))
+        selIndex <<- NULL
+        tkconfigure(selectBut, state = "normal")
+        selIndex <<- unlist(strsplit(tkcurselection(listView), " "))
+
+        for(i in selIndex){
+            temp <- as.character(tkget(listView, i))
+            objsInSel <<- c(objsInSel, temp)
+        }
+        if(length(selIndex) == 1){
+            selectedObj <<- as.character(tkget(listView, selIndex))
             objType <- findObjType(selectedObj)
-            if(objType == "package"){
-                returnList <<- list("name" = gsub("(^package:)", "\\",
-                                    selectedObj), "obj"  =
-                                    package.contents(gsub("(^package:)",
-                                                     "\\", selectedObj)))
-                tkconfigure(visitBut, state = "normal")
-            }else{
-                switch(objType,
-                    "environment" = tkconfigure(visitBut,state="normal"),
-                    "list" = tkconfigure(visitBut, state="normal")
-                       )
-                returnList <<- list("name" = selectedObj,
-                                    "obj" = get(selectedObj))
-            }
-#        }
+        }
+
     }
 
     getAct <- function(){
@@ -129,55 +130,125 @@ objectBrowser <- function (fun = function(x) TRUE){
             writeCap(selectedObj)
 
         }
+        tkconfigure(selectBut, state = "disabled")
+    }
+
+    selectObj <- function (){
+        if(length(selIndex) > 0){
+            for(i in selIndex){
+                selObj <- as.character(tkget(listView, i))
+                objsInSel <<- c(objsInSel, selObj)
+            }
+        }
+        objsInSel <<- unique(objsInSel)
+        writeSelection(objsInSel)
+        tkconfigure(clearBut, state = "normal")
+        tkconfigure(selectBut, state = "disabled")
+    }
+
+    clearSelection <- function(){
+        objsInSel <<- NULL
+        tkdelete(selectView, 0, "end")
+        tkconfigure(clearBut, state = "disabled")
+        tkconfigure(removeBut, state = "disabled")
+        tkconfigure(selectBut, state = "disabled")
+    }
+
+    cancel <- function (){
+        objsInSel <<- NULL
+        end()
+    }
+
+    removeSelection <- function (){
+        toRemove <- NULL
+        if(length(objIndex) > 0){
+            for(i in objIndex)
+                toRemove <- c(toRemove, -(as.numeric(i) + 1))
+
+            objsInSel <<- objsInSel[toRemove]
+            writeSelection(objsInSel)
+        }
+        tkconfigure(removeBut, state = "disabled")
+    }
+
+    selClick <- function (){
+        objIndex <<- NULL
+        tkconfigure(removeBut, state = "normal")
+        objIndex <<- unlist(strsplit(tkcurselection(selectView), " "))
+    }
+
+    writeSelection <- function (toWrite){
+        tkdelete(selectView, 0, "end")
+        for(i in toWrite)
+            tkinsert(selectView, "end", i)
+        fileIndex <<- NULL
     }
 
     writeCap <- function(objName, asis = FALSE){
         if(asis){
-            tkconfigure(butVisit, text = objName)
-            tkconfigure(butType, text = findObjType(objName))
+            tkconfigure(labl1, text = objName)
         }else{
             if(objName == "Top Level"){
-                tkconfigure(butVisit, text = "Top level")
-                tkconfigure(butType, text = "Search path")
+                tkconfigure(labl1, text = "Top level")
             }else{
-                tkconfigure(butVisit, text = objName)
-                tkconfigure(butType, text = findObjType(objName))
+                tkconfigure(labl1, text = objName)
             }
         }
     }
 
     base <- tktoplevel()
-    tktitle(base) <- paste("Object Browser")
+    tktitle(base) <- paste("Bioconductor Object Browser")
 
     capFrame <- tkframe(base)
-    labl1 <- tklabel(capFrame, text = "Visiting: ", font = LABELFONT)
-    labl2 <- tklabel(capFrame, text = "Type: ", font = LABELFONT)
-    butVisit <- tkbutton(capFrame, text = "",
-                         font = LABELFONT, width = 18)
-    butType <- tkbutton(capFrame, text = "",
-                        font = LABELFONT, width = 18)
+    noteLabel <- tklabel(capFrame, text = textToShow, font = LABELFONT1)
+    labl1 <- tklabel(capFrame, text = " ", font = LABELFONT2)
+    labl2 <- tklabel(capFrame, text = "Selected", font = LABELFONT2)
+    dummyLabel <- tklabel(capFrame, text = "           ")
+    tkgrid(noteLabel, columnspan = 3)
+    tkgrid(labl1, dummyLabel, labl2)
+    tkgrid(capFrame, columnspan = 2, padx = 10)
 
-    tkgrid(labl1, butVisit, labl2, butType)
-    tkpack(capFrame, side = "top")
+    leftFrame <- tkframe(base)
 
-    listFrame <- tkframe(base, height = 40)
+    listFrame <- tkframe(leftFrame)
     listView <- makeView(listFrame)
-    tkpack(listFrame, fill = "x", expand = TRUE)
+    tkgrid(listFrame, columnspan = 2)
+    tkconfigure(listView, selectmode = "extended", font = LABELFONT2)
     tkbind(listView, "<Double-Button-1>", dClick)
     tkbind(listView, "<B1-ButtonRelease>", sClick)
 
-    butFrame <- tkframe(base)
-
-    upBut <- tkbutton(butFrame, text = "Parent", width = BUTWIDTH,
+    butFrame <- tkframe(leftFrame)
+    upBut <- tkbutton(butFrame, text = "UP", width = BUTWIDTH,
 		      command = up)
-    activeBut <- tkbutton(butFrame, text = "Active", width = BUTWIDTH,
+    activeBut <- tkbutton(butFrame, text = "Reset", width = BUTWIDTH,
 		      command = getAct)
-    visitBut <- tkbutton(butFrame, text = "Visit", width = BUTWIDTH,
-		      command = goin, state = "disabled")
-    endBut <- tkbutton(butFrame, text = "End", width = BUTWIDTH,
+    selectBut <- tkbutton(butFrame, text = "Select >>", width = BUTWIDTH,
+                          command = selectObj, state = "disabled")
+    tkgrid(upBut, selectBut)
+    tkgrid(activeBut, columnspan = 2)
+    tkgrid(butFrame)
+
+    rightFrame <- tkframe(base)
+    selectFrame <- tkframe(rightFrame)
+    selectView <- makeView(selectFrame)
+    tkconfigure(selectView, selectmode = "extended", font = LABELFONT2)
+    tkgrid(selectFrame, columnspan = 2)
+    tkbind(selectView, "<B1-ButtonRelease>", selClick)
+
+    butFrame2 <- tkframe(rightFrame)
+    removeBut <- tkbutton(butFrame2, text = "<< Remove", width = BUTWIDTH,
+		      command = removeSelection, state = "disabled")
+    clearBut <- tkbutton(butFrame2, text = "Clear", width = BUTWIDTH,
+		      command = clearSelection, state = "disabled")
+    canBut <- tkbutton(butFrame2, text = "Cancel", width = BUTWIDTH,
+                       command = cancel)
+    endBut <- tkbutton(butFrame2, text = "End", width = BUTWIDTH,
 		       command = end)
-    tkpack(upBut, activeBut, visitBut, endBut, side = "left")
-    tkpack(butFrame)
+    tkgrid(removeBut, clearBut)
+    tkgrid(canBut, endBut)
+    tkgrid(butFrame2)
+
+    tkgrid(leftFrame, rightFrame)
 
     viewGlobalEnv()
 
