@@ -35,8 +35,8 @@ dataViewer <- function(data, height = 20, width = 35, save = TRUE){
     botFrame <- tkframe(base)
     if(save){
         save <- function(){
-            name <- argsWidget(list(FileName = ""))
-            write.table(data, name$FileName, quote = FALSE, sep = "\t",
+            name <- tclvalue(tkgetSaveFile())
+            write.table(data, name, quote = FALSE, sep = "\t",
                         row.names = FALSE, col.names = FALSE)
             exit()
         }
