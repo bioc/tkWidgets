@@ -21,6 +21,8 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     fileSelected <- NULL
     currentDir <- NULL
     currentFile <- NULL
+    selIndex <- NULL
+    fileIndex <- NULL
 
     end <- function(){
         tkdestroy(base)
@@ -45,48 +47,53 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     }
 
     selInDir <- function (){
+        fileIndex <<- NULL
         if(tkcurselection(listView) != ""){
-            selObj <<- tkget(listView, tkcurselection(listView))
-            if(regexpr(".*/", selObj) == -1){
-                tkconfigure(selectBut, state = "normal")
-            }else{
-                tkconfigure(selectBut, state = "disabled")
-            }
+            tkconfigure(selectBut, state = "normal")
+            selIndex <<- unlist(strsplit(tkcurselection(listView), " "))
         }
     }
 
     selInSelection <- function(){
-         if(tkcurselection(selectView) != "")
-             tkconfigure(remBut, state = "normal")
-         else
-             tkconfigure(remBut, state = "disabled")
+        selIndex <<- NULL
+        if(tkcurselection(selectView) != ""){
+            fileIndex <<-
+                 unlist(strsplit(tkcurselection(selectView), " "))
+            tkconfigure(remBut, state = "normal")
+        }else
+            tkconfigure(remBut, state = "disabled")
     }
 
     selectAFile <- function(){
-         if(tkcurselection(listView) != ""){
-             selObj <- tkget(listView, tkcurselection(listView))
-             if(regexpr(".*/", selObj) == -1){
-                 tkconfigure(selectBut, state = "normal")
-                 fileSelected <<- c(fileSelected,
+        if(length(selIndex) > 0){
+            for(i in selIndex){
+                selObj <- tkget(listView, i)
+                if(regexpr(".*/", selObj) == -1){
+                    fileSelected <<- c(fileSelected,
                                     paste(path, Platform()$file.sep,
                                           selObj, sep = ""))
-                 fileSelected <<- unique(fileSelected)
-                 writeToView(selectView, fileSelected)
-             }else
-                 tkconfigure(selectBut, state = "disabled")
-         }
+                }
+            }
+            fileSelected <<- unique(fileSelected)
+            writeToView(selectView, fileSelected)
+            selIndex <<- NULL
+        }
     }
 
     clearSelection <- function(){
+        fileSelected <<- NULL
         writeToView(selectView, NULL)
     }
 
     dropSelection <- function(){
-         if(tkcurselection(selectView) != ""){
-             which <- tkindex(selectView, tkcurselection(selectView))
-             which <- as.numeric(which) + 1
-             fileSelected <<- fileSelected[-which]
-             writeToView(selectView, fileSelected)
+        toRemove <- NULL
+        if(length(fileIndex) > 0){
+            for(i in fileIndex)
+                toRemove <- c(toRemove, -(as.numeric(i) + 1))
+
+            fileSelected <<- fileSelected[toRemove]
+            writeToView(selectView, fileSelected)
+            fileIndex <<- NULL
          }
     }
 
@@ -170,7 +177,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid(upBut, selectBut)
     tkgrid.configure(upBut, sticky = "e")
     tkgrid.configure(selectBut, sticky = "w")
-
+    tkconfigure(listView, selectmode = "extended")
     tkbind(listView, "<Double-Button-1>", inList)
     tkbind(listView, "<B1-ButtonRelease>", selInDir)
     writeDir(listView, pickFiles(dirsNFiles(path), testFun,
@@ -186,6 +193,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     selectView <- makeView(sViewFrame, vWidth = BOXWIDTH,
                            vHeight = BOXHEIGHT)
     tkgrid(sViewFrame, columnspan = 2)
+    tkconfigure(selectView, selectmode = "multiple")
     tkbind(selectView, "<B1-ButtonRelease>", selInSelection)
     remBut <- tkbutton(rightFrame, text = "<< Remove", width = BUTWIDTH,
 		      state = "disabled", command = dropSelection)
