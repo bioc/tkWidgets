@@ -1,0 +1,105 @@
+% \VignetteIndexEntry{tkWidgets}
+% \VignetteDepends{tkWidgets}
+% \VignetteKeywords{Interface}
+% \VignettePackage{tkWidgets}
+\documentclass[12pt]{article}
+\usepackage{hyperref}
+\textwidth=6.2in
+\textheight=8.5in
+%\parskip=.3cm
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in
+
+
+\begin{document}
+\author{Jianhua Zhang}
+
+\title{Examples of some of the widgets}
+
+\maketitle
+
+\copyright{2003 Bioconductor}
+
+\section{Introduction}
+
+This package contains several widgets built by using {\texttt{tcltk}}
+or package {\texttt{widgetTools}} to provide interfaces to perform
+different tasks. Available widgets include:
+
+\begin{itemize}
+\item{argsWidget}{an interface that allows users to input values for
+    an argument list passed to the widget as an argument}
+\item{DPExplorer}{an interface that allows users to view a
+    {texttt{Bioconductor}} data package and make selections}
+\item{fileBrowser}{an interface that allows users to select a group of
+    files from a local directory}
+\item{importWizard}{an interface that allows users to import a data file
+    into R following an Excel style}
+\item{objectBrowser}{an interface that allows users to borwses R
+    objects and make a selection}
+\item{vExplorer}{an interface that allows users to explore vignettes
+    of available R packages}
+\end{itemize}
+
+The following code invokes a widget that contains clickable buttons
+that show the interfaces of the widgets.
+
+<<>> =
+PWEnv <- new.env(hash = TRUE, parent = parent.frame(1))
+argsFun <- function(){
+    argsWidget(formals("list.files"))
+}
+button1 <- button(name = "button1", value = "argsWidget",
+                     funs = list(command = argsFun), env = PWEnv)
+button2 <- button(name = "button2", value = "DPExplorer",
+                     funs = list(command = DPExplorer), env = PWEnv)
+button3 <- button(name = "button3", value = "fileBrowser",
+                     funs = list(command = fileBrowser), env = PWEnv)
+button4 <- button(name = "button4", value = "importWizard",
+                     funs = list(command = importWizard), env = PWEnv)
+button5 <- button(name = "button5", value = "objectBrowser",
+                     funs = list(command = objectBrowser), env = PWEnv)
+button6 <- button(name = "button6", value = "vExplorer",
+                     funs = list(command = vExplorer), env = PWEnv)
+
+pWidgets <- list(A = list(button1 = button1, button2 = button2), C =
+list(button3 = button3, button4 = button4), D = list(button5 = button5,
+button6 = button6))
+if(interactive()){
+viewWidget <- widget(wTitle = "tiWidgets Examples", pWidgets, funs = list(),
+                 preFun = function() print("Hello"),
+                 postFun = function() print("Bye"), env = PWEnv)
+}
+@
+
+There are other widgets that are used by specific packages that may
+not of general interests. These widgets are thus not included in the examples. 
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
