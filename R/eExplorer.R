@@ -49,6 +49,7 @@ eExplorer <- function(pkgName, font = "arial 13"){
         for(i in chunkList[[chunk]]){
             tkinsert(editViewer, "end", paste(i, "\n", sep = ""))
         }
+        tkconfigure(editViewer, state = "disabled")
         tkconfigure(resultViewer, state = "normal")
         tkdelete(resultViewer, "0.0", "end")
         tkconfigure(resultViewer, state = "disabled")
@@ -68,32 +69,22 @@ eExplorer <- function(pkgName, font = "arial 13"){
 
     # Executes whatever that is in the text box for code chunk
     execute <- function(){
-
-        code <- tclvalue(tkget(editViewer, "1.0", "end"))
-        # split the text
-        code <- unlist(strsplit(code, "\n"))
-#        output <- executeChunk(code)
+        expCode <- as.character(tkget(chunkText,
+                                          (tkcurselection(chunkText))))
         tkconfigure(resultViewer, state = "normal")
         tkdelete(resultViewer, "0.0", "end")
-
-        for(i in code){
-            tkinsert(resultViewer, "end", paste(getOption("prompt"),
-                                        i, sep = "") )
-            tkinsert(resultViewer, "end", "\n")
-            options(show.error.messages = FALSE)
-            out <- try(capture.output(eval(parse(text = i),
-                                           envir = evalEnv)))
-            options(show.error.messages = TRUE)
-            if(inherits(out, "try-error")){
-                cont <- paste("Execution fauled because of:", out)
-                tkinsert(resultViewer, "end", out)
+        options(show.error.messages = FALSE)
+        out <- try(capture.output(do.call("example", list(topic = expCode))))
+        options(show.error.messages = TRUE)
+        if(inherits(out, "try-error")){
+            cont <- paste("Execution fauled because of:", out)
+            tkinsert(resultViewer, "end", out)
                 tkinsert(resultViewer, "end", "\n")
-            }else{
-                if(length(out) > 0 && out != "NULL"){
-                    for(outputs in out){
-                        tkinsert(resultViewer, "end", outputs)
-                        tkinsert(resultViewer, "end", "\n")
-                    }
+        }else{
+            if(length(out) > 0 && out != "NULL"){
+                for(outputs in out){
+                    tkinsert(resultViewer, "end", outputs)
+                    tkinsert(resultViewer, "end", "\n")
                 }
             }
         }
@@ -108,7 +99,9 @@ eExplorer <- function(pkgName, font = "arial 13"){
 
     # Cleans the boxes for code chunk and result of execution
     clear <- function(){
+        tkconfigure(editViewer, state = "normal")
         tkdelete(editViewer, "1.0", "end")
+        tkconfigure(editViewer, state = "disabled")
         tkconfigure(resultViewer, state = "normal")
         tkdelete(resultViewer, "1.0", "end")
         tkconfigure(resultViewer, state = "disabled")
@@ -151,6 +144,7 @@ eExplorer <- function(pkgName, font = "arial 13"){
     editViewer <- makeViewer(eViewerFrame, vWidth = 50, vHeight = 15,
                       hScroll = TRUE, vScroll = TRUE, what = "text")
     tkconfigure(editViewer, font = font)
+    tkconfigure(editViewer, state = "disabled")
 #    tkbind(editViewer, "<KeyRelease>", codeChanged)
     tkpack(eViewerFrame, expand = TRUE, fill = "both")
     tkpack(tklabel(editFrame, text = "Output window", font = font))

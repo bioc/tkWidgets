@@ -16,8 +16,8 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         pkgName <- tclVar(pkgName)
     }
     pkgNames <- getRPkgs(tclvalue(pkgPath))
-    curDir <- file.path(tclvalue(pkgPath), tclvalue(pkgName))
-
+    baseDir <- file.path(tclvalue(pkgPath), tclvalue(pkgName))
+    subDirs <- NULL
     end <- function(){
         tkdestroy(base)
     }
@@ -27,11 +27,13 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         if(!is.null(tempNames)){
             pkgNames <<- tempNames
             tclvalue(pkgName) <<- pkgNames[1]
-            curDir <<- file.path(tclvalue(pkgPath), pkgNames[1])
+            baseDir <<- file.path(tclvalue(pkgPath), pkgNames[1])
             writePkgDirs()
+            subDirs <<- NULL
         }else{
             tclvalue(pkgPath) <<- gsub(paste(.Platform$file.sep,
-                                     basename(curDir), sep = ""), "", curDir)
+                                     basename(baseDir), sep = ""), "",
+                                       baseDir)
         }
     }
     upDatePath <- function(){
@@ -43,8 +45,9 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
             tclvalue(pkgPath) <<- opt
             pkgNames <<- getRPkgs(opt)
             tclvalue(pkgName) <<- pkgNames[1]
-            curDir <<- file.path(opt, pkgNames[1])
+            baseDir <<- file.path(opt, pkgNames[1])
             writePkgDirs()
+            subDirs <<- NULL
         }
     }
     browse <- function(){
@@ -55,12 +58,13 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
             tclvalue(pkgPath) <<- tempPath
             pkgNames <<- getRPkgs(tclvalue(pkgPath))
             tclvalue(pkgName) <<- pkgNames[1]
-            curDir <<- file.path(tclvalue(pkgPath), tclvalue(pkgName))
+            baseDir <<- file.path(tclvalue(pkgPath), tclvalue(pkgName))
+            subDir <<- NULL
             writePkgDirs()
         }
     }
     writePkgDirs <- function(){
-        writeList(listView, getPkgContents(curDir, getExclude()))
+        writeList(listView, getPkgContents(baseDir, getExclude()))
         tkconfigure(contViewer, state = "normal")
         tkdelete(contViewer, "0.0", "end")
         tkconfigure(contViewer, state = "disabled")
@@ -74,7 +78,8 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
             #writeList(pkgEntry, opt, clear = TRUE)
             #tkconfigure(pkgEntry, state = "disabled")
             tclvalue(pkgName) <<- opt
-            curDir <<- file.path(tclvalue(pkgPath), opt)
+            baseDir <<- file.path(tclvalue(pkgPath), opt)
+            subDirs <<- NULL
             writePkgDirs()
         }
     }
@@ -85,12 +90,16 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
         selectedObj <- as.character(tkget(listView,
                                           (tkcurselection(listView))))
         if(regexpr(.Platform$file.sep, selectedObj) >= 1){
-            curDir <<- file.path(curDir,
-                                 gsub(.Platform$file.sep, "", selectedObj))
-            writeList(listView, getPkgContents(curDir, getExclude()))
+            subDirs <<- c(subDirs, gsub(.Platform$file.sep, "", selectedObj))
+            writeList(listView, getPkgContents(file.path(baseDir,
+                paste(subDirs, sep = "", collapse = .Platform$file.sep)),
+                                               getExclude()))
             tkconfigure(upBut, state = "normal")
+            print(subDirs)
         }else{
-            popDisplay(getFileContents(curDir, selectedObj))
+            popDisplay(getFileContents(file.path(baseDir,
+                paste(subDirs, sep = "", collapse = .Platform$file.sep)),
+                                       selectedObj))
         }
     }
     popDisplay <- function(contents){
@@ -102,15 +111,23 @@ pExplorer <- function (pkgName = "", pkgPath = "", exclude = getExclude()){
 
     # Move the browser one level up the directory path
     goUp <- function(){
-        curDir <<- gsub(paste(.Platform$file.sep,
-                              basename(curDir), "$", sep = ""), "", curDir)
-        writeList(listView, getPkgContents(curDir, getExclude()))
-        if(curDir == file.path(tclvalue(pkgPath), tclvalue(pkgName))){
-            tkconfigure(upBut, state = "disabled")
+        if(length(subDirs) >= 1){
+            subDirs <<- subDirs[1:length(subDirs) - 1]
+            if(length(subDirs) == 0){
+                writeList(listView, getPkgContents(baseDir,
+                                                          getExclude()))
+                tkconfigure(upBut, state = "disabled")
+            }
+            writeList(listView, getPkgContents(file.path(baseDir,
+                paste(subDirs, sep = "", collapse = .Platform$file.sep)),
+                                               getExclude()))
+            tkconfigure(contViewer, state = "normal")
+            tkdelete(contViewer, "0.0", "end")
+            tkconfigure(contViewer, state = "disabled")
+            if(length(subDirs) == 0){
+                tkconfigure(upBut, state = "disabled")
+            }
         }
-        tkconfigure(contViewer, state = "normal")
-        tkdelete(contViewer, "0.0", "end")
-        tkconfigure(contViewer, state = "disabled")
     }
     tryExp <- function(){
         eExplorer(tclvalue(pkgName))
