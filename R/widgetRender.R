@@ -67,7 +67,6 @@ widgetRender <- function (iWidget, tkTitle) {
                                      list(j=i)),
                      substitute(mytext <- WtoText(wList[[j]])(rval),
                                 list(j=i)),
-
                      substitute(if(!WcanEdit(wList[[j]]))
                                 tkconfigure(entryList[[j]],state = "normal"),
                                 list(j=i)),
@@ -87,7 +86,7 @@ widgetRender <- function (iWidget, tkTitle) {
                      )
 
         body(fun) <- as.call(body)
-        assign(paste("userFunList",i,sep=""), fun)
+        assign(paste("funList",i,sep=""), fun)
     }
 
     # set the functions for user defined control buttons
@@ -102,7 +101,7 @@ widgetRender <- function (iWidget, tkTitle) {
                      )
 
         body(fun) <- as.call(body)
-        assign(paste("funList",i,sep=""), fun)
+        assign(paste("userFunList",i,sep=""), fun)
     }
 
     ##initialize the buttons/boxes

@@ -9,7 +9,10 @@
   selections of items shown on the interface.
 }
 \usage{
-listSelect(aList, topLbl = "Select Elements From The Following List", typeFun = stdType, valueFun = objViewer)
+listSelect(aList, topLbl = "Select Elements From The Following List",
+typeFun = stdType, valueFun = objViewer)
+writeSelBox(baseW, aList, typeFun = NULL, valueFun = NULL)
+writeBut(baseW, butList, butWidth = 6)
 }
 
 \arguments{
@@ -21,6 +24,13 @@ listSelect(aList, topLbl = "Select Elements From The Following List", typeFun = 
     and show the content of the object. The function should get the
     representation of the object and calls function objViewer to have
     the representation rendered in a widget}
+  \item{baseW}{An window widget to which the selection boxes will be
+    put}
+  \item{butList}{A list with names and function pairs that define the
+    name and behavior of buttons to be put on the widget to be
+    generated}
+  \item{butWidth}{A numerical value specifying the width of buttons to
+    be created}
 }
 \details{
    Both typeFun and valueFun have to take an argument (the R object to
@@ -43,6 +53,14 @@ listSelect(aList, topLbl = "Select Elements From The Following List", typeFun = 
 # automatically
 aList <- list(a = "AAA", b = c(123, 456, 789), c =
 as.data.frame(matrix(1:10, ncol = 2)), d = stdType)
-\dontrun{listSelect(aList)}
+if(interactive())
+listSelect(aList)}
 }
 \keyword{interface}
+
+
+
+
+
+
+

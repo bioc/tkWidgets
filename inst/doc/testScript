@@ -1,6 +1,5 @@
-##test function for the Widget builder
+##test function for the widgetRender
 
-## R. Gentleman, Copyright 2002, all rights reserved
 ## Functionality for primary widgets
 ##Slots:
 ##Name
@@ -11,30 +10,29 @@
 ##buttonText
 ##canEdit
 
-  pW1 <- list(Name="AAA", Value="bbb",
-              toText=function(x) paste(x,collapse = ","),
-              fromText=NULL, canEdit=TRUE, buttonFun = fileBrowser,
-              buttonText = "Browse")
+pW1 <- list(Name="AAA", Value="bbb", toText=function(x)
+paste(x,collapse = ","), fromText=NULL, canEdit=TRUE, buttonFun =
+fileBrowser, buttonText = "Browse")
 
-  pW2 <- list(Name="BBB", Value="x,y,z", toText=function(x) paste(x, sep=","),
-            fromText=NULL, canEdit=TRUE, buttonFun = ls,
-           buttonText = "List")
+pW2 <- list(Name="BBB", Value="x,y,z", toText=function(x) paste(x, 
+sep=",", collapse = ";"), fromText=NULL, canEdit=TRUE, buttonFun = ls,
+buttonText = "List") 
 
-  pW3 <- list(Name="CCC", Value="ccc",
-              toText=function(x) paste(x, collapse = ","),
-              fromText=NULL, canEdit=TRUE, buttonFun=NULL,
-              buttonText=NULL)
+pW3 <- list(Name="CCC", Value="ccc", toText=function(x) paste(x,
+collapse = ","), fromText=NULL, canEdit=TRUE, buttonFun=NULL, buttonText=NULL)
 
-  but1 <- list(buttonFun = function() {print("test 1 OK")}, buttonText = "Test1")
+but1 <- list(buttonFun = function() {print("Button1 Works")},
+buttonText = "Button1") 
 
-  but2 <- list( buttonFun = function() {print("test 2 OK")}, buttonText = "Test2")
+but2 <- list( buttonFun = function() {print("Button2 Works")},
+buttonText = "Button2") 
 
-  widget1 <- list(wList = list(a = pW1, b = pW2, c = pW3),preFun =
-function() "Hi Jianhua",postFun = function() "Bye Jianhua", buttons =
-list(a = but1, b = but2))
+widget1 <- list(wList = list(a = pW1, b = pW2, c = pW3),preFun =
+function() "Hi there",postFun = function() "Bye there", buttons =
+list(a = but1, b = but2)) 
 
 #
-  x <- widgetRender(widget1, "HI")
+x <- widgetRender(widget1, "Just to Test")
 
 
 

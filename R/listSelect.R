@@ -5,9 +5,12 @@
 #
 listSelect <- function(aList,
                        topLbl = "Select Elements From The Following List",
-                       typeFun = stdType, valueFun = objViewer){
+                       typeFun = stdType, valueFun = stdView){
 
     require(tcltk) || stop("tcltk support is absent")
+
+    returnList <- list()
+    end <- FALSE
 
     if(is.null(aList) || length(aList) < 1)
         stop("Invalid input")
@@ -27,10 +30,11 @@ listSelect <- function(aList,
     finish <- function(){
         for(i in names(aList)){
             if(tclvalue(i) == 1)
-                aList[[i]] <<- TRUE
+                returnList[[i]] <<- TRUE
             else
-                aList[[i]] <<- FALSE
+                returnList[[i]] <<- FALSE
         }
+        end <<- TRUE
         cancel()
     }
 
@@ -61,12 +65,18 @@ listSelect <- function(aList,
 
     tkwait.window(base)
 
-    return(aList)
+    if(end)
+        return(returnList)
+    else
+        return(aList)
 }
 
 writeSelBox <- function(baseW, aList, typeFun = NULL, valueFun = NULL){
 
     LABELFONT <- "Helvetica 12"
+
+    writeLabel(baseW, typeFun, valueFun)
+
     for (i in names(aList)){
         tempName <- tklabel(baseW, text = paste(i, ":", sep = ""),
                             font = LABELFONT, padx = 2)
@@ -78,15 +88,13 @@ writeSelBox <- function(baseW, aList, typeFun = NULL, valueFun = NULL){
         else
             tempType <- tklabel(baseW, text = "")
         if(!is.null(valueFun)){
-            print(call(paste(quote(valueFun)),
-                          eval(substitute(aList[[i]], list(i = i)))))
-            fun <- function(){
-                eval(call(paste(quote(valueFun)),
-                          eval(substitute(aList[[i]], list(i = i)))))
-            }
-            assign(paste("viewFun", i, sep = ""), fun)
-            viewBut <- tkbutton(baseW, text = "View",
-                                command = get(paste("viewFun", i, sep = "")))
+            fun <- function() {}
+            body <- list(as.name("{"),
+                         substitute(valueFun(aList[[i]]), list(i = i))
+
+                         )
+            body(fun) <- as.call(body)
+            viewBut <- tkbutton(baseW, text = "View", command = fun)
         }
         else
             viewBut <- tklabel(baseW, text = "")
@@ -96,19 +104,32 @@ writeSelBox <- function(baseW, aList, typeFun = NULL, valueFun = NULL){
     }
 }
 
-writeBut <- function(baseW, butList){
-    BUTWIDTH <- 6
+writeBut <- function(baseW, butList, butWidth = 6){
 
-    button <- NULL
     butFrame <- tkframe(baseW, borderwidth = 5)
     for(i in 1:length(butList)){
         button <- tkbutton(butFrame, text= names(butList)[i],
-                           width=BUTWIDTH, command = butList[[i]])
+                           width=butWidth, command = butList[[i]])
         tkpack(button, side = "left")
     }
-    tkpack(butFrame, side = "bottom")
+    tkgrid(butFrame, columnspan = 4)
 }
 
+writeLabel <- function(baseW, typeFun, valueFun){
+    LABELFONT <- "Helvetica 12"
+    name <- tklabel(baseW, text = "Name", font = LABELFONT, padx = 2)
+    if(!is.null(typeFun))
+        type <- tklabel(baseW, text = "Type", font = LABELFONT, padx = 2)
+    else
+        type <- tklabel(baseW, text = "", font = LABELFONT, padx = 2)
+    if(!is.null(valueFun))
+        view <- tklabel(baseW, text = "Value", font = LABELFONT, padx = 2)
+    else
+        view <- tklabel(baseW, text = "", font = LABELFONT, padx = 2)
+    option <- tklabel(baseW, text = "Option", font = LABELFONT, padx = 2)
+
+    tkgrid(name, type, view, option)
+}
 
 
 
