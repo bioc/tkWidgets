@@ -66,7 +66,7 @@ pW3 <- list(Name="CCC", Value="ccc",
               fromText=NULL, canEdit=TRUE, buttonFun=NULL,
               buttonText=NULL)
 
-widget1 <- list(wList = list(pW1, pW2, pW3),
+widget1 <- list(wList = list(a = pW1, b = pW2, c = pW3),
                   preFun = function() "Hi",
                   postFun = function() "Bye")
 

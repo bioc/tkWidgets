@@ -19,12 +19,12 @@ widgetRender <- function (iWidget, tkTitle) {
     CANCEL <- FALSE
     END <- FALSE
     cancel <- function() {
-        CANCEL <<- FALSE
-        rval <<- savediWidget
+        CANCEL <<- TRUE
         tkdestroy(base)
     }
     end <- function() {
-        END <<- FALSE
+        END <<- TRUE
+        updateValues()
         tkdestroy(base)
     }
 
@@ -32,6 +32,15 @@ widgetRender <- function (iWidget, tkTitle) {
     tktitle(base) <- tkTitle
 
     eFrame <- tkframe(base)
+
+
+    ## funciton that gets called at the end and updtates the
+    ## values in list to be returned
+    updateValues <- function(){
+        for(i in 1:length(wList) ) {
+           WValue(wList[[i]]) <<- tclvalue(entryValue[[i]])
+        }
+    }
 
     ##build button functions
     for(i in 1:length(wList)) {
@@ -54,12 +63,14 @@ widgetRender <- function (iWidget, tkTitle) {
 
     ##initialize the buttons/boxes
     entryList <- vector("list", length = length(wList))
+    entryValue <- vector("list", length = length(wList))
     for(i in 1:length(wList) ) {
         pW <- wList[[i]]
-
         label <- tklabel(eFrame, text = WName(pW), font = LABELFONT)
-
-        entryList[[i]] <- tkentry(eFrame, width=ENTRYWIDTH)
+        entryValue[[i]] <- tclVar()
+        entryList[[i]] <- tkentry(eFrame,
+                                  textvariable = entryValue[[i]],
+                                  width=ENTRYWIDTH)
 
         if( !is.null(WValue(pW))){
             tkinsert(entryList[[i]], 0, WValue(pW))
@@ -84,6 +95,26 @@ widgetRender <- function (iWidget, tkTitle) {
     tkgrid(doneBut, cancelBut)
     tkpack(butFrame)
     tkwait.window(base)
-    return(list(wList))
+    if(END) {
+        iWidget$end <- "END"
+        return(iWidget)
+    }else{
+        savedWidget$end <- "CANCEL"
+        return(savedWidget)
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -10,6 +10,8 @@ print.pWidget <- function (x, ...){
     print(paste("canEdit = ", WcanEdit(x), ";", sep = ""))
     if(!is.null(WbuttonFun(x)))
        print(paste("buttonText = ", WbuttonText(x), ";", sep = ""))
+    # For now we just print the other prameters as a vector. Will do
+    # more later.
     if(length(unlist(list(...))) > 0)
         unlist(list(...))
 }

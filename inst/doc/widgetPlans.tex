@@ -39,8 +39,8 @@ exited regardless of how. It might be nice (but this will take some
 time) to allow it to determine how the exit was achieved (is it an end
 or a next or an error or ...).
 
-Widgets are rendered by the \verb+renderWidget+ function.
-It returns an object of the \verb+widgetClass+. If the exit is normal
+Widgets are rendered by the \verb+widgetRender+ function.
+It returns an object of the \verb+widgetRender+. If the exit is normal
 (ie via the {\em end} button) then the users changes will be contained
 in the return value. For all other forms of exit the input will be
 returned. We need to figure out a good mechanism for signalling the
@@ -48,7 +48,7 @@ type of exit.
 The rendered widget has an \verb+end+ button and a \verb+cancel+
 button.
 
-In the not to distant future the pwidgets will be implemented as S4
+In the not too distant future the pwidgets will be implemented as S4
 classes. This will give them more structure. In the first
 implementation they will be lists. However, we will attempt to use an
 abstract data type implementation that should let us reuse much of the
@@ -151,3 +151,13 @@ the Value slot and toText is run on it to ensure the text box has up
 to date data.
 
 \end{document}
+
+
+
+
+
+
+
+
+
+

@@ -13,6 +13,7 @@ print.Widget <- function (x, ...){
         class(pW) <- "pWidget"
         print.pWidget(pW)
     }
+    # for now we just the other parameters as a vector. Will do more later.
     if(length(unlist(list(...))) > 0)
         unlist(list(...))
 }
