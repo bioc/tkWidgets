@@ -70,10 +70,16 @@ DPExplorer <- function (pkgName = "",
         tkconfigure(loadBut, state = "normal")
     }
     dataSelected <- function(){
-        dataName <<- as.character(tkget(dataNameList,
+        dName <- as.character(tkget(dataNameList,
                                        tkcurselection(dataNameList)))
-        keys <- ls(get(dataName, pos = grep(pkgName, search())))
-        writeList(keyList, keys)
+        if(!is.environment(get(dName, pos = grep(pkgName, search())))){
+            writeList(valueList, capture.output(get(dName)))
+        }else{
+            dataName <<- dName
+            keys <- ls(get(dataName, pos = grep(pkgName, search())))
+            writeList(keyList, keys)
+            tkdelete(valueList, "0", "end")
+        }
     }
     keySelected <- function(){
         keyName <<- as.character(tkget(keyList,
@@ -129,7 +135,7 @@ DPExplorer <- function (pkgName = "",
     tkpack(label, side = "left")
     tkpack(entry, side = "left", expand = TRUE, fill = "x")
     tkpack(loadBut, side = "left")
-    tkpack(nameFrame, expand = TRUE, fill = "x", pady = 5, padx = 5)
+    tkpack(nameFrame, expand = FALSE, fill = "x", pady = 5, padx = 5)
     # Pack the frame with lists for data
     dataFrame <- tkframe(base)
     # Frame for a list for names of data sets
@@ -143,25 +149,25 @@ DPExplorer <- function (pkgName = "",
     tkbind(dataNameList, "<B1-ButtonRelease>", dataSelected)
     tkpack(dataLabel, side = "top")
     tkpack(tempFrame, side = "bottom", expand = TRUE, fill ="both")
-    tkpack(dataListFrame, side = "left", expand = TRUE, fill = "both")
+    tkpack(dataListFrame, side = "left", expand = FALSE, fill = "y")
     # Frame for a list for names of keys
     keyListFrame <- tkframe(dataFrame)
     keyLabel <- tklabel(keyListFrame, text = "Keys:")
     tempFrame <- tkframe(keyListFrame)
-    keyList <- makeViewer(tempFrame, vWidth = NULL, vHeight = NULL,
+    keyList <- makeViewer(tempFrame, vWidth = 13, vHeight = 15,
                         hScroll = FALSE, vScroll = TRUE,
                         what = "list", side = "bottom")
     tkconfigure(keyList, exportselection = FALSE)
     tkbind(keyList, "<B1-ButtonRelease>", keySelected)
     tkpack(keyLabel, side = "top")
     tkpack(tempFrame, side = "bottom", expand = TRUE, fill = "both")
-    tkpack(keyListFrame, side = "left", expand = TRUE, fill = "both")
+    tkpack(keyListFrame, side = "left", expand = FALSE, fill = "y")
     # Frame for a list for displaying values of selected keys
     valueFrame <- tkframe(dataFrame)
     valueLabel <- tklabel(valueFrame, text = "Value(s)")
     temp <- tkframe(valueFrame)
-    valueList <- makeViewer(temp, vWidth = NULL, vHeight = NULL,
-                        hScroll = FALSE, vScroll = TRUE,
+    valueList <- makeViewer(temp, vWidth = 25, vHeight = 15,
+                        hScroll = TRUE, vScroll = TRUE,
                         what = "list", side = "bottom")
     selectBut <- tkbutton(valueFrame, text = "Select Key", width = 16,
                           command = select, state = "disabled")
@@ -169,9 +175,9 @@ DPExplorer <- function (pkgName = "",
                          command = drop, state = "disabled")
     clearBut <- tkbutton(valueFrame, text = "Clear Selection", width = 16,
                           comman = clear, state = "disabled")
-    tkpack(clearBut, side = "bottom", expand = TRUE, fill = "x")
-    tkpack(dropBut, side = "bottom", expand = TRUE, fill = "x")
-    tkpack(selectBut, side = "bottom", expand = TRUE, fill = "x")
+    tkpack(clearBut, side = "bottom", expand = FALSE, fill = "x")
+    tkpack(dropBut, side = "bottom", expand = FALSE, fill = "x")
+    tkpack(selectBut, side = "bottom", expand = FALSE, fill = "x")
     tkpack(temp, side = "bottom", expand = TRUE, fill = "both")
     tkpack(valueLabel, side = "bottom")
     tkpack(valueFrame, side = "left", expand = TRUE, fill = "both")
@@ -179,13 +185,13 @@ DPExplorer <- function (pkgName = "",
     selectionListFrame <- tkframe(dataFrame)
     selectionLabel <- tklabel(selectionListFrame, text = "Selected keys:")
     viewFrame <- tkframe(selectionListFrame)
-    selectionList <- makeViewer(viewFrame, vWidth = NULL, vHeight = NULL,
+    selectionList <- makeViewer(viewFrame, vWidth = 13, vHeight = 15,
                         hScroll = FALSE, vScroll = TRUE,
                         what = "list", side = "bottom")
     tkbind(selectionList, "<B1-ButtonRelease>", selectionSelected)
     tkpack(selectionLabel, side = "top")
     tkpack(viewFrame, side = "bottom", expand = TRUE, fill = "both")
-    tkpack(selectionListFrame, side = "left", expand = TRUE, fill = "both")
+    tkpack(selectionListFrame, side = "left", expand = FALSE, fill = "y")
     # Pack the frame for data lists
     tkpack(dataFrame, expand = TRUE, fill = "both", padx = 5)
     # Frame for the buttons
@@ -195,7 +201,7 @@ DPExplorer <- function (pkgName = "",
     finishBut <- tkbutton(butFrame, text = "Finish", width = 8,
                           comman = finish)
     tkgrid(cancelBut, finishBut, padx = 10)
-    tkpack(butFrame, side = "top", expand = TRUE, fill = "x")
+    tkpack(butFrame, side = "top", expand = FALSE, fill = "x")
 
     if(pkgName != ""){
         loadDP()
