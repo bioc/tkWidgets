@@ -92,20 +92,24 @@ guess.header <- function(twoLines, sep){
     }
 }
 
-find.type <- function(file.name, sep, header = FALSE, numLine = 5){
-
-    line <- as.matrix(read.table(file.name, sep = sep, header = header,
-                       nrows = numLine, as.is = TRUE))
+find.type <- function(file.name, sep, header = FALSE, numLine = 5,
+                      isFile = TRUE){
+    if(isFile){
+        line <- as.matrix(read.table(file.name, sep = sep, header = header,
+                                     nrows = numLine, as.is = TRUE))
+    }else{
+        line <- file.name
+    }
 
     types <- NULL
     for(i in 1:nrow(line)){
         types <- rbind(types, charOrNum(line[i,]))
     }
-    if(nrow(unique(types)) == 1){
+    #if(nrow(unique(types)) == 1){
         return(types[1,])
-    }else{
-        return(rep("Character", ncol(types)))
-    }
+    #}else{
+    #    return(rep("Character", ncol(types)))
+    #}
 }
 
 charOrNum <- function(vect){
