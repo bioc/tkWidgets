@@ -5,7 +5,8 @@
 # Copyright 2002, J. Zhang, all rights reserved
 #
 
-argsWidget <- function(argsList, defaultNames = c("OK", "Cancel")){
+argsWidget <- function(argsList, defaultNames = c("OK", "Cancel"),
+                       inst = ""){
 
     # Arguments that are functions
     funcs <- getSymbol(argsList)
@@ -14,7 +15,7 @@ argsWidget <- function(argsList, defaultNames = c("OK", "Cancel")){
     # Constructs the interface
     # Sets the working environment
     PWEnv <- new.env(hash = TRUE, parent = NULL)
-    pWidgets <- getPWidget(argsList, PWEnv)
+    pWidgets <- getPWidget(argsList, PWEnv, inst)
     widget <- widget(wTitle = "BioC Arguments Widget", pWidgets,
                      funs = list(), preFun = function() {},
                      postFun = function() {}, env = PWEnv,
@@ -37,10 +38,18 @@ argsWidget <- function(argsList, defaultNames = c("OK", "Cancel")){
 #    return(argsList)
 }
 # Creates the primary widget list for building the interface
-getPWidget <- function(argsList, PWEnv){
+getPWidget <- function(argsList, PWEnv, inst = ""){
     # Figures out the width for lables
     lWidth <- max(nchar(names(argsList)))
     pWidgets <- list()
+
+    if(inst != ""){
+        label <- label(wName = "label", wValue = inst,
+                       wWidth = nchar(inst), wEnv = PWEnv)
+        tempList <- list()
+        tempList[["label"]] <- label
+        pWidgets[["inst"]] <- tempList
+    }
 
     for(i in names(argsList)){
         tempList <- list()
