@@ -20,5 +20,6 @@ WLValue <- function(x, index) WValue(WwList(x)[[index]])
 
 WpreFun <- function(x) x$preFun
 WpostFun <- function(x) x$postFun
+WRButtons <- function(x) x$buttons
 WEnd <- function(x) x$end
 

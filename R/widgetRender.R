@@ -87,6 +87,21 @@ widgetRender <- function (iWidget, tkTitle) {
                      )
 
         body(fun) <- as.call(body)
+        assign(paste("userFunList",i,sep=""), fun)
+    }
+
+    # set the functions for user defined control buttons
+    butFuns <- WRButtons(iWidget)
+    for(i in 1:length(butFuns)) {
+        fun <- function() {}
+        body <- list(as.name("{"),
+                     substitute(rval <-
+                                eval(as.call(list(WbuttonFun(butFuns[[j]]))),
+                                             env=PFRAME),
+                                     list(j=i)),
+                     )
+
+        body(fun) <- as.call(body)
         assign(paste("funList",i,sep=""), fun)
     }
 
@@ -124,13 +139,23 @@ widgetRender <- function (iWidget, tkTitle) {
 
     tkpack(eFrame)
 
+    # make a list with all user defined and default buttons
+    butFuns[["cancel"]] <-  list(buttonText = "Cancel",
+                             buttonFun = cancel)
+    butFuns[["end"]] <- list(buttonText = "Finish", buttonFun = end)
+
+    # Put user defined buttons in
     butFrame <- tkframe(base)
-    cancelBut <- tkbutton(butFrame, text = "Cancel",
-                  width = BUTWIDTH, command = cancel)
-    doneBut <- tkbutton(butFrame, text = "Done",
-                  width = BUTWIDTH, command = end)
-    tkgrid(doneBut, cancelBut)
+
+    for(i in 1:length(butFuns)){
+        aBut <- butFuns[[i]]
+        button <- tkbutton(butFrame, text = WbuttonText(aBut),
+                           width = BUTWIDTH,
+                               command = WbuttonFun(aBut))
+        tkpack(button, side = "left")
+    }
     tkpack(butFrame)
+
     tkwait.window(base)
 
     if(END){
