@@ -8,7 +8,6 @@
 \alias{colType<-}
 \alias{dropOrNot}
 \alias{dropOrNot<-}
-\alias{colInfo}
 \alias{colName<-,colInfo-method}
 \alias{colName,colInfo-method}
 \alias{colType,colInfo-method}
@@ -60,4 +59,14 @@ Objects can be created by calls of the form \code{new("colInfo", ...)}
 dropOrNot = FALSE)  
 }
 \keyword{classes}
+
+
+
+
+
+
+
+
+
+
 
