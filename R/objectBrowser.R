@@ -13,6 +13,7 @@ objectBrowser <- function (fun = function(x) TRUE){
     selectedObj <- NULL
     isPack <- FALSE
     returnObj <- NULL
+    returnList <- NULL
 
     end <- function(){
         tkdestroy(base)
@@ -101,10 +102,16 @@ objectBrowser <- function (fun = function(x) TRUE){
             selectedObj <<- tkget(listView,
                                       tkcurselection(listView))
             if(regexpr("^package", selectedObj) > 0)
-                returnObj <<- package.contents(gsub("(^package:)",
-                                                    "\\", selectedObj))
+                returnList <<- list("name" = gsub("(^package:)", "\\",
+                                    selectedObj), "obj"  =
+                                    package.contents(gsub("(^package:)",
+                                                          "\\", selectedObj)))
+#                returnObj <<- package.contents(gsub("(^package:)",
+#                                                    "\\", selectedObj))
             else
-                returnObj <<- get(selectedObj)
+                returnList <<- list("name" = selectedObj,
+                                    "obj" = get(selectedObj))
+#                returnObj <<- get(selectedObj)
         }
     }
 
@@ -137,23 +144,38 @@ objectBrowser <- function (fun = function(x) TRUE){
         if(asis)
             toWrite <- objName
         else{
-            if(objName == "Top Level")
-                toWrite <- objName
-            else
-                toWrite <- paste(objName, ":", typeof(get(objName)))
+            if(objName == "Top Level"){
+                tclVar$vText <- "Top Level"
+                tclVar$tText <- "Search path"
+#                toWrite <- objName
+            }else{
+                tclVar$vText <- objName
+                tclVar$tText <- typeof(get(objName))
+#                toWrite <- paste(objName, ":", typeof(get(objName)))
+            }
         }
-        tkconfigure(caption, text = toWrite)
+#        tkconfigure(caption, text = toWrite)
     }
 
     base <- tktoplevel()
     tktitle(base) <- paste("Object Browser")
 
-    topMenu <- tkmenu(base)
-    tkconfigure(base, menu = topMenu)
+#    topMenu <- tkmenu(base)
+#    tkconfigure(base, menu = topMenu)
 
-    caption <- tklabel(base, text = "Top Level",
-                       font = LABELFONT, width = 60)
-    tkpack(caption, side = "top")
+    capFrame <- tkframe(base)
+    labl1 <- tklabel(capFrame, text = "Visiting: ", font = LABELFONT)
+    labl2 <- tklabel(capFrame, text = "Type: ", font = LABELFONT)
+    butVisit <- tkbutton(capFrame, textvariable = "vText",
+                         font = LABELFONT, width = 18)
+    butType <- tkbutton(capFrame, textvariable = "tText",
+                        font = LABELFONT, width = 18)
+
+    tkgrid(labl1, butVisit, labl2, butType)
+    tkpack(capFrame, side = "top")
+#    caption <- tklabel(base, text = "Top Level",
+#                       font = LABELFONT, width = 60)
+#    tkpack(caption, side = "top")
 
     listFrame <- tkframe(base, height = 40)
     listView <- makeView(listFrame)
@@ -174,7 +196,7 @@ objectBrowser <- function (fun = function(x) TRUE){
 
     tkwait.window(base)
 
-    return(returnObj)
+    return(returnList)
 }
 
 
