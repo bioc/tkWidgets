@@ -48,6 +48,9 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     inList <- function(){
         selectedObj <- as.character(tkget(listView,
                                           (tkcurselection(listView))))
+        # In case the name selected has a space
+        if(length(selectedObj) > 1)
+            selectedObj <- paste(selectedObj, collapse = " ")
         if(regexpr(.Platform$file.sep, selectedObj[1]) >= 1){
             setwd(file.path(getwd(), selectedObj))
             write2List(listView,
@@ -90,7 +93,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
             for(i in selIndex){
                 selObj <- as.character(tkget(listView, i))
                 # In case a file name contains a space
-                if(length(selObj > 1))
+                if(length(selObj) > 1)
                    selObj <- paste(selObj, collapse = " ")
                 fileSelected <<- c(fileSelected,
                                     file.path(getwd(), selObj))
