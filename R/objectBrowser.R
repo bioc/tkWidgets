@@ -1,5 +1,7 @@
 # This function provides the interface to view the objects in the
-# work place.
+# work place. fun = a function that filters objects; textToShow = text
+# to be shown on the widget, nSelect = number of selection can be
+# made (default to no limit).
 
 objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
                           nSelect = -1){
@@ -84,11 +86,9 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
     }
 
     dClick <- function (){
-#        if(tkcurselection(listView) != ""){
         selectedObj <<- as.character(tkget(listView,
                                            tkcurselection(listView)))
         goin()
-#        }
     }
 
     goin <- function (){
@@ -112,18 +112,11 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
 
     sClick <- function () {
         selectedObj <<- NULL
-#        selIndex <<- NULL
         tkconfigure(selectBut, state = "normal")
         selIndex <<- unlist(strsplit(tkcurselection(listView), " "))
 
-#        for(i in selIndex){
-#            temp <- as.character(tkget(listView, i))
-#            objsInSel <<- c(objsInSel, temp)
-#            selectedObj <<- c(selected
-#        }
         if(length(selIndex) == 1){
             tempObj <<- as.character(tkget(listView, selIndex))
-#            objType <- typeof(get(selectedObj))
         }else{
             for(i in selIndex){
                 tempObj <<- c(tempObj,
@@ -162,12 +155,7 @@ objectBrowser<- function (fun = noAuto, textToShow = "Select object(s)",
     }
 
     selectObj <- function (){
-#        if(length(selIndex) > 0){
-#            for(i in selIndex){
-#                selObj <- as.character(tkget(listView, i))
         objsInSel <<- c(objsInSel, tempObj)
-#            }
-#        }
         objsInSel <<- unique(objsInSel)
         writeSelection(objsInSel)
         tkconfigure(clearBut, state = "normal")

@@ -3,7 +3,7 @@
 #
 # Copyright 2002, J. Zhang, all rights reserved.
 
-fileWizard <- function(filename = "", fun = "read.table"){
+fileWizard <- function(filename = "", fun = read.table){
 
     BOLD12 <- "Helvetica 12 bold"
     NORMAL11 <- "Helvetica 11"
