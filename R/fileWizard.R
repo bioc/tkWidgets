@@ -82,7 +82,7 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
     nameFrame <- tkframe(top)
     nameLabel <- tklabel(nameFrame, text = "File name:", font = NORMAL11)
     nameEntry <- tkentry(nameFrame, width = 60)
-    browsBut <- tkbutton(nameFrame, text = "Brows", command = brows)
+    browsBut <- tkbutton(nameFrame, text = "Browse", command = brows)
     tkpack(nameLabel, side = "left", padx = 2, pady = 4)
     tkpack(nameEntry, side = "left", padx = 2, pady = 4)
     tkpack(browsBut, side = "left", padx = 2, pady = 4)
