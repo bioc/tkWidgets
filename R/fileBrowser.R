@@ -193,7 +193,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     selectView <- makeView(sViewFrame, vWidth = BOXWIDTH,
                            vHeight = BOXHEIGHT)
     tkgrid(sViewFrame, columnspan = 2)
-    tkconfigure(selectView, selectmode = "multiple")
+    tkconfigure(selectView, selectmode = "extended")
     tkbind(selectView, "<B1-ButtonRelease>", selInSelection)
     remBut <- tkbutton(rightFrame, text = "<< Remove", width = BUTWIDTH,
 		      state = "disabled", command = dropSelection)
