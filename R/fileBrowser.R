@@ -17,6 +17,7 @@ fileBrowser <- function (path = ""){
     readMode <- "readTable"
     fileSelected <- ""
     obj <- NULL
+    selectedObj <- NULL
 
     end <- function(){
         tkdestroy(base)
@@ -63,30 +64,46 @@ fileBrowser <- function (path = ""){
 
     doList <- function (item){
         fileOrObj <<- "list"
+
+        if(length(objLevel) > 1){
+            writeObj(listView, paste("Variable:",
+                                     names(get(item,
+                                   env = get(objLevel[length(objLevel)])))))
+            obj <<- get(item, env = get(objLevel[length(objLevel)]))
+        }else{
+            writeObj(listView, names(get(item)))
+            obj <<- get(item)
+        }
+        writeCap("Object View: List")
+
     }
 
     doMat <- function (item){
+        fileOrObj <<- "list"
+        doList(item)
     }
 
     doChar <- function (item){
         fileOrObj <<- "character"
 
         if(length(objLevel) > 1){
-            writeObj(listView, get(item,
-                                   env = get(objLevel[length(objLevel)])))
+            writeObj(listView,
+                     get(item, env = get(objLevel[length(objLevel)])),
+                     check = FALSE)
             obj <<- get(item, env = get(objLevel[length(objLevel)]))
         }else{
-            writeObj(listView, get(item))
+            writeObj(listView, get(item), check = FALSE)
             obj <<- get(item)
         }
+        writeCap("Object View: Character")
     }
 
     showFiles <- function(){
         if(tkcurselection(listView) != ""){
-            item <- tkget(listView, tkcurselection(listView))
-            if(regexpr(Platform()$file.sep, item) >= 1){
+            selectedObj <<- tkget(listView, tkcurselection(listView))
+            if(regexpr(Platform()$file.sep, selectedObj) >= 1){
 	        path <<- paste(path, Platform()$file.sep,
-                               gsub(Platform()$file.sep, "\\", item),
+                               gsub(Platform()$file.sep, "\\", selectedObj),
                                sep = "")
                 doPath()
                 writeDir(listView, list.files(path), path)
@@ -94,22 +111,23 @@ fileBrowser <- function (path = ""){
                 if(currentNode >= 2)
                     tkconfigure(upBut, state = "normal")
             }else
-                fileSelected <<- item
+                fileSelected <<- selectedObj
         }
     }
 
     showObj <- function (){
         if(tkcurselection(listView) != ""){
-            item <- tkget(listView, tkcurselection(listView))
-            objType <- typeof(get(item))
-            print(paste("type = ", objType))
+            selectedObj <<- tkget(listView, tkcurselection(listView))
+            objType <- typeof(get(selectedObj))
+print(objType)
             switch(objType,
-                   "environment" = doEnv(item),
-                   "data.frame" = doDF(item),
-                   "vector" = doVec(item),
-                   "list" = doList(item),
-                   "matrix" = doMat(item),
-                   "character" = doChar(item)
+                   "environment" = doEnv(selectedObj),
+                   "data.frame" = doDF(selectedObj),
+                   "vector" = doVec(selectedObj),
+                   "list" = doList(selectedObj),
+                   "matrix" = doMat(selectedObj),
+                   "integer" = ,
+                   "character" = doChar(selectedObj)
                    )
             if(length(objLevel) >= 2)
                 tkconfigure(upBut, state = "normal")
@@ -117,9 +135,12 @@ fileBrowser <- function (path = ""){
     }
 
     inList <- function(){
+        num <- as.numeric(tkcurselection(listView))+1
         switch(fileOrObj,
                "file" = showFiles(),
-               "obj" = showObj()
+               "obj" = showObj(),
+               "list" = writeObj(listView,
+               get(selectedObj)[num], check = FALSE)
            )
     }
 
@@ -158,6 +179,7 @@ fileBrowser <- function (path = ""){
         switch(fileOrObj,
                "file" = fileUP(),
                "obj" = objUP(),
+               "list" = doList(selectedObj),
                viewObj())
     }
 
@@ -174,7 +196,7 @@ fileBrowser <- function (path = ""){
     doPath()
 
     base <- tktoplevel()
-    tktitle(base) <- paste("File Browser")
+    tktitle(base) <- paste("File/Object Browser")
 
     topMenu <- tkmenu(base)
     tkconfigure(base, menu = topMenu)
