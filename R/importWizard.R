@@ -517,7 +517,6 @@ setState2BFrame <- function(frame, env){
 showData4State2 <- function(canvas, env, state = "state2"){
     # Only show the number of rows defined
     temp <- getArgs(env)[[state]]
-#    temp[["nrow"]] <- getShowNum(env)
     dataFile <- as.matrix(do.call("read.table", temp))
     # Cut to right size of file is longer than maxRow
     if(nrow(dataFile) > getShowNum(env)){
@@ -530,7 +529,6 @@ showData4State2 <- function(canvas, env, state = "state2"){
         tkinsert(tempList, "end", dataFile[,i])
         tkpack(tempList, side = "left", fill = "both", expand = TRUE)
     }
-#    tkpack(tempFrame, fill = "both", expand = TRUE)
     tkcreate(canvas, "window", 0, 0, anchor = "nw", window = tempFrame)
 }
 # Gets the frame containing the interface for the top frame of
@@ -597,7 +595,6 @@ setState3BFrame <- function(frame, env){
                        what = "canvas", side = "top")
     tempFrame <- tkframe(rCanv)
     argsList <- getArgs(env)[["state3"]]
-#    argsList[["nrow"]] <- getShowNum(env)
     dataFile <- do.call("read.table", argsList)
     # Cut to right size of file is longer than maxRow
     if(nrow(dataFile) > getShowNum(env)){
@@ -645,7 +642,6 @@ setState3BFrame <- function(frame, env){
         tkpack(colList[[i]], side = "top", fill = "x", expand = TRUE)
         tkpack(colFrame, side = "left", fill = "both", expand = TRUE)
     }
-#    tkpack(tempFrame, fill = "both", expand = TRUE)
     tkcreate(rCanv, "window", 0, 0, anchor = "nw", window = tempFrame)
     # Sets values for colInfo object
     assignColInfo(colInfos, env)
