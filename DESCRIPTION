@@ -4,7 +4,7 @@ Date: 2002-4-10
 Title: R based tk widgets 
 Author: J. Zhang <jzhang@jimmy.harvard.edu>
 Maintainer: J. Zhang <jzhang@jimmy.harvard.edu>
-Depends: R (>= 1.3), tcltk
+Depends: R (>= 1.6.1), tcltk
 Description: Widgets to provide user interfaces. 
   Tcltk should have been installed for the widgets to run. 
 Keyword: graphics
