@@ -61,8 +61,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                 tkconfigure(upBut, state = "normal")
             tkconfigure(selectBut, state = "disabled")
         }else{
-            selIndex <<- unlist(strsplit(
-                                as.character(tkcurselection(listView)), ""))
+            selIndex <<- as.character(tkcurselection(listView))
             selectAFile()
         }
     }
