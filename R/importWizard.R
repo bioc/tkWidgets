@@ -8,7 +8,7 @@
 #
 # Copyright 2002, J. Zhang, all rights reserved.
 
-importWizard <- function(filename, maxRow = 200){
+importWizard <- function(filename, maxRow = 400){
 
     # Creates an environment to make some variables available to all
     # related functions
@@ -20,28 +20,53 @@ importWizard <- function(filename, maxRow = 200){
 
     if(!missing(filename)){
         # Do this if a file name is given
-        setArgsList(filename, workEnv)
+        argsSet <- setArgsList(filename, workEnv)
     }else{
         # Otherwise, assign an empty list to argsList and colInfo
         assignArgs(list(), workEnv)
         setColInfos(env = workEnv)
+        argsSet <- TRUE
     }
-    # Initializes the interface
-    initImportWizard(workEnv)
+    if(argsSet){
+        # Initializes the interface
+        initImportWizard(workEnv)
+    }
 }
 # Using function guess.sep to figure out the the header, sep, and data
 # type of a file and sets the argument list and colInfo
 setArgsList <- function(filename, env){
     argsList <- list()
-
-    fileInfo <- guess.sep(file.name = filename, n = 40)
-    temp <- list()
-    temp[["file"]] <- filename
-    temp[["header"]] <- fileInfo[["header"]]
-    temp[["sep"]] <- fileInfo[["separator"]]
-    argsList[["state1"]] <- temp
-    assignArgs(argsList, env)
-    setColInfos(fileInfo[["type"]], env)
+    options(show.error.messages = FALSE)
+    fileInfo <- try(guess.sep(file.name = filename, n = 40))
+    options(show.error.messages = TRUE)
+    if(inherits(fileInfo, "try-error")){
+    tkmessageBox(title = "Incorrect File Name",
+                 message = paste("File name", filename, "may not be valid.",
+                           "Please provide a correct file name",
+                           "or use the browse button on the interface",
+                           "to get a correct file name."),
+                 icon = "error",
+                 type = "ok")
+        return(FALSE)
+    }else{
+        temp <- list()
+        temp[["file"]] <- filename
+        temp[["header"]] <- fileInfo[["header"]]
+        temp[["sep"]] <- fileInfo[["separator"]]
+        argsList[["state1"]] <- temp
+        assignArgs(argsList, env)
+        setColInfos(fileInfo[["type"]], env)
+        assignLineData(readLines(filename, n = getShowNum(env)), env)
+        return(TRUE)
+    }
+}
+# Set the temp data read as lines with a maxmun number
+assignLineData <- function(lineData, env){
+    assign("lineData", lineData, env = env)
+}
+# Get the temp data stroed as lines with a maxmun number
+getLineData <- function(env){
+    get("lineData", env = env)
 }
 # Set and get methods for argument list
 assignArgs <- function(value, env){
@@ -291,15 +316,21 @@ setState1BFrame <- function(frame, env){
 }
 # Sets the top frame for state1
 setState1TFrame <- function(frame, viewer, delims, env){
+    fName <- tclVar()
     # Populate the entry box for file name when the brose button is
     # clicked
     browse <- function(){
         filename <- tclvalue(tkgetOpenFile())
         writeList(nameEntry, filename, clear = TRUE)
-        setArgsList(filename, env)
-        showData4State1(viewer, env)
-        if(!is.null(getArgs(env)[["state1"]][["sep"]])){
-            tkselect(delims[["delimit"]])
+    }
+    # Get the file
+    getFile <- function(){
+        argsSet <- setArgsList(tclvalue(fName), env)
+        if(argsSet){
+            showData4State1(viewer, env)
+            if(!is.null(getArgs(env)[["state1"]][["sep"]])){
+                tkselect(delims[["delimit"]])
+            }
         }
     }
 
@@ -308,7 +339,7 @@ setState1TFrame <- function(frame, viewer, delims, env){
     label1 <- tklabel(nameFrame, text = "File name: ")
     tkpack(label1, side = "left")
     # An entry box to hold the result of fileBrowser
-    nameEntry <- tkentry(nameFrame, width = 20)
+    nameEntry <- tkentry(nameFrame, width = 20, textvariable = fName)
     # If a file name is given, fill the widget with data
     if(!is.null(getArgs(env)[["state1"]][["file"]])){
         writeList(nameEntry, getArgs(env)[["state1"]][["file"]], clear = TRUE)
@@ -319,14 +350,17 @@ setState1TFrame <- function(frame, viewer, delims, env){
     }
     tkpack(nameEntry, side = "left", fill = "x", expand = TRUE)
     # A button to envoke fileBrowser
-    browseBut <- tkbutton(nameFrame, width = 8, text = "Browse",
+    browseBut <- tkbutton(nameFrame, width = 6, text = "Browse",
                           command = browse)
+    getBut <- tkbutton(nameFrame, width = 6, text = "Get",
+                       command = getFile)
     tkpack(browseBut, side = "left", fill = "x")
+    tkpack(getBut, side = "left", fill = "x")
     tkpack(nameFrame, fill = "both", expand = TRUE)
 }
 # Show the data read in using readLines for state1
 showData4State1 <- function(widget, env){
-     dataFile <- readLines(getArgs(env)[["state1"]][["file"]])
+     dataFile <- getLineData(env)
      # Preventing the header to be shown
      if(getArgs(env)[["state1"]][["header"]]){
          dataFile <- dataFile[2:length(dataFile)]
@@ -385,38 +419,36 @@ setSkip <- function(widget, env, state = "state1"){
     assignArgs(temp, env)
 }
 # Gets a frame for state2
-getState2Frame <- function(base, env, state = "state2"){
-    temp <- getArgs(env)
-    temp[[state]] <- temp
+getState2Frame <- function(base, env, state = "state2", reset = FALSE){
     frame <- tkframe(base)
     # Shows the name of the file
     label1 <- tklabel(frame, text = paste("File:",
                       getArgs(env)[[state]][["file"]]),
                       font = "Helvetica 11 bold")
     tkpack(label1, pady = 5, padx = 5)
-    midFrame <- tkframe(frame)
-    setState2MFrame(midFrame, env)
-    tkpack(midFrame, pady = 5, padx = 5, fill = "x", expand = TRUE)
     bottomFrame <- tkframe(frame)
     setState2BFrame(bottomFrame, env)
+    midFrame <- tkframe(frame)
+    setState2MFrame(midFrame, env, bottomFrame)
+    tkpack(midFrame, pady = 5, padx = 5, fill = "x", expand = TRUE)
     tkpack(bottomFrame, fill = "both", expand = TRUE)
     return(frame)
 }
 # Sets the state2 mid frame containing radio buttons for delimiters
 # and a list box for quote selection
-setState2MFrame <- function(frame,env){
+setState2MFrame <- function(frame, env, bottomFrame){
     # Radio buttons for delimiters
     leftFrame <- tkframe(frame)
-    setSepRadios(leftFrame, env)
+    setSepRadios(leftFrame, env, bottomFrame)
     # A list for quote selecttion (" or/and ')
     rightFrame <- tkframe(frame)
-    setQuoteList(rightFrame, env)
+    setQuoteList(rightFrame, env, bottomFrame)
     tkpack(leftFrame, side = "left", anchor = "w", fill = "x",
            expand  = TRUE)
     tkpack(rightFrame, side = "left", fill = "x", expand = TRUE)
 }
 # Sets the radio buttons for separators for state2 mid frame
-setSepRadios <- function(frame, env, state = "state2"){
+setSepRadios <- function(frame, env, base, state = "state2"){
     labelFrame <- tkframe(frame)
     label <- tklabel(labelFrame, text = "File Delimiter:")
     tkpack(label, side = "left", anchor = "nw")
@@ -478,8 +510,9 @@ setSepRadios <- function(frame, env, state = "state2"){
         tkselect(sepButs[[whatDeli(getArgs(env)[[state]][["sep"]])]])
     }
 }
+
 # Sets the list box for quotes for state2 mid frame
-setQuoteList <- function(frame, env){
+setQuoteList <- function(frame, env, base){
     quoteSelected <- function(){
         setQuote(quoteList, env)
     }
@@ -515,23 +548,29 @@ setState2BFrame <- function(frame, env){
     tkpack(viewFrame, anchor = "w", padx = 5, pady = 5, fill = "both",
            expand = TRUE)
     showData4State2(dataView2, env)
-
 }
 # Populates the data preview list of state2
 showData4State2 <- function(canvas, env, state = "state2"){
-    # Only show the number of rows defined
-    temp <- getArgs(env)[[state]]
-    tempFrame <- tkframe(canvas)
-    dataFile <- as.matrix(do.call("read.table", temp))
-    if(nrow(dataFile) > getShowNum(env)){
-        # Cut to right size of file is longer than maxRow
-        dataFile <- dataFile[1:getShowNum(env),]
-    }
-    for(i in 1:ncol(dataFile)){
+    writeColList <- function(i){
         tempList <- tklistbox(tempFrame, height = 0, width = 0,
                               background = "white")
         tkinsert(tempList, "end", dataFile[,i])
         tkpack(tempList, side = "left", fill = "both", expand = TRUE)
+    }
+
+    # Only show the number of rows defined
+    temp <- getArgs(env)[[state]]
+    tempFrame <- tkframe(canvas)
+    # Puts n in temporaly
+    temp[["nrows"]] = getShowNum(env)
+    dataFile <- do.call("read.table", temp)
+    # For data without a separater
+    if(is.null(ncol(dataFile))){
+        writeColList(1)
+    }else{
+        for(i in 1:ncol(dataFile)){
+            writeColList(i)
+        }
     }
     tkcreate(canvas, "window", 0, 0, anchor = "nw", window = tempFrame)
 }
