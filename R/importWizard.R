@@ -3,7 +3,7 @@
 #
 # Copyright 2002, J. Zhang, all rights reserved.
 
-importWizard <- function(filename = ""){
+importWizard <- function(filename = "", maxRow = 200){
 
     on.exit(end)
 
@@ -44,6 +44,9 @@ importWizard <- function(filename = ""){
     # clicked
     browse <- function(){
         args1[["file"]] <<- fileBrowser(nSelect = 1)
+        initState1()
+    }
+    initState1 <- function(){
         writeList(nameEntry, args1[["file"]], clear = TRUE)
         showData(state, dataView1, args1)
         fileInfo <- guess.sep(file.name = args1[["file"]], n = 40)
@@ -64,14 +67,6 @@ importWizard <- function(filename = ""){
             args2 <<- args1
             # Figures out the starting line to import
             options(show.error.messages = FALSE)
-            beginAt <- try(as.numeric(tkget(startList,
-                                            tkcurselection(statList))))
-            options(show.error.messages = TRUE)
-            if(inherits(beginAt, "try-error")){
-                args2[["skip"]] <<- 0
-            }else{
-                args2[["skip"]] <<- beginAt - 1
-            }
             tkdelete(midCanv, stateID)
             stateID <<- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
                             anchor = "nw", window = stateFrame[["state2"]])
@@ -84,14 +79,6 @@ importWizard <- function(filename = ""){
         }else if(state == "state2"){
             args3 <<- args2
             keepOrType <<- columnType
-            # Figures out whether there are quotes
-#            options(show.error.messages = FALSE)
-#            quote <- try(as.character(tkget(quoteList,
-#                                            tkcurselection(quoteList))))
-#            options(show.error.messages = TRUE)
-#            if(inherits(quote, "try-error")){
-#                args3[["quote"]] <<- quote
-#            }
             tkdelete(midCanv, stateID)
             stateID <<- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
                           anchor = "nw", window = stateFrame[["state3"]])
@@ -107,9 +94,9 @@ importWizard <- function(filename = ""){
             writeList(widget, paste(1:length(dataFile), ": ",
                                         dataFile, sep = ""), TRUE)
         }else if(state == "state2"){
-            # Set a limit of 200 rows for better performance and
+            # Set a limit of number of rows for better performance and
             # presentation
-            argsList[["nrows"]] <- 200
+            argsList[["nrows"]] <- maxRow
             dataFile <- as.matrix(do.call("read.table", argsList))
             tempFrame <- tkframe(widget)
             for(i in 1:ncol(dataFile)){
@@ -158,17 +145,17 @@ importWizard <- function(filename = ""){
     }
     # Moves one step back when the back button is clicked
     back <- function(){
-        if(state == "state2"){
-            tkdelete(midCanv, stateID)
-            stateID <<- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
-                            anchor = "nw", window = stateFrame[["state1"]])
+        if(state == "state3"){
             state <<- "state1"
-            tkconfigure(backBut, state = "disabled")
-        }else if(state == "state3"){
+            nextState()
+            tkconfigure(nextBut, state = "normal")
+        }else{
+            state <<- "state1"
             tkdelete(midCanv, stateID)
             stateID <<- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
-                           anchor = "nw", window = stateFrame[["state2"]])
-            state <<- "state2"
+                            anchor = "nw", window = stateFrame[[state]])
+            initState1()
+            tkconfigure(backBut, state = "disabled")
         }
     }
     # Closes the top window then the cancel button is clicked
@@ -186,7 +173,7 @@ importWizard <- function(filename = ""){
     # Sets the value for skip when user selects line to start in
     # state1
     setSkip <- function(){
-        args2[["skip"]] <<- as.numeric(tkget(startList,
+        args1[["skip"]] <<- as.numeric(tkget(startList,
                               tkcurselection(startList))) - 1
     }
     # Sets the value for quote when user selects quote in state2
@@ -209,9 +196,7 @@ importWizard <- function(filename = ""){
             args <- args3
         }
         print(args)
-        print("OK before")
         dataFile <<- do.call("read.table", args)
-        print("OK here")
         if(state == "state3"){
             for(i in 1:length(keepOrType)) {
                 if(keepOrType[[i]] == "Skip"){
@@ -224,18 +209,6 @@ importWizard <- function(filename = ""){
                        as.numeric(dataFile[, i]))
             }
         }
-#            for(i in 1:length(typeButs)){
-#                print(paste("but = ", typeButs[[i]]))
-#                if(as.character(tkcget(typeButs[[i]], "-text")) == "Skip"){
-#                    print(paste("text = ", tkcget(typeButs[[i]])))
-#                    dataFile <<- dataFile[, -i]
-#                }
-#                switch(as.character(tkcget(typeButs[[i]], "-text")),
-#                       "Character" = dataFile[, i] <<-
-#                       as.character(dataFile[, i]),
-#                       "Numeric" = dataFile[, i] <<-
-#                       as.numeric(dataFile[, i]))
-#            }
         end()
     }
     ## Set up the interface
@@ -307,7 +280,7 @@ importWizard <- function(filename = ""){
                            vScroll = TRUE, hScroll = TRUE,
                            what = "list", side = "top")
     tkpack(viewFrame, anchor = "w", pady = 10)
-    # State 1 is endered now
+    # State 1 is entered now
     stateID <- tkcreate(midCanv, "window", XMARGIN, YMARGIN,
                         anchor = "nw", window = stateFrame[["state1"]])
     ##################################################################
