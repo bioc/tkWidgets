@@ -181,7 +181,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
     tkgrid(dirLabel, columnspan = 2)
     dirLFrame <- tkframe(leftFrame)
 
-    listView <- makeView(dirLFrame, vWidth = BOXWIDTH,
+    listView <- makeViewer(dirLFrame, vWidth = BOXWIDTH,
                          vHeight = BOXHEIGHT)
     tkgrid(dirLFrame, columnspan = 2)
     upBut <- tkbutton(leftFrame, text = "Up", width = BUTWIDTH,
@@ -202,7 +202,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                         font = "Helvetica 11")
     tkgrid(selLabel, columnspan = 2)
     selLFrame <- tkframe(rightFrame)
-    selectView <- makeView(selLFrame, vWidth = BOXWIDTH,
+    selectView <- makeViewer(selLFrame, vWidth = BOXWIDTH,
                            vHeight = BOXHEIGHT)
     tkgrid(selLFrame, columnspan = 2)
     tkconfigure(selectView, selectmode = "extended", font = LABELFONT2)

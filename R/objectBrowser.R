@@ -41,13 +41,10 @@ objectBrowser<- function (fun = function(x) TRUE,
             tkdestroy(base)
         }
     }
-##FIXME: this makes no sense -- pickObjs is doing stuff that it has
-##no business doing; if we are listing an environment we do not
-##need to see if get works on the output of ls on that environment!
-##and you are not even doing ls(all=TRUE)!!!
+
     viewGlobalEnv <- function(){
-        writeObj(listView, pickObjs(objNames = ls(env = get(".GlobalEnv")),
-                                             fun = fun))
+        writeObj(listView, pickObjs(objNames = ls(env = .GlobalEnv,
+                                    all = TRUE), fun = fun))
         writeCap(".GlobalEnv")
     }
 
@@ -91,46 +88,10 @@ objectBrowser<- function (fun = function(x) TRUE,
 #        if(tkcurselection(listView) != ""){
             selectedObj <<- as.character(tkget(listView,
                                       tkcurselection(listView)))
-            goin()
+            goin(envir = selectedObj)
 #        }
     }
-
-##please use mode or type or ask specific questions do not invent
-##functions like findObjType -- this is really a bad idea
-    goin <- function (){
-        if(!is.null(selectedObj)){
-            objType <- findObjType(selectedObj)
-            switch(objType,
-               "environment" = doEnv(selectedObj),
-               "package" =  doPack(tkcurselection(listView), selectedObj),
-               "list" = doList(selectedObj),
-               doElse()
-            )
-            tkconfigure(selectBut, state = "disabled")
-            selectedObj <<- NULL
-        }
-    }
-
-
-    sClick <- function () {
-        selIndex <<- NULL
-        tkconfigure(selectBut, state = "normal")
-        selIndex <<- unlist(strsplit(tkcurselection(listView), " "))
-
-        for(i in selIndex){
-            temp <- as.character(tkget(listView, i))
-            objsInSel <<- c(objsInSel, temp)
-        }
-        if(length(selIndex) == 1){
-            selectedObj <<- as.character(tkget(listView, selIndex))
-            objType <- findObjType(selectedObj)
-        }
-
-    }
-
-    getAct <- function(){
-        selectedObj <<- ".GlobalEnv"
-        goin()
+)
     }
 
     up <- function(){
@@ -232,7 +193,7 @@ objectBrowser<- function (fun = function(x) TRUE,
     leftFrame <- tkframe(base)
 
     listFrame <- tkframe(leftFrame)
-    listView <- makeView(listFrame)
+    listView <- makeViewer(listFrame)
     tkgrid(listFrame, columnspan = 2)
     tkconfigure(listView, selectmode = "extended", font = LABELFONT2)
     tkbind(listView, "<Double-Button-1>", dClick)
@@ -251,7 +212,7 @@ objectBrowser<- function (fun = function(x) TRUE,
 
     rightFrame <- tkframe(base)
     selectFrame <- tkframe(rightFrame)
-    selectView <- makeView(selectFrame)
+    selectView <- makeViewer(selectFrame)
     tkconfigure(selectView, selectmode = "extended", font = LABELFONT2)
     tkgrid(selectFrame, columnspan = 2)
     tkbind(selectView, "<B1-ButtonRelease>", selClick)

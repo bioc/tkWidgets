@@ -11,7 +11,7 @@ objViewer <- function(toView, width = 40, height = 10){
     tktitle(base) <- "BioC Object Viewer"
 
     boxFrame <- tkframe(base)
-    boxView <- makeView(boxFrame, vWidth = width,
+    boxView <- makeViewer(boxFrame, vWidth = width,
                         vHeight = height, vScroll = TRUE,
                         hScroll = TRUE)
     writeObj(boxView, toView)
