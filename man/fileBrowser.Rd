@@ -76,7 +76,7 @@ fileBrowser(path="", testFun = function(x) TRUE, prefix = NULL,
 \note{This function is part of the Bioconductor project at Dana-Farber
   Cancer Institute to provide Bioinformatics functions using \R.}
 
-\seealso{\code{\link{makeView}},\code{\link{writeDir}},
+\seealso{\code{\link{makeViewer}},\code{\link{writeDir}},
   \code{\link{pickFiles}}, \code{\link{hasPrefix}}, \code{\link{hasSuffix}}}
 
 \examples{

@@ -1,41 +1,34 @@
-WName                   Accessors functions for primitive widget
-                        objects.
-dirsNFiles              This function lists file and directories (with
-                        a system path separator) for a given path.
-fileBrowser             An simple interface to view files and pick one
-                        as the return.
-findObjType             A function that determines the type of the
-                        object represented by a passed name.
-getActiveEnv            A function to get the active environment.
-getContent              Functions to return a representation of an R
-                        object passed
-hasPrefix               An utility function for tkWidgets.
-hasSuffix               An utility function for tkWidgets.
-isCharacter             A function to determine if a given name is for
-                        a character object.
-listSelect              Functions that make a widget with selection
-                        boxes based on user specifications
-makeView                A function to put a scrollable list box into a
-                        tkWidget.
-nameToObjList           A function to convert a vector of object names
-                        to a list of lists with name and object pairs.
-objViewer               A function to show the content of the passed
-                        argument on a widget
-objectBrowser           A function to view the objects in the work
-                        space.
-pickFiles               A functions to pick elements from a given
-                        vector of strings based on predefined
-                        condition.
-pickObjs                A function that determines what to be sent to a
-                        widget for display.
-stdType                 Functions that provide default behaviors for
-                        typeFun and valueFun functions of listSelect
-                        function
-values.Widget           Functions dealing with the names and values of
-                        a widget created by using the function
-                        widgetRender.
-widgetRender            A function to render a tk widget based on the
-                        specifications passed as a list.
-writeDir
-writeObj                A function to write object lists to a given
-                        list box.
+WName                   Accessors for Primitive Widget Objects
+args2XML                Converting the formal arguments to a function
+                        and converts into an XML format
+dirsNFiles              List File and Directories for a Given Path
+fileBrowser             Simple Interface to View and Pick Files
+fileWizard              A function that import a text file into R
+getWvalues              Obtaining values of widgets on a given widget
+guess.sep               Automatically determines whether a data file
+                        has a header and what delimiter is used to
+                        separate data columns
+hasChar                 String Prefix and Suffix Checking
+listSelect              Utilities Creating a Widget With Selection
+                        Boxes
+makeViewer              Put a Scrollable List Box into a tkWidget.
+nameToObjList           Convert Object Names to List of Lists with
+                        (name, object) Pairs
+objViewer               Show the Content of an R Object in a Widget
+objectBrowser           View the Objects in the Workspace.
+pickFiles               Pick Elements From Vector of Strings
+pickObjs                Determine What to Be Sent to a Widget
+stdType                 Provide Default Behavior for listSelect Helper
+                        Functions
+tkMIAME                 Simple Interface to enter experimental design
+                        information
+tkSampleNames           Simple interface to associate sample names with
+                        files
+tkphenoData             Simple interface to enter phenoData
+values.Widget           Deal with Names and Values of Widget Created by
+                        widgetRender()
+vignetteBrowser         An interface to interact with vignette code
+                        chunks
+widgetRender            Render a Tk Widget from Given Specifications
+writeDir                Write Directory Information into a Tk Listbox
+writeObj                Write Object Lists into a List Box

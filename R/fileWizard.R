@@ -13,6 +13,7 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
     args <- formals(fun)
     rest <- setdiff(names(args), c(file, basic))
     boxes <- vector("list")
+    dList <- vector("list")
 
     end <- function(){
          tkdestroy(top)
@@ -27,6 +28,7 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
         if(!is.null(filename) && !is.na(filename) && filename != ""){
             tkinsert(nameEntry, "0", filename)
             writeEntry(fileText, readLines(filename))
+            tkpack(tempList)
             makeGuess(filename)
         }
     }
@@ -34,7 +36,7 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
     brows <- function(){
         filename <<- tclvalue(tkcmd("tk_getOpenFile"))
         args$file <<- filename
-        writeEntry(fileText, readLines(args$file))
+        writeEntry(fileText, readLines(filename))
         writeEntry(nameEntry, args$file)
         makeGuess(args$file)
     }
@@ -55,12 +57,10 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
         fileRead <- read.table(file = args$file, head = args$header,
                                sep = args$sep, as.is = TRUE)
 
+        fileRead <- as.matrix(fileRead)
         tkdelete(fileText, 0, "end")
-        doFormat <- function(line){
-            temp <- paste(line, sep = "", collapse = "      ")
-            tkinsert(fileText, "end", temp)
-        }
-        lapply(fileRead, doFormat)
+
+        tkinsert(fileText, "end", fileRead[1:nrow(fileRead),])
     }
 
     showMore <- function(){
@@ -157,8 +157,9 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
                             font = NORMAL11)
     tkgrid(previewLabel, pady = 4, padx = 2, sticky = "nw")
     textFrame <- tkframe(fileFrame)
-    fileText <- makeViewer(textFrame, vWidth = 70, vHeight = 15,
-                           vScroll = TRUE, hScroll = TRUE)
+    fileText <- makeViewer(textFrame, vWidth = 20, vHeight = 15,
+                           vScroll = TRUE, hScroll = TRUE,
+                           what = "list")
     tkgrid(textFrame)
     tkgrid(fileFrame, columnspan = 2, padx = 2)
 

@@ -66,7 +66,7 @@ objectBrowser(fun = function(x) TRUE,
 \note{This function is part of the Bioconductor project at Dana-Farber
   Cancer Institute to provide Bioinformatics functionalities through \R.}
 
-\seealso{\code{\link{writeObj}}, \code{\link{isCharacter}}}
+\seealso{\code{\link{writeObj}}}
 
 \examples{
 ## The example here is only run interactively since it requires user

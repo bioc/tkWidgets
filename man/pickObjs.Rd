@@ -1,5 +1,6 @@
 \name{pickObjs}
 \alias{pickObjs}
+\alias{noAuto}
 
 \title{Determine What to Be Sent to a Widget}
 \description{
@@ -9,12 +10,15 @@
 }
 \usage{
 pickObjs(objNames, fun = function(x) TRUE)
+noAuto(x)
 }
-%- maybe also `usage' for other objects documented here.
+
 \arguments{
-  \item{objNames}{character vector with object names to be processed.}
-  \item{fun}{function checking the object names for satisfaction of
-    certain requirement.}
+  \item{objNames}{\code{objNames} character vector with object names to
+    be processed} 
+  \item{fun}{\code{fun} function checking the object names for satisfaction of
+    certain requirement} 
+  \item{x}{\code{x} a character string for the name of an object}
 }
 \details{
   Packages and environments are always displayed.
