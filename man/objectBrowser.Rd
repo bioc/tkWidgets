@@ -8,7 +8,12 @@
   object will be returned. 
 }
 \usage{
-objectBrowser()
+objectBrowser(fun = function(x) TRUE)
+}
+
+\arguments{
+  \item{fun}{A function to test whether certain conditions are met by
+    the objects. Only objects that meet the conditions will be displyed.}
 }
 
 \details{
@@ -16,6 +21,9 @@ objectBrowser()
   the package will be returned. If the selected object is a function, a
   text string of the original code will be returned. Otherwise, the
   object will be returned.
+
+  See function isCharacter for an example of writting a function for
+  objectBrowser. 
 
   The function is at its preliminary stage of development and will be
   enhanced later.
@@ -28,14 +36,15 @@ objectBrowser()
 \note{This function is part of the Bioconductor project at Dana-Farber
   Cancer Institute to provide Bioinformatics functionalities through R.}
 
-\seealso{\code{\link{writeObj}}}
+\seealso{\code{\link{writeObj}}, \code{\link{isCharacter}}}
 
 \examples{
 # The example is commented out as it requires user interference which
 # may not be desirable for auto build.
 
-# Call the funciton
-#objectBrowser()
+# Call the function with the isCharacter function.
+#objectBrowser(isCharacter)
   
 }
 \keyword{interface}
+
