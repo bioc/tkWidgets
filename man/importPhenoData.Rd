@@ -42,8 +42,10 @@ convert2PData(phenoList)
 }
 
 \details{
-  When import a data frame, the default path will be the .GlobelEnv. All
-  the data frame objects will be listed in a browser.
+  When import a data frame or phenoData object, the object to be
+  imported should have been stored in .GlobelEnv. All
+  the objects of data frame or phenoData will be made available through
+  a browser. 
 }
 \value{
   A phenoData object
