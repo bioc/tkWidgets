@@ -144,7 +144,7 @@ initImportWizard <- function(env){
     endBut <- tkbutton(butFrame, text = "Finish", width = 8,
                        command = finishClicked)
     tkpack(canBut, backBut, nextBut, endBut, side = "left")
-    tkpack(butFrame, pady = 10, fill = "both", expand = TRUE)
+    tkpack(butFrame, pady = 10, fill = "y", expand = TRUE)
 
     tkwait.window(top)
     return(dataList)
@@ -287,7 +287,7 @@ getState1Frame <- function(base, env){
 setState1BFrame <- function(frame, env){
     # A list box to show the original data
     viewFrame <- tkframe(frame)
-    dataViewer <- makeViewer(viewFrame, vWidth = 99, vHeight = 17,
+    dataViewer <- makeViewer(viewFrame, vWidth = 50, vHeight = 10,
                             vScroll = TRUE, hScroll = TRUE,
                             what = "list", side = "top")
     tkpack(viewFrame, anchor = "w", pady = 10, fill = "both",
@@ -313,7 +313,7 @@ setState1TFrame <- function(frame, viewer, delims, env){
     label1 <- tklabel(nameFrame, text = "File name: ")
     tkpack(label1, side = "left")
     # An entry box to hold the result of fileBrowser
-    nameEntry <- tkentry(nameFrame, width = 77)
+    nameEntry <- tkentry(nameFrame, width = 20)
     # If a file name is given, fill the widget with data
     if(!is.null(getArgs(env)[["state1"]][["file"]])){
         writeList(nameEntry, filename, clear = TRUE)
@@ -322,11 +322,11 @@ setState1TFrame <- function(frame, viewer, delims, env){
             tkselect(delims[["delimit"]])
         }
     }
-    tkpack(nameEntry, side = "left")
+    tkpack(nameEntry, side = "left", fill = "x", expand = TRUE)
     # A button to envoke fileBrowser
     browseBut <- tkbutton(nameFrame, width = 8, text = "Browse",
                           command = browse)
-    tkpack(browseBut)
+    tkpack(browseBut, side = "left", fill = "x")
     tkpack(nameFrame, fill = "both", expand = TRUE)
 }
 # Show the data read in using readLines for state1
@@ -353,15 +353,15 @@ setState1MFrame <- function(frame, env){
                                   " - Files are separated by a character",
                                   " such as a comma or tab", sep =""),
                                   value = "delim", variable = delimit,
-                                  width = 71, anchor = "nw")
-    tkpack(delimitRadio, anchor = "w")
+                                  anchor = "nw")
+    tkpack(delimitRadio, anchor = "w", expand = TRUE, fill = "x")
     fixedRadio <- tkradiobutton(leftPan, text = paste("Fixed",
                                 " width - Fields are aligned in columns",
                                 " with spaces between fields", sep = ""),
                                 value = "fixed", variable = delimit,
-                                width = 71, anchor = "nw")
-    tkpack(fixedRadio, anchor = "w")
-    tkpack(leftPan, side = "left", anchor = "w")
+                                anchor = "nw")
+    tkpack(fixedRadio, anchor = "w", expand = TRUE, fill = "x")
+    tkpack(leftPan, side = "left", anchor = "w", fill = "x", expand = TRUE)
     rightPan <- tkframe(frame)
     paraLabel2 <- tklabel(rightPan, text = "Start import at row:")
     tkpack(paraLabel2, side = "left", anchor = "ne")
@@ -371,8 +371,9 @@ setState1MFrame <- function(frame, env){
     tkconfigure(startList, selectmode = "single")
     tkbind(startList, "<B1-ButtonRelease>", startClicked)
     writeList(startList, 1:99, clear = TRUE)
-    tkpack(startFrame, anchor = "w", side = "left")
-    tkpack(rightPan, side = "left", padx = 7)
+    tkpack(startFrame, anchor = "w", side = "left",
+                                          fill = "x", expand = TRUE)
+    tkpack(rightPan, side = "left", padx = 7, expand = TRUE, fill = "x")
     return(list(delimit = delimitRadio, fixed = fixedRadio))
 }
 
