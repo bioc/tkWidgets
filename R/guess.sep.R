@@ -1,5 +1,6 @@
 # This function reads a few lines from a given file and then guesses
-# the separator used to separate columns.
+# if there is a header line, the separator used to separate columns,
+# and the data type of each column.
 #
 # Copyright 2002, J. Zhang, all rights reserved
 #
@@ -43,7 +44,6 @@ guess.sep <- function(file.name, n = 3, seps = ""){
 guess.header <- function(twoLines, sep){
 
     on.exit(options(warn = 1))
-    header <- "Not detected"
 
     if(!is.null(sep)){
         firstLine <- unlist(strsplit(twoLines[1], sep))
@@ -55,26 +55,16 @@ guess.header <- function(twoLines, sep){
 
     options(warn = -1)
     firstLine <- as.numeric(firstLine)
+    scndLine <- as.numeric(scndLine)
     options(warn = 1)
-    if(any(is.na(firstLine))){
-        options(warn = -1)
-        scndLine <- as.numeric(scndLine)
-        options(warn = 1)
-        if(any(is.na(scndLine))){
-            for(i in 1:length(scndLine)){
-                if((is.na(firstLine[i]) && !is.na(scndLine[i])) ||
-                   (!is.na(firstLine[i]) && is.na(scndLine[i]))){
-                    header <- TRUE
-                    break
-                }
-            }
-        }else{
-            header <- TRUE
-        }
+    if(!setequal(firstLine, scndLine)){
+        return(TRUE)
     }else{
-        header = FALSE
+        if(any(!is.na(firstLine))){
+            return(FALSE)
+        }
+        return("Not detectable")
     }
-    return(header)
 }
 
 find.type <- function(line, sep){
