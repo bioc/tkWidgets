@@ -100,7 +100,6 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
         if(length(fileIndex) > 0){
             for(i in fileIndex)
                 toRemove <- c(toRemove, -(as.numeric(i) + 1))
-
             fileSelected <<- fileSelected[toRemove]
             writeToView(selectView, fileSelected)
             fileIndex <<- NULL
@@ -146,7 +145,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
                 if(substr(i, nchar(i), (nchar(i) + 1))
                       == Platform()$file.sep)
                     i <- substr(i, 0, (nchar(i) - 1 ))
-                tkinsert(aView, 0,
+                tkinsert(aView, "end",
                      gsub(paste(".*", Platform()$file.sep, "(.*)",
                                 sep = ""), "\\1", i))
             }
@@ -227,7 +226,7 @@ fileBrowser <- function (path = "", testFun = function(x) TRUE,
 	     anchor = "nw", window = rightFrame)
 
     botFrame <- tkframe(canvas)
-    endBut <- tkbutton(botFrame, text = "End", width = BUTWIDTH,
+    endBut <- tkbutton(botFrame, text = "Finish", width = BUTWIDTH,
 		       command = end)
     tkpack(endBut)
     tkcreate(canvas, "window", CANWIDTH/2,
