@@ -1,20 +1,19 @@
 \name{widgetRender}
 \alias{widgetRender}
 
-\title{A function to render a tk widget based on the specifications
-  passed as a list.}
+\title{Render a Tk Widget from Given Specifications}
 \description{
   This function takes a list that specifies the appearance and behavior
-  of a tk widget and renders the widget. 
+  of a Tk widget and renders the widget accordingly.
 }
 \usage{
 widgetRender(iWidget, tkTitle)
 }
 
 \arguments{
-  \item{iWidget}{A list of lists that specifies the appearance and
+  \item{iWidget}{list of lists that specifies the appearance and
     behavior of the widget to be rendered.}
-  \item{tkTitle}{a character string for the text to be appear in the
+  \item{tkTitle}{character string for the text to appear in the
     title bar of the widget to be rendered.}
 }
 \details{
@@ -30,46 +29,58 @@ widgetRender(iWidget, tkTitle)
   The widget to be rendered also has two buttons at the bottom part of
   the widgets. The followings are the name and behavior of the buttons:
 
-  Cancel - The unmodified list passed to the function at the time of
-  invocation will be returned when pressed.
+  \describe{
+    \item{\bold{Cancel} -}{The unmodified list passed to the function at
+      the time of invocation will be returned when pressed.}
 
-  End - A modified version of the passed list will be returned when
-  pressed. The returned list has the same number of elements as the
-  original one but with the values modified based on the entries in
-  corresponding widgets items. 
+    \item{\bold{End} -}{A modified version of the \code{iWidget}
+      argument will be returned when pressed.  The returned list has the
+      same number of elements as the original one but with the values
+      modified based on the entries in corresponding widgets items.}
+    }
 }
 \value{
-  \item{list}{A list of lists with the original values of the passed
-    modified or unmodified depending on whether the cancel or end button
-    pressed.} 
+  A \code{\link{list}} of lists with the original values of the passed
+  modified or unmodified depending on whether the cancel or end button
+  pressed.}
 }
-\references{A Primer on the R-Tcl/Tk Package. R News val.1/3, 2001}
+\references{
+  Peter Dalgaard (2001)
+  A Primer on the R-Tcl/Tk Package;
+  R News \bold{1} (3), 27--31
+  \url{http://CRAN.R-project.org/doc/Rnews/}
+}
 \author{Jianhua (John) Zhang}
 \note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R.}
+  Cancer Institute to provide Bioinformatics functionalities through \R.}
 
-\seealso{\code{\link{fileBrowser}},\code{\link{objectBrowser}}}
+\seealso{\code{\link{fileBrowser}},
+  \code{\link{objectBrowser}}.
+}
 
 \examples{
 # Create the list to be passed
-pW1 <- list(Name="AAA", Value="bbb", toText=function(x) paste(x,collapse
-= ","), fromText=NULL, canEdit=TRUE, buttonFun = fileBrowser,
-buttonText = "Browse") 
+pW1 <- list(Name="AAA", Value="bbb",
+            toText=function(x) paste(x,collapse= ","), fromText=NULL,
+            canEdit=TRUE,
+            buttonFun = fileBrowser, buttonText = "Browse")
 
-pW2 <- list(Name="BBB", Value="x,y,z", toText=function(x) paste(x,
-collapse=","), fromText=NULL, canEdit=TRUE, buttonFun = ls,  
-buttonText = "List")
+pW2 <- list(Name="BBB", Value="x,y,z",
+            toText=function(x) paste(x, collapse=","), fromText=NULL,
+            canEdit=TRUE, buttonFun = ls, buttonText = "List")
 
-pW3 <- list(Name="CCC", Value="ccc",toText=function(x) paste(x, collapse
-= ","), fromText=NULL, canEdit=TRUE, buttonFun=NULL,  buttonText=NULL)
+pW3 <- list(Name="CCC", Value="ccc",
+            toText=function(x) paste(x, collapse = ","), fromText=NULL,
+            canEdit=TRUE, buttonFun=NULL,  buttonText=NULL)
 
-widget1 <- list(wList = list(a = pW1, b = pW2, c = pW3),preFun =
-function() "Hi", postFun = function() "Bye")
+widget1 <- list(wList = list(a = pW1, b = pW2, c = pW3),
+                preFun  = function() "Hi",
+                postFun = function() "Bye")
 
-# Call the funciton 
-
+# Call the function
 if(interactive()){
     x <- widgetRender(widget1, "Test Widget")
+    str(x)
 }
 }
 \keyword{interface}

@@ -1,26 +1,24 @@
 \name{objectBrowser}
 \alias{objectBrowser}
 
-\title{A function to view the objects in the work space.}
+\title{View the Objects in the Workspace.}
 \description{
-  This function provides a widget to view objects and select one that is
-  going to be returned. When the "End" button is pressed,the selected
-  object will be returned. 
+  This function provides a widget to view objects and select some which
+  are going to be returned.  When the \code{End} button is pressed, the
+!  selected objects will be returned.
 }
 \usage{
-objectBrowser(fun = function(x) TRUE, textToShow = "Select object(s)", nSelect = -1)
+objectBrowser(fun = function(x) TRUE,
+              textToShow = "Select object(s)", nSelect = -1)
 }
-
 \arguments{
-  \item{fun}{A function to test whether certain conditions are met by
-    the objects. Only objects that meet the conditions will be
-    displayed.}
-  \item{textToShow}{A character string for the message to be show on the
+  \item{fun}{function to test whether certain conditions are met by
+    the objects.  Only objects that meet the conditions will be displayed.}
+  \item{textToShow}{character with the message to be shown on the
     widget as an instruction.}
-  \item{nSelect}{An integer for the number of object to select. No
-    limitation if nSelect = -1}
+    \item{nSelect}{integer indicating the number of objects to select.
+      No limitation if \code{nSelect = -1} as per default.}
 }
-
 \details{
   This function will return a list of lists with a "name" and "obj" pair
   for each object. The "name" will be the name of the object and "obj"
@@ -31,51 +29,54 @@ objectBrowser(fun = function(x) TRUE, textToShow = "Select object(s)", nSelect =
   on the objects to be displayed. See function isCharacter for an
   example of writing a filtering function for objectBrowser.
 
-  The buttons and their expected behavior are listed below:
+  The buttons and their expected behavior are
+  \describe{
+    \item{\code{Up}}{Moves one level up along the search list and
+      displays the content in the box for object names on the left of the
+      widget.}
 
-  Up - Moves one level up along the search list and displays the content
-  in the box for object names on the left of the widget.
+    \item{\code{Select \>\>}}{When objects in the box for object names
+      have been highlighted by clicking or clicking/dragging, this
+      button will display the highlighted object names in the box
+      for selected objects on the right.}
 
-  Select >> - When objects in the box for object names have been
-  highlighted by clicking or clicking/draging, clicking "Select >>" will
-  display the highlighted object names in the box for selected objects on
-  the right. 
+    \item{\code{Reset}}{Moves back to \code{\link{.GlobalEnv}} which
+      is the default starting point of the system.}
 
-  Reset - Moves back to ".GlobalEnv" which is the default starting point
-  of the system.
+    \item{\code{\<\< Remove}}{When object names in the box for selected
+      objects have been highlighted by clicking or clicking/dragging and
+      this button is pressed, the highlighted object names will be removed
+      from the display.}
 
-  << Remove - When object names in the box for seleted objects have been
-  highlighted by clicking or clicking/draging and the "<< Remove" button
-  pressed, the highlighted object names will be removed from the display.
+    \item{\code{Clear}}{Removes all the object names from the box for
+      selected objects.}
 
-  Clear <- Removes all the object names from the box for selected
-  objects.
+    \item{\code{Cancel}}{Exits the widget and returns \code{NULL} when
+      pressed.}
 
-  Cancel - Exits the widget and returns a NULL when pressed.
-
-  End <- Returns a list of lists with names of the objects in the box
-  for selected objects and their corresponding values or NULL if nothing
-  exists in the box.
-  
+    \item{\code{End}}{Returns a \code{list} of lists with names of the
+      objects in the box for selected objects and their corresponding values
+      or \code{NULL} if nothing exists in the box.}
+  }
 }
 \value{
-  \item{returnList}{A list of lists with a name and value pair for each
-    object.} 
+  A \code{\link{list}} of lists with a name and value pair for each object.
 }
-\references{Tcltk, R News Vol 1/3. A Primer on the R-Tck/Tk Package.}
 \author{Jianhua (John) Zhang}
 \note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R.}
+  Cancer Institute to provide Bioinformatics functionalities through \R.}
 
 \seealso{\code{\link{writeObj}}, \code{\link{isCharacter}}}
 
 \examples{
-# The example is commented out as it requires user interference which
-# may not be desirable for auto build.
+## The example here is only run interactively since it requires user
+## interference which may cause problems if not available:
+if(interactive()) {
 
 # Call the function with the isCharacter function.
-#objectBrowser(isCharacter)
-  
+r <- objectBrowser(isCharacter)
+str(r) # show what we've got
+}
 }
 \keyword{interface}
 

@@ -1,7 +1,8 @@
 \name{WName}
+\title{Accessors for Primitive Widget Objects}
 \alias{WName}
-\alias{WValue} 
-\alias{"WValue<-"} 
+\alias{WValue}
+\alias{"WValue<-"}
 \alias{WtoText}
 \alias{WfromText}
 \alias{WcanEdit}
@@ -15,17 +16,15 @@
 \alias{WpreFun}
 \alias{WpostFun}
 \alias{WEnd}
-
-\title{Accessors functions for primitive widget objects.}
 \description{
-  Currently primitive widget object (pwidgets) are implemented as lists,
-  but this will change. Users should only rely on these accessors
-  functions, not the implementation.
+  Currently primitive widget objects (\code{pwidget}s) are implemented
+  as \code{\link{list}}s, but this will change.  Users should only rely
+  on these accessors functions, not the implementation.
 }
 \usage{
 WName(x)
-WValue(x) 
-WValue(x) <-  value 
+WValue(x)
+WValue(x) <-  value
 WtoText(x)
 WfromText(x)
 WcanEdit(x)
@@ -40,68 +39,62 @@ WpreFun(x)
 WpostFun(x)
 WEnd{x}
 }
-
 \arguments{
-  \item{x}{A list of lists with a Name, Value, toText, fromText,
+  \item{x}{list of lists with a Name, Value, toText, fromText,
     canEdit, buttonText, buttonFun, preFun, postFun element.}
-  \item{name}{A character string for the name of the list to be returned}  
-  \item{index}{An integer or character string as an index or name for
+  \item{name}{character string for the name of the list to be returned}
+  \item{index}{integer or character string as an index or name for
     the list in the first list of a list of lists for a widget.}
-  \item{value}{An R data type that is going to be used to update the value.}
+  \item{value}{An \R data type that is going to be used to update the value.}
 }
 \details{
-  WName(x) will return the value of the Name element of the list passed.
-  WValue(x) will return the value of the Value element of the list passed.
-  WValue(x) <- value will change the value of the Value element of the list
-  passed to the value specified by "value" passed.
-  WtoText(x) will return the value of the toText element of the list
-  passed.
-  WfromText(x) will return the value of the fromText element of the list
-  passed.
-  WcanEdit(x) will return the value of the canEdit element of the list
-  passed.
-  WbuttonText(x) will return the value of the buttonText element of the
-  list passed.
-  WbuttonFun(x) will return the value of the buttonFun element of the
-  list passed.
-  WwList(x) will return the value of the wList element of the list
-  passed.
-  WwList <- value will update the wList element of a Widget list with value.
-  WLValue(x, index) will return the value of a list indicated by the
+  \code{WName(x)} returns the \code{Name} element of \code{x}.
+  \code{WValue(x)} returns the \code{Value} element of \code{x}.
+  \code{WValue(x) <- value} will change the \code{Value} element of
+  \code{x} to \code{value}.
+
+  \code{WtoText(x)} returns the \code{toText} element of \code{x}.
+  \code{WfromText(x)} returns the \code{fromText} element of \code{x}.
+  \code{WcanEdit(x)} returns the \code{canEdit} element of \code{x}.
+
+  \code{WbuttonText(x)} returns the \code{buttonText} element of \code{x}.
+  \code{WbuttonFun(x)} returns the \code{buttonFun} element of \code{x}.
+  \code{WwList(x)} returns the \code{wList} element of \code{x}.
+  \code{WwList <- value} will update the \code{wList} element of a
+  Widget list with \code{value}.
+
+%% FIXME: the following is not well understandable...
+  \code{WLValue(x, index)} returns a list indicated by the
   index in the wList of a widget list.
-  WLValue(x, index) <- value will update the value of the list indicated
-  by the index in the wList of a widget list with the value. 
-  WpreFun(x) will return the value of the preFun element of the list
-  passed.
-  WpostFun(x) will return the value of the post element of the list passed.
-  WEnd(x) will return the value of the end element of the list passed.
+  \code{WLValue(x, index) <- value} will update indicated
+  by the index in the wList of a widget list with the value.
+
+  \code{WpreFun(x)} returns the preFun element of \code{x}.
+  \code{WpostFun(x)} returns  the post element of \code{x}.
+  \code{WEnd(x)} returns  the end element of \code{x}.
 }
 \value{
-  \item{x}{A character string or R function represented by the element
-    of the list whose value is to be retrieved.}
+  A character string or \R function represented by the element
+  of the list whose value is to be retrieved.
 }
-
 \author{Jianhua (John) Zhang}
-\note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R.}
-
-\seealso{\code{\link{widgetRender}}}
-
+\seealso{\code{\link{widgetRender}} for references etc.
+}
 \examples{
 # Create the list of lists
 pW1 <- list(Name="AAA", Value="bbb",
-              toText=function(x) paste(x,collapse = ","),
-              fromText=NULL, canEdit=TRUE, buttonFun = ls,
-              buttonText = "Browse")
+            toText = function(x) paste(x,collapse = ","),
+            fromText = NULL, canEdit = TRUE,
+            buttonFun = ls, buttonText = "Browse")
 
 widget1 <- list(wList = list(a = pW1),
-                  preFun = function() "Hi",
-                  postFun = function() "Bye")
+                preFun = function() "Hi",
+                postFun = function() "Bye")
 
 # Call the functions
 WName(pW1)
-WValue(pW1) 
-WValue(pW1) <- "lll" 
+WValue(pW1)
+WValue(pW1) <- "lll"
 WtoText(pW1)
 WfromText(pW1)
 WcanEdit(pW1)
