@@ -1,4 +1,4 @@
-# This function provides the interface to browse files under a 
+# This function provides the interface to browse files under a
 # given path.
 #
 
@@ -6,62 +6,46 @@ fileBrowser <- function (path = ""){
 
     require(tcltk) || stop("tcl/tk library not available")
     LABELFONT <- "Helvetica 10"
-    WIDTH <- 440
-    HEIGHT <- 300
-    OFFSET <- 20
     BUTWIDTH <- 8
 
     currentNode <- NULL
     nodes <- NULL
-    fileSelected <- NULL
-    
+    fileSelected <- ""
+
     end <- function(){
         tkdestroy(base)
     }
 
     inList <- function(){
+
         item <- tkget(listView, tkcurselection(listView))
-        if(regexpr("^/", item) == 1){
-	    path <<- paste(path, item, sep = "")
+        if(regexpr(Platform()$file.sep, item) >= 1){
+	    path <<- paste(path, Platform()$file.sep,
+                           gsub(Platform()$file.sep, "\\", item),
+                           sep = "")
             doPath()
             writeDir(listView, list.files(path), path)
 	    writeCap(path)
-	    if(currentNode == length(nodes))
-   	        tkconfigure(downBut, state = "disabled")         
+            if(currentNode >= 2)
+                tkconfigure(upBut, state = "normal")
         }else
-	    fileSelected <- item
+	    fileSelected <<- item
     }
 
     doPath <- function(){
-	nodes <<- unlist(strsplit(path, "/"))
+	nodes <<- unlist(strsplit(path, Platform()$file.sep))
         currentNode <<- length(nodes)
     }
 
     up <- function(){
 	if(currentNode > 2){
 	    path <<- paste(nodes[1:(currentNode - 1)],
-			  sep = "", collapse = "/")
+			  sep = "", collapse = Platform()$file.sep)
             writeDir(listView, list.files(path), path)
             writeCap(path)
             currentNode <<- currentNode - 1
             if(currentNode == 2)
    	        tkconfigure(upBut, state = "disabled")
-	    if(currentNode == (length(nodes) - 1))
-		tkconfigure(downBut, state = "normal")
-        }
-    }
-
-    down <- function(){
-	if(currentNode < length(nodes)){
-	    path <<- paste(nodes[1:(currentNode + 1)],
-			  sep = "", collapse = "/")
-            writeDir(listView, list.files(path), path)
-            writeCap(path)
-            currentNode <<- currentNode + 1
-	    if(currentNode == length(nodes))
-   	        tkconfigure(downBut, state = "disabled")
-	    if(currentNode == 3)
-		tkconfigure(upBut, state = "normal")
         }
     }
 
@@ -70,10 +54,8 @@ fileBrowser <- function (path = ""){
         tkinsert(listView, 0, toWrite)
     }
 
-    writeCap <- function(toWrite){
-	tkconfigure(caption, text = paste("Current Location:",
-                                 toWrite))
-    }
+    writeCap <- function(toWrite)
+	tkconfigure(caption, text = toWrite)
 
     if(path == "")
         path <- getwd()
@@ -82,43 +64,29 @@ fileBrowser <- function (path = ""){
     base <- tktoplevel()
     tktitle(base) <- paste("File Browser")
 
-    canvas <- tkcanvas(base,width = WIDTH, height = HEIGHT)
-    tkpack(canvas)
+    caption <- tklabel(base, text = path,font = LABELFONT,
+                       width = 60)
+    tkpack(caption, side = "top")
 
-    capFrame <- tkframe(canvas)
-    caption <- tklabel(capFrame, text = paste("Current Location:", 
-		       path),font = LABELFONT)
-    tkpack(caption)
-    tkcreate(canvas, "window", (WIDTH/2), OFFSET, 
- 	     anchor = "center", window = capFrame)
+    listFrame <- tkframe(base, height = 40)
+    listView <- makeView(listFrame)
+    tkpack(listFrame, fill = "x", expand = TRUE)
 
-    viewFrame <- tkframe(canvas)
-    listView <- makeView(viewFrame, 25, 15) 
-    tkcreate(canvas, "window", 2*OFFSET, 2*OFFSET, anchor = "nw", 
-	     window = viewFrame)
     tkbind(listView, "<B1-ButtonRelease>", inList)
     writeDir(listView, list.files(path), path)
 
-    upFrame <- tkframe(canvas)
-    upBut <- tkbutton(upFrame, text = "Up", width = BUTWIDTH,
+    butFrame <- tkframe(base)
+    upBut <- tkbutton(butFrame, text = "Up", width = BUTWIDTH,
 		      command = up)
-    tkpack(upBut) 
-    tkcreate(canvas, "window", (WIDTH - 85), (HEIGHT - 100), 
-	     anchor = "center", window = upFrame)
 
-    downFrame <- tkframe(canvas)
-    downBut <- tkbutton(downFrame, text = "Down", width = BUTWIDTH,
-			command = down, state = "disabled")
-    tkpack(downBut) 
-    tkcreate(canvas, "window", (WIDTH - 85), (HEIGHT - 65), 
-	     anchor = "center", window = downFrame)
-
-    endFrame <- tkframe(canvas)
-    endBut <- tkbutton(endFrame, text = "End", width = BUTWIDTH,
+    endBut <- tkbutton(butFrame, text = "End", width = BUTWIDTH,
 		       command = end)
-    tkpack(endBut) 
-    tkcreate(canvas, "window", (WIDTH - 85), (HEIGHT - 30), 
-	     anchor = "center", window = endFrame)    
+    tkpack(upBut, endBut, side = "left")
+    tkpack(butFrame)
+
+    tkwait.window(base)
+
+    return(invisible(fileSelected))
 }
 
 
