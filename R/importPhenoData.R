@@ -1,7 +1,7 @@
 # Functions that guide users through the steps of inporting a
 # phenoData object. Used by the affy package.
 
-importPhenoData <- function(sampleNames = NULL){
+importPhenoData <- function(sampleNames = NULL, from = NULL){
 
     if(!require("Biobase", character.only = TRUE)){
         tkmessageBox(title = paste("Dependency error"),
@@ -21,7 +21,7 @@ importPhenoData <- function(sampleNames = NULL){
         tkgrab.release(base)
         tkdestroy(base)
     }
-    on.exit(end())
+    on.exit(if(!any(from == c("file", "object", "edit", "new"))) end())
 
     cancel <- function(){
         newPhenoData <- NULL
@@ -79,11 +79,14 @@ importPhenoData <- function(sampleNames = NULL){
             #if(!is.null(tempPheno)){
             #    newPhenoData <<- tempPheno
             newPhenoData <<- tempData
-                filename <- getName4Data("phenodata", objType = "phenoData")
-                if(!is.null(filename)){
-                    .GlobalEnv[[filename]] <- newPhenoData
-                }
+            filename <- getName4Data("phenodata", objType = "phenoData")
+            if(!is.null(filename)){
+                .GlobalEnv[[filename]] <- newPhenoData
+            }
+            if(is.null(from) ||
+               !any(tolower(from) == c("file", "object", "edit", "new"))){
                 end()
+            }
             #}
         }
     }
@@ -103,52 +106,62 @@ importPhenoData <- function(sampleNames = NULL){
         getPData("new")
     }
 
-    base <- tktoplevel()
-    tktitle(base) <- "BioC Read phenoData"
+    if(!is.null(from) &&
+       any(tolower(from) == c("file", "object", "edit", "new"))){
+        switch(tolower(from),
+               file =  getPData("file"),
+               object = getPData("df"),
+               edit = getPData("pd"),
+               new = getPData("new"),
+               return(TRUE))
+    }else{
+        base <- tktoplevel()
+        tktitle(base) <- "BioC Read phenoData"
 
-    tkpack(tklabel(base, text = paste("Please make a selection using",
+        tkpack(tklabel(base, text = paste("Please make a selection using",
                          "the buttons below:"),
                          font = "Helvetica 11 bold"), side = "top",
-                   expand = FALSE, pady = 8, padx = 5)
+               expand = FALSE, pady = 8, padx = 5)
 
-    # Frame for read from file
-    fileFrame <- tkframe(base, borderwidth = 2, relief = "groove")
-    tkpack(tkbutton(fileFrame, text = "Read From File", width = 18,
-                command = readFile), side = "left", expand = FALSE)
-    tkpack(tklabel(fileFrame, text = paste("Create a phenoData object",
-                              "using a specified file")),
-           side = "left", expand = FALSE)
-    tkpack(fileFrame, side = "top", anchor = "w", pady = 2, padx = 5)
-    # frame for read from data frame
-    dfFrame <- tkframe(base, borderwidth = 2, relief = "groove")
-    tkpack(tkbutton(dfFrame, text = "Read From Object", width = 18,
-                command = readDF), side = "left", expand = FALSE)
-    tkpack(tklabel(dfFrame, text = paste("Create a phenoData object",
-                              "using an existing data frame")),
-           side = "left", expand = FALSE)
-    tkpack(dfFrame, side = "top", anchor = "w", pady = 2, padx = 5)
-    # Frame for editing phenoData
-    epFrame <- tkframe(base, borderwidth = 2, relief = "groove")
-    tkpack(tkbutton(epFrame, text = "Edit phenoData", width = 18,
-                command = readPheno), side = "left", expand = FALSE)
-    tkpack(tklabel(epFrame, text = paste("Editing an existing phenoData",
-                              "object")),
-           side = "left", expand = FALSE)
-    tkpack(epFrame, side = "top", anchor = "w", pady = 2, padx = 5)
+        # Frame for read from file
+        fileFrame <- tkframe(base, borderwidth = 2, relief = "groove")
+        tkpack(tkbutton(fileFrame, text = "Read From File", width = 18,
+                        command = readFile), side = "left", expand = FALSE)
+        tkpack(tklabel(fileFrame, text = paste("Create a phenoData object",
+                                  "using a specified file")),
+               side = "left", expand = FALSE)
+        tkpack(fileFrame, side = "top", anchor = "w", pady = 2, padx = 5)
+        # frame for read from data frame
+        dfFrame <- tkframe(base, borderwidth = 2, relief = "groove")
+        tkpack(tkbutton(dfFrame, text = "Read From Object", width = 18,
+                        command = readDF), side = "left", expand = FALSE)
+        tkpack(tklabel(dfFrame, text = paste("Create a phenoData object",
+                                "using an existing data frame")),
+               side = "left", expand = FALSE)
+        tkpack(dfFrame, side = "top", anchor = "w", pady = 2, padx = 5)
+        # Frame for editing phenoData
+        epFrame <- tkframe(base, borderwidth = 2, relief = "groove")
+        tkpack(tkbutton(epFrame, text = "Edit phenoData", width = 18,
+                        command = readPheno), side = "left", expand = FALSE)
+        tkpack(tklabel(epFrame, text = paste("Editing an existing phenoData",
+                                "object")),
+               side = "left", expand = FALSE)
+        tkpack(epFrame, side = "top", anchor = "w", pady = 2, padx = 5)
 
-    # Frame for creating new phenoData
-    newFrame <- tkframe(base, borderwidth = 2, relief = "groove")
-    tkpack(tkbutton(newFrame, text = "Create New phenoData", width = 18,
-                command = createNew), side = "left", expand = FALSE)
-    tkpack(tklabel(newFrame, text = "Create a new phenoData object"),
-           side = "left", expand = FALSE)
-    tkpack(newFrame, side = "top", anchor = "w", pady = 2, padx = 5)
+        # Frame for creating new phenoData
+        newFrame <- tkframe(base, borderwidth = 2, relief = "groove")
+        tkpack(tkbutton(newFrame, text = "Create New phenoData", width = 18,
+                        command = createNew), side = "left", expand = FALSE)
+        tkpack(tklabel(newFrame, text = "Create a new phenoData object"),
+               side = "left", expand = FALSE)
+        tkpack(newFrame, side = "top", anchor = "w", pady = 2, padx = 5)
 
-    tkpack(tkbutton(base, text = "Cancel", command = cancel, width = 15),
-           side = "top", anchor = "center", expand = FALSE, pady = 10)
+        tkpack(tkbutton(base, text = "Cancel", command = cancel, width = 15),
+               side = "top", anchor = "center", expand = FALSE, pady = 10)
 
-    tkgrab.set(base)
-    tkwait.window(base)
+        tkgrab.set(base)
+        tkwait.window(base)
+    }
 
     return(invisible(newPhenoData))
 }

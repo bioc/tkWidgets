@@ -7,5 +7,5 @@ tkphenoData, vExplorer, viewVignette, "WLValue<-", WName, WRButtons,
 WcanEdit, WfromText, WpostFun, WpreFun, WtoText, WwList, "WwList<-",
 print.Widget, WLValue, WEnd, appendSepDir, getWvalues, hasChar,
 stdType, objNameToList, getPkgContents, getFileContents, pickFiles,
-pickObjs, print.pWidget)
+pickObjs, print.pWidget, getName4Data)
 exportClass(colInfo)

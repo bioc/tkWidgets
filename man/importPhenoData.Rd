@@ -17,7 +17,7 @@
   data frame object and use the data frame to construct a phenoData object
 }
 \usage{
-importPhenoData(sampleNames)
+importPhenoData(sampleNames = NULL, from = NULL)
 createPData(pdata, varList)
 writePDRowNames(pdata, sampleNames)
 writePhenoTable(base, textWidget, pdata)
@@ -48,6 +48,13 @@ getCovarDesc(varList)
   \item{varList}{\code{varList} a list of characters with names
     being coavraite names and values being short descriptions of
     covariate names}
+  \item{from}{\code{from} a character string indicating hwo a phenoData
+    object will be created. "file" - create from an existing file,
+    "object" - create from an existing data frame object, "edit" -
+    create by editing an existing phenoData object, and "new" create a
+    new phenoData object from scratch. NULL or any other values for
+    \code{from} will invoke a widget that allows users to select one of
+    the four means from an interface}
 }
 
 \details{
@@ -71,6 +78,8 @@ getCovarDesc(varList)
 \note{This function is intended for use by funciton read.phenoData of Biobase}
 
 \examples{
-
+if(interactive()){
+    importPhenoData()
+}
 }
 \keyword{ interface }

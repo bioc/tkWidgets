@@ -33,7 +33,9 @@ guess.sep <- function(file.name, numLine = 5, seps, isFile = TRUE){
             break
         }
     }
-
+    if(i == "\\t"){
+        i <- "\t"
+    }
     if(!is.null(sep)){
         separator <- sep
         if(length(unlist(strsplit(toCheck[1], separator)))
