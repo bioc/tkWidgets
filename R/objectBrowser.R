@@ -60,16 +60,16 @@ objectBrowser<- function (env = .GlobalEnv,
     # Write the content of the global environment to the list box for
     # object names
     viewEnv <- function(env){
-        writeObj(listView, pickObjs(objNames = ls(env = env,
-                                    all = TRUE), fun = fun))
+        writeList(listView, pickObjs(objNames = ls(env = env,
+                                    all = TRUE), fun = fun), clear = TRUE)
         writeCap(".GlobalEnv")
     }
     # Executed when a user double clicks an object that is an R
     # environment. List object names in an enviroment to the list
     # boxes for objects.
     doEnv <- function (item){
-        writeObj(listView,  pickObjs(objNames = ls(env = get(item)),
-                                      fun = fun))
+        writeList(listView,  pickObjs(objNames = ls(env = get(item)),
+                                      fun = fun), clear = TRUE)
         writeCap(item)
         if(!is.null(parent.env(get(item))))
             tkconfigure(upBut, state = "normal")
@@ -78,7 +78,7 @@ objectBrowser<- function (env = .GlobalEnv,
     # package. List all object names in the list box for objects.
     doPack <- function (index, pack){
         whichOne <- as.numeric(index) + 1
-        writeObj(listView, ls(pos = whichOne))
+        writeList(listView, ls(pos = whichOne), clear = TRUE)
         isPack <<- TRUE
         writeCap(pack, asis = TRUE)
         tkconfigure(upBut, state = "normal")
@@ -101,7 +101,7 @@ objectBrowser<- function (env = .GlobalEnv,
                      paste("Number of row(s):", nrow(get(aList))),
                      paste("Column Name(s):"),names(get(aList)))
 
-        writeObj(listView, toWrite)
+        writeList(listView, toWrite, clear = TRUE)
         writeCap(aList)
     }
 
@@ -165,14 +165,14 @@ objectBrowser<- function (env = .GlobalEnv,
 
         if(isPack || selectedObj == ".GlobalEnv" ||
            inherits(tryMe, "try-error")){
-            writeObj(listView, pickObjs(objNames = search(),
-                                             fun = fun))
+            writeList(listView, pickObjs(objNames = search(),
+                                             fun = fun), clear = TRUE)
             writeCap("Top Level")
             tkconfigure(upBut, state = "disabled")
         }else{
-            writeObj(listView,
+            writeList(listView,
                     pickObjs(objNames = ls(env = get(selectedObj)),
-                                             fun = fun))
+                                             fun = fun), clear = TRUE)
             writeCap(selectedObj)
 
         }
@@ -222,9 +222,10 @@ objectBrowser<- function (env = .GlobalEnv,
     }
     # Write to the list box for selected objects
     writeSelection <- function (toWrite){
-        tkdelete(selectView, 0, "end")
-        for(i in toWrite)
-            tkinsert(selectView, "end", i)
+        writeList(selectView, toWrite, clear = TRUE)
+        #tkdelete(selectView, 0, "end")
+        #for(i in toWrite)
+        #    tkinsert(selectView, "end", i)
         fileIndex <<- NULL
     }
     # Writes to the top of the widget to indicate the current environment
