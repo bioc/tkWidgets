@@ -5,7 +5,7 @@
 # Copyrihgt, 2002, J. Zhang, all rights reserved
 #
 
-vExplorer <- function (title = "BioC Vignettes Browser",
+vExplorer <- function (title = "BioC Vignettes Explorer",
                            packNames = ""){
 
     require(Biobase) || stop("Package Biobase not available!")
