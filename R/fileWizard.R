@@ -3,30 +3,24 @@
 #
 # Copyright 2002, J. Zhang, all rights reserved.
 
-fileWizard <- function(filename = ""){
+fileWizard <- function(filename = "", fun = "read.table"){
 
     BOLD12 <- "Helvetica 12 bold"
     NORMAL11 <- "Helvetica 11"
-    DELIMITER <- c("Tab", "Semicolon", "comma", "Space", "Other")
-    NUMS <- c(1:20)
+    BOXW <- 20
 
-    type <- tclVar()
-    type <- "delimited"
-    sep <- "\t"
-    skip <- 0
+    args <- formals(fun)
+    boxNames <- names(args)
+    boxNames <- boxNames[boxNames != "file"]
+    boxes <- vector(length = length(args))
 
     end <- function(){
          tkdestroy(top)
     }
 
-    popLists <- function(){
-        for(i in DELIMITER)
-            tkinsert(sepList, "end", i)
-        tkinsert(skipList, "end", "0")
-        for(i in NUMS){
-            tkinsert(widthList, "end", i)
-            tkinsert(skipList, "end", i)
-        }
+    writeEntry <- function(name, toPop){
+        tkdelete(name, "0", "end")
+        tkinsert(name, "end", toPop)
     }
 
     init <- function(){
@@ -38,41 +32,17 @@ fileWizard <- function(filename = ""){
     }
 
     brows <- function(){
-        filename <<- tkcmd("tk_getOpenFile")
+        filename <<- tclvalue(tkcmd("tk_getOpenFile"))
+        args$file <<- filename
         init()
     }
 
-    deliSelected <- function(){
-        tkconfigure(widthList, state = "disabled")
-        tkconfigure(sepList, state = "normal")
-    }
-
-    fixSelected <- function(){
-        tkconfigure(sepList, state = "disabled")
-        tkconfigure(widthList, state = "normal")
-    }
-
-    sepSel <- function(){
-        switch(tclvalue(tkget(sepList, (tkcurselection(sepList)))),
-               "Tab" = sep <<- "\t",
-               "Semicolon" = sep <<- ";",
-               "comma" = sep <<- ",",
-               "Space" = sep <<- " ",
-               sep <<- tclvalue(tkget(sepList,(tkcurselection(sepList)))))
-    }
-
-    skipSel <- function(){
-        skip <<- as.character(tclvalue(tkget(skipList,
-                                             tkcurselection(skipList))))
-    }
-
     view <- function(){
-        if(type == "delimited"){
-            tkdelete(fileText, 0, "end")
-            tkinsert(fileText, "end",
-                     read.table(filename, sep = sep, header = FALSE,
-                                skip = skip))
-        }else if(tclvalue(type) == "fixed"){
+        tkdelete(fileText, 0, "end")
+        text <- do.call(fun, (paste(names(args), "=", args, sep = ",",
+                                 collapse = "")))
+        for (i in 1:nrow(text)){
+            tkinsert(fileText, "end", paste(text[1,], sep = "\t"))
         }
     }
 
@@ -88,41 +58,37 @@ fileWizard <- function(filename = ""){
     tkpack(browsBut, side = "left", padx = 2, pady = 4)
     tkgrid(nameFrame, columnspan = 2, sticky = "w")
 
-    typeFrame <- tkframe(top)
-    typeLabel <- tklabel(typeFrame, text = "Original data type:",
-                        font = NORMAL11)
-    radioFrame <- tkframe(typeFrame)
-    deliBut <- tkradiobutton(radioFrame, text = "Delimited",
-                             variable = type, value = "delimited",
-                             font = NORMAL11, command = deliSelected)
-    fixedBut <- tkradiobutton(radioFrame, text = "Fixed width",
-                              variable = type, value = "fixed",
-                              font = NORMAL11, command = fixSelected)
-    tkpack(deliBut, fixedBut, side = "top", anchor = "w")
-    sepFrame <- tkframe(typeFrame)
-    sepLabel <- tklabel(sepFrame, text = "Delimiter:", font = NORMAL11)
-    sepList <- tklistbox(sepFrame, selectmode = "browse",
-                         width = 10, height = 1)
-    tkbind(sepList, "<B1-ButtonRelease>", sepSel)
-    tkgrid(sepLabel, sepList, padx = 2)
-    widthLabel <- tklabel(sepFrame, text = "Width:", font = NORMAL11)
-    widthList <- tklistbox(sepFrame, selectmode = "browse",
-                           width = 10, height = 1)
-    tkgrid(widthLabel, widthList, padx = 2)
-    tkgrid.configure(sepLabel, widthLabel, sticky = "e")
-    tkgrid.configure(sepList, widthList, sticky = "w")
-    tkpack(sepFrame)
-    tkgrid(typeLabel, radioFrame, sepFrame, sticky = "nw", pady = 4,
-           padx = 2)
-    skipFrame <- tkframe(top)
-    skipLabel <- tklabel(skipFrame, text = "Start at row:",
-                         font = NORMAL11)
-    skipList <- tklistbox(skipFrame, selectmode = "browse",
-                          height = 1, width = 10)
-    tkbind(skipList, "<B1-ButtonRelease>", skipSel)
-    tkgrid(skipLabel, skipList, pady = 4, sticky = "nw")
-
-    tkgrid(typeFrame, skipFrame, sticky = "nw")
+    argFrame <- tkframe(top)
+    i <- 1
+    while(i <= length(boxNames)){
+        if(i != length(boxNames)){
+            frame1 <- tkframe(argFrame)
+            boxes[boxNames[i]] <- tkentry(frame1, width = BOXW)
+            tkpack(tklabel(frame1, text = paste(boxNames[i], ": ",
+                            sep = ""), font = NORMAL11), side = "left")
+            tkpack(boxes[boxNames[i]], side = "left")
+            frame2 <- tkframe(argFrame)
+            boxes[boxNames[i + 1]] <- tkentry(frame2, width = BOXW)
+            tkpack(tklabel(frame2, text = paste(boxNames[i + 1],
+                                   ": ", sep = ""), font =NORMAL11),
+                   side = "left")
+            tkpack(boxes[boxNames[i + 1]], side = "left")
+            tkgrid(frame1, frame2)
+            writeEntry(boxes[boxNames[i]], args[[boxNames[i]]])
+            writeEntry(boxes[boxNames[i + 1]], args[[boxNames[i + 1]]])
+        }else{
+            frame1 <- tkframe(argFrame)
+            boxes[boxNames[i]] <- tkentry(frame1, width = BOXW)
+            tkpack(tklabel(frame1, text = paste(boxNames[i], ": ",
+                            sep = ""), font = NORMAL11), side = "left")
+            tkpack(boxes[boxNames[i]], side = "left")
+            frame2 <- tkframe(argFrame)
+            tkgrid(frame1, frame2)
+            writeEntry(boxes[boxNames[i]], args[[boxNames[i]]])
+        }
+        i <- (i + 2)
+    }
+    tkgrid(argFrame, columnspan = 2, sticky = "nw")
 
     fileFrame <- tkframe(top)
     fileLabel <- paste("Preview of file:", filename)
@@ -158,7 +124,6 @@ fileWizard <- function(filename = ""){
     tkgrid(butFrame, columnspan = 2, pady = 4)
 
     init()
-    popLists()
 }
 
 
