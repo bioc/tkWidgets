@@ -1,7 +1,6 @@
 # These are the functions used by widgetRender
 
 WName <- function(x) x$Name
-"WName<-" <- function(x, value) {x$Name <- value; x}
 WValue <- function(x) x$Value
 
 "WValue<-" <- function(x, value) {x$Value <- value; x}

@@ -4,6 +4,7 @@ widgetRender <- function (iWidget, tkTitle) {
     BUTWIDTH <- 10
 
     savediWidget <- iWidget
+    # This $ sign will go when a function that gets the list is ready
     wList <- iWidget$wList
 
     if(is.null(wList) || is.na(wList) )
@@ -45,7 +46,7 @@ widgetRender <- function (iWidget, tkTitle) {
                                 list(i=i)),
                      substitute(tkinsert(entryList[[i]], 0, text),
                                 list(i=i)),
-                     substitute(wList[[i]]$Value <<- rval, list(i=i))
+                     substitute(WValue(wList[[i]]) <<- rval, list(i=i))
                           )
 
         body(fun) <- as.call(body)
