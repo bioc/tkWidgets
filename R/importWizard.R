@@ -66,14 +66,6 @@ assignCState <- function(value, env){
 getCState <- function(env){
     get("currentState", env)
 }
-# Set and get methods for state id that keeps the tkwin id for a state frame
-#assignSID <- function(value, env){
-#    assign("stateID", value, env)
-#}
-#getSID <- function(env){
-#    get("stateID", env)
-#}
-
 # Set and get methods for colInfo that is a list of colInfo objects to
 # keep column name, type, and drop info
 assignColInfo <- function(value, env){
@@ -111,12 +103,16 @@ initImportWizard <- function(env){
         tkdestroy(top)
     }
     nextState <- function(){
+        tempFrame <- changeState(canvas, backBut, nextBut, env, TRUE)
         tkdestroy(currentFrame)
-        currentFrame <<- changeState(canvas, backBut, nextBut, env, TRUE)
+        tkpack(tempFrame, fill = "both", expand = TRUE)
+        currentFrame <<- tempFrame
     }
     preState <- function(){
+        tempFrame<- changeState(canvas, backBut, nextBut, env, FALSE)
         tkdestroy(currentFrame)
-        currentFrame <<- changeState(canvas, backBut, nextBut, env, FALSE)
+        tkpack(tempFrame, fill = "both", expand = TRUE)
+        currentFrame <<- tempFrame
     }
     finishClicked <- function(){
         dataList <<- finish(env)
@@ -171,11 +167,8 @@ changeState <- function(canvas, backBut, nextBut, env, forward = TRUE){
     }else{
         dropArgs(env)
     }
-    newFrame <- getAFrame(canvas, env)
-    tkpack(newFrame, fill = "both", expand = TRUE)
+    return(getAFrame(canvas, env))
 #    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = newFrame)
-
-    return(newFrame)
 }
 # Sets the string for the new state (next or previous) and
 # actviates/inactivates buttons depending on the state
@@ -236,16 +229,21 @@ finish <- function(env){
     dataFile <- do.call("read.table", args)
     colInfos <- getColInfo(env)
     colNames <- NULL
+    colToDrop <- NULL
     dataName <- getName4Data(args[["file"]])
     for(i in 1:length(colInfos)){
         if(drop(colInfos[[i]])){
-            dataFile <- dataFile[, -i]
+            colToDrop <- c(colToDrop, i)
         }else{
             switch(type(colInfos[[i]]),
                "Character" = dataFile[, i] <- as.character(dataFile[, i]),
                "Numeric" = dataFile[, i] <- as.numeric(dataFile[, i]))
             colNames <- c(colNames, name(colInfos[[i]]))
         }
+    }
+    # Drop the columns
+    if(!is.null(colToDrop)){
+        dataFile <- dataFile[, -colToDrop]
     }
     # In case there is only one column left
     if(is.null(ncol(dataFile))){
@@ -316,7 +314,7 @@ setState1TFrame <- function(frame, viewer, delims, env){
     nameEntry <- tkentry(nameFrame, width = 20)
     # If a file name is given, fill the widget with data
     if(!is.null(getArgs(env)[["state1"]][["file"]])){
-        writeList(nameEntry, filename, clear = TRUE)
+        writeList(nameEntry, getArgs(env)[["state1"]][["file"]], clear = TRUE)
         showData4State1(viewer, env)
         if(length(getArgs(env)[["state1"]][["sep"]]) != 0){
             tkselect(delims[["delimit"]])
@@ -392,14 +390,15 @@ getState2Frame <- function(base, env, state = "state2"){
     frame <- tkframe(base)
     # Shows the name of the file
     label1 <- tklabel(frame, text = paste("File:",
-                                 getArgs(env)[[state]][["file"]]))
+                      getArgs(env)[[state]][["file"]]),
+                      font = "Helvetica 11 bold")
     tkpack(label1, pady = 5, padx = 5)
     midFrame <- tkframe(frame)
     setState2MFrame(midFrame, env)
-    tkpack(midFrame, pady = 5, padx = 5)
+    tkpack(midFrame, pady = 5, padx = 5, fill = "x", expand = TRUE)
     bottomFrame <- tkframe(frame)
     setState2BFrame(bottomFrame, env)
-    tkpack(bottomFrame)
+    tkpack(bottomFrame, fill = "both", expand = TRUE)
     return(frame)
 }
 # Sets the state2 mid frame containing radio buttons for delimiters
@@ -411,8 +410,9 @@ setState2MFrame <- function(frame,env){
     # A list for quote selecttion (" or/and ')
     rightFrame <- tkframe(frame)
     setQuoteList(rightFrame, env)
-    tkpack(leftFrame, side = "left", anchor = "w")
-    tkpack(rightFrame, side = "left")
+    tkpack(leftFrame, side = "left", anchor = "w", fill = "x",
+           expand  = TRUE)
+    tkpack(rightFrame, side = "left", fill = "x", expand = TRUE)
 }
 # Sets the radio buttons for separators for state2 mid frame
 setSepRadios <- function(frame, env, state = "state2"){
@@ -466,7 +466,8 @@ setSepRadios <- function(frame, env, state = "state2"){
     tkbind(otherEntry, "<KeyRelease>", sepEntered)
     # Second row with an entry box for delimiters other those given here
     tkgrid(sepButs[["space"]], sepButs[["other"]], otherEntry)
-    tkpack(sepFrame, side = "left", anchor = "ne")
+    tkpack(sepFrame, side = "left", anchor = "ne", fill = "x",
+           expand = TRUE)
     tkselect(sepButs[[whatDeli(getArgs(env)[[state]][["sep"]])]])
 }
 # Sets the list box for quotes for state2 mid frame
@@ -482,7 +483,7 @@ setQuoteList <- function(frame, env){
     tkconfigure(quoteList, selectmode = "extended")
     tkbind(quoteList, "<B1-ButtonRelease>", quoteSelected)
     writeList(quoteList, c("\"", "'"), clear = TRUE)
-    tkpack(quoteFrame, anchor = "w")
+    tkpack(quoteFrame, anchor = "w", fill = "x", expand = TRUE)
 }
 
 # Sets the value for quote when user selects quote in the list for
@@ -501,10 +502,10 @@ setQuote <- function(listBox, env, state = "state2"){
 # Sets the canvas holding the preview of data for state2
 setState2BFrame <- function(frame, env){
     viewFrame <- tkframe(frame)
-    dataView2 <- makeViewer(viewFrame, vWidth = 700, vHeight = 280,
-                           vScroll = TRUE, hScroll = TRUE,
+    dataView2 <- makeViewer(viewFrame, vScroll = TRUE, hScroll = TRUE,
                            what = "canvas", side = "top")
-    tkpack(viewFrame, anchor = "w", padx = 5, pady = 5)
+    tkpack(viewFrame, anchor = "w", padx = 5, pady = 5, fill = "both",
+           expand = TRUE)
     showData4State2(dataView2, env)
 
 }
@@ -520,13 +521,13 @@ showData4State2 <- function(canvas, env, state = "state2"){
     }
     tempFrame <- tkframe(canvas)
     for(i in 1:ncol(dataFile)){
-        tempList <- tklistbox(tempFrame, width = 0, height = 0,
+        tempList <- tklistbox(tempFrame, height = 0, width = 0,
                               background = "white")
         tkinsert(tempList, "end", dataFile[,i])
-        tkpack(tempList, side = "left")
+        tkpack(tempList, side = "left", fill = "both", expand = TRUE)
     }
-    tkpack(tempFrame, fill = "both", expand = TRUE)
-#    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = tempFrame)
+#    tkpack(tempFrame, fill = "both", expand = TRUE)
+    tkcreate(canvas, "window", 0, 0, anchor = "nw", window = tempFrame)
 }
 # Gets the frame containing the interface for the top frame of
 # importWizard for state3
@@ -534,14 +535,15 @@ getState3Frame <- function(base, env){
     # A frame containing the interface that will be returned
     frame <- tkframe(base)
     label1 <- tklabel(frame, text = paste("File:",
-                             getArgs(env)[["state3"]][["file"]]))
+                             getArgs(env)[["state3"]][["file"]]),
+                      font ="Helvetica 11 bold")
     tkpack(label1, pady = 5)
     topFrame <- tkframe(frame)
     setState3TFrame(topFrame, env)
-    tkpack(topFrame, anchor = "nw")
+    tkpack(topFrame, anchor = "nw", fill = "x", expand = TRUE)
     bottomFrame <- tkframe(frame)
     setState3BFrame(bottomFrame, env)
-    tkpack(bottomFrame, padx = 5, pady = 5)
+    tkpack(bottomFrame, padx = 5, pady = 5, fill = "both", expand = TRUE)
     return(frame)
 }
 # Creates the left bottom portion of state3 frame
@@ -612,7 +614,7 @@ setState3BFrame <- function(frame, env){
         var <- tclVar()
         dropCheck[[i]] <- tkcheckbutton(colFrame, text = "Drop",
                                    variable = var, command = dropCMD[[i]])
-        tkpack(dropCheck[[i]], side = "top")
+        tkpack(dropCheck[[i]], side = "top", fill = "x", expand = TRUE)
         nameEntry[[i]] <- tkentry(colFrame, width = colWidth)
         writeList(nameEntry[[i]], colnames(dataFile)[i])
         # Also updates the value of colInfos
@@ -624,7 +626,7 @@ setState3BFrame <- function(frame, env){
                                       nameEntry[[j]], env)), list(j = i)))
         body(nameCMD[[i]]) <- as.call(body)
         tkbind(nameEntry[[i]], "<KeyRelease>", nameCMD[[i]])
-        tkpack(nameEntry[[i]], side = "top")
+        tkpack(nameEntry[[i]], side = "top", fill = "x", expand = TRUE)
         typeEntry[[i]] <- tkentry(colFrame, width = colWidth)
         writeList(typeEntry[[i]], type(colInfos[[i]]))
         typeCMD[[i]] <- function(){}
@@ -632,15 +634,15 @@ setState3BFrame <- function(frame, env){
                                       typeEntry[[j]], env)), list(j = i)))
         body(typeCMD[[i]]) <- as.call(body)
         tkbind(typeEntry[[i]], "<KeyRelease>", typeCMD[[i]])
-        tkpack(typeEntry[[i]], side = "top")
+        tkpack(typeEntry[[i]], side = "top", fill = "x", expand = TRUE)
         colList[[i]] <- tklistbox(colFrame, width = (colWidth),
                                    height = 0, background = "white")
         tkinsert(colList[[i]], "end", dataFile[,i])
-        tkpack(colList[[i]], side = "top")
-        tkpack(colFrame, side = "left")
+        tkpack(colList[[i]], side = "top", fill = "x", expand = TRUE)
+        tkpack(colFrame, side = "left", fill = "both", expand = TRUE)
     }
-    tkpack(tempFrame, fill = "both", expand = TRUE)
-#    tkcreate(rCanv, "window", 0, 0, anchor = "nw", window = tempFrame)
+#    tkpack(tempFrame, fill = "both", expand = TRUE)
+    tkcreate(rCanv, "window", 0, 0, anchor = "nw", window = tempFrame)
     # Sets values for colInfo object
     assignColInfo(colInfos, env)
 }
