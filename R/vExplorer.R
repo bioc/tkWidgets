@@ -16,7 +16,7 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     on.exit(tkdestroy(base))
     PLATFORM <- .Platform$OS.type
     selectedPkg <- NULL
-    selectedVig <- NULL
+#    selectedVig <- NULL
     vigList <- NULL
 
     end <- function(){
@@ -45,23 +45,29 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
                      tkinsert(vigViewer, "end", i)
                  }
              }
-             tkconfigure(vButton, state = "disabled")
+#             tkconfigure(vButton, state = "disabled")
          }
     }
 
     # Executes when a user clicks a vignette name in the list of Rnw files
     vigSelected <- function(){
-        selectedVig <<-
+        selectedVig <-
              tclvalue(tkget(vigViewer,(tkcurselection(vigViewer))))
-        tkconfigure(vButton, state = "normal")
+        writeList(statusBar, paste("Loading", selectedVig), TRUE)
+        # Make sure widget gets redrawn
+        Sys.sleep(1)
+        viewVignette(title, selectedPkg, vigList[[selectedVig]]$VigPath,
+                     vigList[[selectedVig]]$PDFpath, font)
+        writeList(statusBar, "", TRUE)
+#        tkconfigure(vButton, state = "normal")
     }
 
     # Executes when a user clicks the view button after selecting a
     # vignette
-    viewVig <- function(){
-        viewVignette(title, selectedPkg, vigList[[selectedVig]]$VigPath,
-                     vigList[[selectedVig]]$PDFpath, font)
-    }
+#    viewVig <- function(){
+#        viewVignette(title, selectedPkg, vigList[[selectedVig]]$VigPath,
+#                     vigList[[selectedVig]]$PDFpath, font)
+#    }
 
 
     base <- tktoplevel()
@@ -76,6 +82,7 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     packViewer <- makeViewer(packFrame, hScroll = TRUE, vScroll = TRUE)
     tkconfigure(packViewer, selectmode = "browse")
     tkconfigure(packViewer, font = font)
+    tkconfigure(packViewer, exportselection = FALSE)
     tkbind(packViewer, "<B1-ButtonRelease>", packSelected)
     tkpack(packFrame, side = "left", expand = TRUE, fill = "both")
 
@@ -86,20 +93,25 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     vigViewer <- makeViewer(vigFrame, hScroll = TRUE, vScroll = TRUE)
     tkconfigure(vigViewer, selectmode = "browse")
     tkconfigure(vigViewer, font = font)
+    tkconfigure(vigViewer, exportselection = FALSE)
     tkbind(vigViewer, "<B1-ButtonRelease>", vigSelected)
     tkpack(vigFrame, side = "left", expand = TRUE, fill = "both")
 
     # Buttons to view a vignette and end the widget
-    vButton <- tkbutton(listFrame, text = "View", width = 8,
-                        font = font, command = viewVig)
-    tkpack(vButton, side = "left")
+#    vButton <- tkbutton(listFrame, text = "View", width = 8,
+#                        font = font, command = viewVig)
+#    tkpack(vButton, side = "left")
 
     # Put the three frames in
     tkpack(listFrame, expand = TRUE, fill = "both", pady = 4, padx = 4)
     # put in the end button
     endButton <- tkbutton(base, text = "End", width = 8,
                           font = font, command = end)
-    tkpack(endButton, side = "bottom", pady = 4)
+    tkpack(endButton, pady = 4)
+
+    # Put a status
+    tkpack(statusBar <- tkentry(base, foreground = "Red"),
+           expand = FALSE, side = "bottom", fill = "x")
 
     # Populates the list box for package names
     .popPackList(packViewer, pkgName)
@@ -107,7 +119,7 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
          write2VigList(pkgName)
      }
 
-    tkconfigure(vButton, state = "disabled")
+#    tkconfigure(vButton, state = "disabled")
 
     tkwait.window(base)
 }
