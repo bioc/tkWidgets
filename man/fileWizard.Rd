@@ -7,12 +7,13 @@
   way similar to what MS Excel does.
 }
 \usage{
-fileWizard(filename = "")
+fileWizard(filename = "", fun = read.table)
 }
 
 \arguments{
   \item{filename}{A character string for the name of the text file to be
     imported}
+  \item{fun}{An R function that is going to be used to read the file. Default to    \code{\link{read.table}}}
 }
 \details{
   This function is only partially finished and will be improved soon.
@@ -30,7 +31,7 @@ fileWizard(filename = "")
 \examples{
 if(interactive()) {
   # Only the interface is displyed as no real file is given
-  fileWizard(filename = "")  
+  fileWizard()  
 }
 }
 \keyword{interface}
