@@ -13,10 +13,17 @@ importWizard <- function(filename = ""){
     F3HEIGHT <- 50
     XMARGIN <- 5
     YMARGIN <- 5
-    fileName <- NULL
+    # A list of frames each renders a state specific interface
     stateFrame <- list()
+    # Keeps track of the current state
     state <- "state1"
+    # A tk id that will be associated with a frame for a given state
     stateID <- NULL
+    # Three argument lists to keep the state specific argument information
+    args1 <- list()
+    args2 <- list()
+    args3 <- list()
+    dataFile <- NULL
 
     # Destroy the window
     end <- function(){
@@ -25,8 +32,10 @@ importWizard <- function(filename = ""){
     # Populate the entry box for file name when the brose button is
     # clicked
     browse <- function(){
-        fileName <<- fileBrowser(nSelect = 1)
-        writeList(nameEntry, fileName, clear = TRUE)
+        args1[["file"]] <<- fileBrowser(nSelect = 1)
+        writeList(nameEntry, args1[["file"]], clear = TRUE)
+        dataFile <<- readLines(args1[["file"]])
+        showData(state, dataView1, dataFile)
     }
     # Moves to the next state of the three available states when the
     # next button is clicked
@@ -134,7 +143,7 @@ importWizard <- function(filename = ""){
     tkpack(midFrame, anchor = "w")
     # A text box to show the original data
     viewFrame <- tkframe(stateFrame[["state1"]])
-    dataView <- makeViewer(viewFrame, vWidth = 99, vHeight = 10,
+    dataView1 <- makeViewer(viewFrame, vWidth = 99, vHeight = 10,
                            vScroll = TRUE, hScroll = TRUE,
                            what = "text", side = "top")
     tkpack(viewFrame, anchor = "w", pady = 10)
@@ -187,7 +196,7 @@ importWizard <- function(filename = ""){
     tkpack(midFrame, anchor = "w")
     # A text box to show the original data
     viewFrame <- tkframe(stateFrame[["state2"]])
-    dataView <- makeViewer(viewFrame, vWidth = 99, vHeight = 14,
+    dataView2 <- makeViewer(viewFrame, vWidth = 99, vHeight = 14,
                            vScroll = TRUE, hScroll = TRUE,
                            what = "text", side = "top")
     tkpack(viewFrame, anchor = "w", pady = 10)
@@ -215,7 +224,7 @@ importWizard <- function(filename = ""){
                                   width = 13, anchor = "nw")
     tkpack(dateRadio, anchor = "w")
     skipRadio <- tkradiobutton(leftFrame, text = "Drop column",
-                                  value = 2, variable = dataType,
+                                  value = 4, variable = dataType,
                                   width = 13, anchor = "nw")
     tkpack(skipRadio, anchor = "w")
     tkpack(leftFrame, side = "left", anchor = "w")
@@ -233,7 +242,7 @@ importWizard <- function(filename = ""){
     tkpack(midFrame, anchor = "w")
     # A text box to show the original data
     viewFrame <- tkframe(stateFrame[["state3"]])
-    dataView <- makeViewer(viewFrame, vWidth = 99, vHeight = 10,
+    dataView3 <- makeViewer(viewFrame, vWidth = 99, vHeight = 10,
                            vScroll = TRUE, hScroll = TRUE,
                            what = "text", side = "top")
     tkpack(viewFrame, anchor = "w", pady = 10)
@@ -253,3 +262,18 @@ importWizard <- function(filename = ""){
     tkwait.window(top)
 }
 
+# Populates the list box for data file
+showData <- function(state, listWidget, datafile, argsList){
+    if(state == "state1"){
+        aFrame <- tkframe(listWidget)
+        for(i in 1:length(datafile)){
+            tempFrame <- tkframe(aFrame)
+            tkpack(tkbutton(tempFrame, width = 1, text = i), side = "left")
+            tkpack(tklabel(tempFrame, text = datafile[i]), side = "left")
+            tkpack(tempFrame, side = "top", anchor = "w")
+        }
+        tkwindow.create(listWidget, "end", window = aFrame)
+    }else if(state == "state2"){
+    }else{
+    }
+}
