@@ -10,18 +10,21 @@ pickFiles <- function (fileNames, fun = function(x) TRUE,
 
     unTouched <- fileNames[regexpr(exclude, fileNames) > 0]
     rest <- setdiff(fileNames, unTouched)
+    if(length(rest) > 0){
+        rest <- rest[sapply(rest, fun)]
 
-    rest <- rest[sapply(rest, fun)]
-
-    if(!is.null(prefix)){
-        tryMe <- hasChar(prefix, "prefix")
-        rest <- rest[sapply(rest, tryMe)]
+        if(!is.null(prefix)){
+            tryMe <- hasChar(prefix, "prefix")
+            rest <- rest[sapply(rest, tryMe)]
+        }
+        if(!is.null(suffix)){
+            tryMe <- hasChar(suffix, "suffix")
+            rest <- sapply(rest, tryMe)
+        }
+        return(c(unTouched, rest))
+    }else{
+        return(unTouched)
     }
-    if(!is.null(suffix)){
-        tryMe <- hasChar(suffix, "suffix")
-        rest <- sapply(rest, tryMe)
-    }
-   return(c(unTouched, rest))
 }
 
 
