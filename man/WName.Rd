@@ -14,10 +14,10 @@
 \alias{WpostFun}
 \alias{WEnd}
 
-\title{Accessor functions for primitive widget objects.}
+\title{Accessors functions for primitive widget objects.}
 \description{
   Currently primitive widget object (pwidgets) are implemented as lists,
-  but this will change. Users should only rely on these accessor
+  but this will change. Users should only rely on these accessors
   functions, not the implementation.
 }
 \usage{

@@ -136,7 +136,7 @@ widgetRender <- function (iWidget, tkTitle) {
         class(iWidget) <- "Widget"
         return(iWidget)
     }else{
-        savedWidget$end <- "CANCEL"
+        savediWidget$end <- "CANCEL"
         class(iWidget) <- "Widget"
         return(savediWidget)
     }

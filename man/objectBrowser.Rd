@@ -3,7 +3,7 @@
 
 \title{A function to view the objects in the work space.}
 \description{
-  This function provides a GUI to view objects and select one that is
+  This function provides a widget to view objects and select one that is
   going to be returned. When the "End" button is pressed,the selected
   object will be returned. 
 }
@@ -14,9 +14,9 @@ objectBrowser(fun = function(x) TRUE, textToShow = "Select object(s)", nSelect =
 \arguments{
   \item{fun}{A function to test whether certain conditions are met by
     the objects. Only objects that meet the conditions will be
-    displyed.}
+    displayed.}
   \item{textToShow}{A character string for the message to be show on the
-    GUI as an instruction.}
+    widget as an instruction.}
   \item{nSelect}{An integer for the number of object to select. No
     limitation if nSelect = -1}
 }
@@ -27,18 +27,18 @@ objectBrowser(fun = function(x) TRUE, textToShow = "Select object(s)", nSelect =
   will be the value of the object. If the object is a package, a
   description of the contents of the package will be the value. If the
   selected object is a function, a text string of the original code will
-  be the value. A function can be passed to impose a filtering mechanism
+  be the value. A function can be passed to impose a filtering mechanisms
   on the objects to be displayed. See function isCharacter for an
-  example of writting a filtering function for objectBrowser.
+  example of writing a filtering function for objectBrowser.
 
   The buttons and their expected behavior are listed below:
 
   Up - Moves one level up along the search list and displays the content
-  in the box for object names on the left of the GUI.
+  in the box for object names on the left of the widget.
 
   Select >> - When objects in the box for object names have been
   highlighted by clicking or clicking/draging, clicking "Select >>" will
-  display the highlisted object names in the box for selected objects on
+  display the highlighted object names in the box for selected objects on
   the right. 
 
   Reset - Moves back to ".GlobalEnv" which is the default starting point
@@ -46,12 +46,12 @@ objectBrowser(fun = function(x) TRUE, textToShow = "Select object(s)", nSelect =
 
   << Remove - When object names in the box for seleted objects have been
   highlighted by clicking or clicking/draging and the "<< Remove" button
-  pressed, the hgihlisted object names will be removed from the display.
+  pressed, the highlighted object names will be removed from the display.
 
   Clear <- Removes all the object names from the box for selected
   objects.
 
-  Cancel - Exits the GUI and returns a NULL when pressed.
+  Cancel - Exits the widget and returns a NULL when pressed.
 
   End <- Returns a list of lists with names of the objects in the box
   for selected objects and their corresponding values or NULL if nothing

@@ -1,10 +1,10 @@
 \name{pickObjs}
 \alias{pickObjs}
 
-\title{A function that determines what to be sent the GUI for display.}
+\title{A function that determines what to be sent to a widget for display.}
 \description{
   This function takes a vector of object names and determines what will
-  be sent to the objectBrowser GUI for display based on the default and
+  be sent to the objectBrowser widget for display based on the default and
   user input requirements.
 }
 \usage{
@@ -13,7 +13,7 @@ pickObjs(objNames, fun = function(x) TRUE)
 %- maybe also `usage' for other objects documented here.
 \arguments{
   \item{objNames}{A vector of character strings for object names to be
-    processed.} 
+    precessed.} 
   \item{fun}{A function that checks the object names for satisfaction of
   certain requirement.} 
 }

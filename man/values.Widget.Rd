@@ -51,7 +51,7 @@ values.Widget(x)
 }
 
 \author{Jianhua (John) Zhang}
-\note{This function is part of the Bioconductor procject at Dana-Farber
+\note{This function is part of the Bioconductor project at Dana-Farber
   Cancer Institute to provide Bioinformatics functionalities through R.}
 
 \seealso{\code{\link{widgetRender}}}
@@ -73,8 +73,8 @@ values.Widget(x)
               buttonText=NULL)
 
   widget1 <- list(wList = list(a = pW1, b = pW2, c = pW3),
-                  preFun = function() "Hi Jianhua",
-                  postFun = function() "Bye Jianhua")
+                  preFun = function() "Hi"),
+                  postFun = function() "Bye")
 
 # Define the classes
 class(pW1) <- c("pWidget", "textbox")

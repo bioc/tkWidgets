@@ -6,7 +6,7 @@ on predefined condition.}
 \description{
   This function takes a vector of strings and then checks to see if the
   predefined conditions are met for each element. Elements that meet the
-  condtions will be included in the vector returned and those that do
+  conditions will be included in the vector returned and those that do
   not meet the conditions will be excluded.
 }
 \usage{
@@ -20,7 +20,7 @@ NULL, exclude = Platform()$file.sep)
   \item{prefix}{A character string that is used to check to see if
     strings in the vector have the prefix.}
   \item{suffix}{A character string that is used to check to see if
-    strings in the vector have the sufix.}
+    strings in the vector have the suffix.}
   \item{exclude}{A character string with which strings in the vector
     will be excluded form the checking. The default is to exclude all
     the directory names and always return them.}
@@ -28,10 +28,10 @@ NULL, exclude = Platform()$file.sep)
 \details{
   The function fun will be used only when both prefix and suffix are
   NULL. If a prefix is not NULL, that prefix will be checked. A suffix
-  is going to be checnked when prefix is NULL. 
+  is going to be checked when prefix is NULL. 
 }
 \value{
-  \item{fileNames}{A vector of strings that satisfy the condtions.}
+  \item{fileNames}{A vector of strings that satisfy the conditions.}
 }
 
 \author(Jianhua (John) Zhang}

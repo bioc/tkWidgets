@@ -4,7 +4,7 @@
 \title{A function to render a tk widget based on the specifications
   passed as a list.}
 \description{
-  This function takes a list that specifies the appearance and behaviour
+  This function takes a list that specifies the appearance and behavior
   of a tk widget and renders the widget. 
 }
 \usage{
@@ -13,7 +13,7 @@ widgetRender(iWidget, tkTitle)
 
 \arguments{
   \item{iWidget}{A list of lists that specifies the appearance and
-    behaviour of the widget to be rendered.}
+    behavior of the widget to be rendered.}
   \item{tkTitle}{a character string for the text to be appear in the
     title bar of the widget to be rendered.}
 }
@@ -21,14 +21,14 @@ widgetRender(iWidget, tkTitle)
   The widget to be rendered normally consists of frames with three
   widgets arranged in a row. The first widget is normally a label for
   the name of the second widget. The second widget can be any type of
-  vidgets. The third widget is a button widget that defines some
-  behaviour to be associated with the second widget. For example, a
+  widgets. The third widget is a button widget that defines some
+  behavior to be associated with the second widget. For example, a
   button that will cause something to be displayed in the second widget
   when pressed. The third widget can be missing if no such association
   is required.
 
   The widget to be rendered also has two buttons at the bottom part of
-  the widgets. The following are the name and behaviour of the buttons:
+  the widgets. The followings are the name and behavior of the buttons:
 
   Cancel - The unmodified list passed to the function at the time of
   invocation will be returned when pressed.
@@ -46,7 +46,7 @@ widgetRender(iWidget, tkTitle)
 \references{A Primer on the R-Tcl/Tk Package. R News val.1/3, 2001}
 \author{Jianhua (John) Zhang}
 \note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics funcitonalities through R.}
+  Cancer Institute to provide Bioinformatics functionalities through R.}
 
 \seealso{\code{\link{fileBrowser}},\code{\link{objectBrowser}}}
 
