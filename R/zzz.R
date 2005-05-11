@@ -1,5 +1,5 @@
 
-.onLoad <- function(libname, pkgname, where) {
+.onLoad <- function(libname, pkgname) {
     require("methods", quietly=TRUE) || stop("Package methods unavailable")
     require("widgetTools", quietly = TRUE) ||
                      stop("Package widgetTools unavailable!")

@@ -152,7 +152,7 @@ importing process.
 The version number of R and packages loaded for generating the vignette were:
 
 <<echo=FALSE,results=tex>>=
-sessionInfo()
+toLatex(sessionInfo())
 @
 
 \end{document}
