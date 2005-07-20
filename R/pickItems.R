@@ -6,7 +6,8 @@
 #
 # Copyright 2002 J. Zhang, all rights reserved
 #
-pickItems <- function (items){
+pickItems <- function (items, title1 = "Items to pick",
+                       title2 = "Picked items"){
 
     on.exit(end())
 
@@ -77,8 +78,7 @@ pickItems <- function (items){
     tkgrid(text2Label, columnspan = 2, pady = 2)
     # Label for available SAGE libs
     leftFrame <- tkframe(midFrame)
-    label1 <- tklabel(leftFrame, text = "Items to pick",
-                        font = "Helvetica 11")
+    label1 <- tklabel(leftFrame, text = title1, font = "Helvetica 11")
     tkpack(label1)
     # List box showing the available SAGE libs
     colFrame <- tkframe(leftFrame)
@@ -93,8 +93,7 @@ pickItems <- function (items){
     tkconfigure(colView, selectmode = "extended")
     # Put the list box for selected SAGE libs and the associated buttons
     rightFrame <- tkframe(base)
-    label2 <- tklabel(rightFrame, text = "Picked items",
-                        font = "Helvetica 11")
+    label2 <- tklabel(rightFrame, text = title2, font = "Helvetica 11")
     tkgrid(label2, columnspan = 2)
     selLFrame <- tkframe(rightFrame)
     selectView <- makeViewer(selLFrame, vWidth = 40, vHeight = 15,

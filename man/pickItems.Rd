@@ -9,12 +9,16 @@ available sources}
   the vector.
 }
 \usage{
-pickItems(items)
+pickItems(items, title1 = "Items to pick", title2 = "Picked items")
 }
 
 \arguments{
   \item{items}{\code{items} a vector for the available source elements
     to be selected}
+  \item{title1}{\code{title1} a character string for the title of the
+    list box that shows the list of items to be selected from}
+  \item{title2}{\code{title2} a character string for the title of the
+    list box that shows the items that have been selected}
 }
 \details{
   This function is to provide visual support to other functions and thus
