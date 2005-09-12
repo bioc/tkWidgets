@@ -9,6 +9,7 @@
 \alias{WbuttonText}
 \alias{WbuttonFun}
 \alias{WwList}
+\alias{WwList<-}
 \alias{"WwList<-"}
 \alias{WLValue}
 \alias{WLValue<-}
@@ -38,7 +39,7 @@ WLValue(x, index) <- value
 WRButtons(x)
 WpreFun(x)
 WpostFun(x)
-WEnd{x}
+WEnd(x)
 }
 \arguments{
   \item{x}{list of lists with a Name, Value, toText, fromText,
