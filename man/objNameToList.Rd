@@ -33,7 +33,7 @@ objNameToList(objNames, env)
 \examples{
 # Create two R objects
 obj1 <- c("aaa", "bbb", "ccc")
-env1 <- new.env(parent = NULL)
+env1 <- new.env(parent = baseenv())
 
 # Get a list containing the two objects
 nl <- objNameToList(c("obj1", "env1"), parent.frame())
