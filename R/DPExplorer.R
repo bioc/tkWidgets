@@ -47,13 +47,13 @@ DPExplorer <- function (pkgName = "", title = "BioC Data Package Explorer",
         dName <- as.character(tkget(dataNameList,
                                        tkcurselection(dataNameList)))
         if(!is.environment(get(dName, pos = grep(pkgName, search())))){
-            writeList(valueList, capture.output(get(dName)))
+            writeList(valueList, sort(capture.output(get(dName))))
         }else{
             dataName <<- dName
             currentList <<- as.list(get(dataName,
                                         pos = grep(pkgName, search())))
             #keys <- ls(get(dataName, pos = grep(pkgName, search())))
-            writeList(keyList, names(currentList))
+            writeList(keyList, sort(names(currentList)))
             tkdelete(valueList, "0", "end")
         }
     }
