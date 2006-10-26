@@ -97,7 +97,7 @@ widgetRender <- function (iWidget, tkTitle)
                      substitute(rval <-
                                 eval(as.call(list(WbuttonFun(butFuns[[j]]))),
                                              env=PFRAME),
-                                     list(j=i)),
+                                     list(j=i))
                      )
 
         body(fun) <- as.call(body)
