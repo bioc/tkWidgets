@@ -23,7 +23,7 @@ argsWidget <- function(argsList, defaultNames = c("OK", "Cancel"),
     tempList <- as.list(sapply(funcs2Char(argsList, funcs), formatArg))
     # Constructs the interface
     # Sets the working environment
-    PWEnv <- new.env(hash = TRUE, parent = NULL)
+    PWEnv <- new.env(hash = TRUE, parent = emptyenv())
     pWidgets <- getPWidget(tempList, PWEnv, inst)
     widget <- widget(wTitle = "BioC Arguments Widget", pWidgets,
                      funs = list(), preFun = function() {},
