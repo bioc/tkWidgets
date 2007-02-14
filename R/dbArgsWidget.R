@@ -7,7 +7,7 @@
 dbArgsWidget <- function(){
 
     # Sets the working environment
-    PWEnv <- new.env(hash = TRUE, parent = NULL)
+    PWEnv <- new.env(hash = TRUE, parent = emptyenv())
     # Defines the widget components
     label1 <- label(wName = "label1", wValue = "Database: ", wWidth = 15,
                     wEnv = PWEnv)

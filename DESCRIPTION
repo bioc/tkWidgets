@@ -1,6 +1,6 @@
 Package: tkWidgets
-Version: 1.13.1
-Date: 2006-10-26
+Version: 1.13.2
+Date: 2007-02-14
 Title: R based tk widgets
 Author: J. Zhang <jzhang@jimmy.harvard.edu>
 Maintainer: J. Zhang <jzhang@jimmy.harvard.edu>

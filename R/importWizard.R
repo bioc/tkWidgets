@@ -12,7 +12,7 @@ importWizard <- function(filename = NULL, maxRow = 400){
     argsSet <- FALSE
     # Creates an environment to make some variables available to all
     # related functions
-    workEnv <- new.env(hash = TRUE, parent = NULL)
+    workEnv <- new.env(hash = TRUE, parent = emptyenv())
     # A string to keep track of the current state
     assignCState("state1", env = workEnv)
 
