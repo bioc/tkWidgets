@@ -7,41 +7,33 @@
                                        colType = "character",
                                        dropOrNot = "logical"))
     # Set the get methods
-    if(!isGeneric("colName")){
-        setGeneric("colName",
-                   function(object) standardGeneric("colName"))
-    }
+    setGeneric("colName",
+               function(object) standardGeneric("colName"))
     setMethod("colName", "colInfo",
               function(object) object@colName)
-    if(!isGeneric("colType")){
-        setGeneric("colType",
-                   function(object) standardGeneric("colType"))
-    }
+    
+    setGeneric("colType",
+               function(object) standardGeneric("colType"))
     setMethod("colType", "colInfo",
               function(object) object@colType)
-    if(!isGeneric("dropOrNot")){
-        setGeneric("dropOrNot",
-                   function(object) standardGeneric("dropOrNot"))
-    }
+    
+    setGeneric("dropOrNot",
+               function(object) standardGeneric("dropOrNot"))
     setMethod("dropOrNot", "colInfo",
               function(object) object@dropOrNot)
     # Define the replace methods
-    if(!isGeneric("colName<-")){
-        setGeneric("colName<-", function(object, value)
+    setGeneric("colName<-", function(object, value)
                    standardGeneric("colName<-"))
-    }
     setReplaceMethod("colName", "colInfo", function(object, value){
                   object@colName <- value; object})
-    if(!isGeneric("colTyype<-")){
-        setGeneric("colType<-", function(object, value)
+    
+    setGeneric("colType<-", function(object, value)
                    standardGeneric("colType<-"))
-    }
     setReplaceMethod("colType", "colInfo", function(object, value){
                   object@colType <- value; object})
-    if(!isGeneric("dropOrNot<-")){
-        setGeneric("dropOrNot<-", function(object, value)
+  
+    setGeneric("dropOrNot<-", function(object, value)
                    standardGeneric("dropOrNot<-"))
-    }
     setReplaceMethod("dropOrNot", "colInfo", function(object, value){
                   object@dropOrNot <- value; object})
 
