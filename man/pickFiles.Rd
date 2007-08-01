@@ -32,8 +32,6 @@ pickFiles(fileNames, fun = function(x) TRUE,
 }
 
 \author{Jianhua Zhang}
-\note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R.}
 
 \seealso{\code{\link{fileBrowser}}, \code{\link{hasPrefix}}, \code{\link{hasSuffix}} }
 

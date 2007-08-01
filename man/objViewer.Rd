@@ -23,9 +23,6 @@ objViewer(toView, width = 40, height = 10)
   This function does not return any value
 }
 \author{Jianhua Zhang}
-\note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through \R.
-}
 \seealso{\code{\link{listSelect}}}
 
 \examples{

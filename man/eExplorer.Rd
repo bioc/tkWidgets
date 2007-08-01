@@ -41,8 +41,6 @@ getHelpFile(pkgName, fileName)
 \references{Writing R Extension for information on "R-ex" and "help"
   directories} 
 \author{Jianhua Zhang}
-\note{The functions are part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R}
 
 \seealso{\code{\link{vExplorer}}}
 \examples{

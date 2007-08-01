@@ -73,8 +73,6 @@ getTrueNullNa(toFormat)
 }
 \references{R tcltk}
 \author{Jianhua Zhang}
-\note{The functions are part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R}
 
 \examples{
   if(interactive()){

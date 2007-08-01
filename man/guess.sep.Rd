@@ -57,8 +57,6 @@ getRowNames(file.name, sep, header, skip)
     numeric} 
 }
 \author{Jianhua Zhang}
-\note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R}
 
 \seealso{\code{\link{fileWizard}}}
 

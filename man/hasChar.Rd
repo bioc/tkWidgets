@@ -41,8 +41,6 @@ hasSuffix(aSuffix)
 }
 
 \author{Jianhua (John) Zhang}
-\note{These function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R.}
 
 \seealso{\code{\link{pickFiles}}}
 

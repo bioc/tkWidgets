@@ -168,8 +168,6 @@ getLineData(env)
 }
 
 \author{Jianhua Zhang}
-\note{The functions are part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics funcitonalities through R}
 
 \seealso{\code{\link{importWizard}}}
 \examples{

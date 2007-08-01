@@ -63,8 +63,6 @@ objectBrowser(env = .GlobalEnv,fun = noAuto, textToShow = "Select object(s)", nS
   A \code{\link{list}} of lists with a name and value pair for each object.
 }
 \author{Jianhua (John) Zhang}
-\note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through \R.}
 
 \examples{
 ## The example here is only run interactively since it requires user

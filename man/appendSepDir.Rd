@@ -18,8 +18,6 @@ appendSepDir(path)
   A character vector containing file and directory names.
 }
 \author{Jianhua (John) Zhang}
-\note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R.}
 
 \seealso{\code{\link{fileBrowser}}, \code{\link{pickFiles}}}
 

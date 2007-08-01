@@ -29,9 +29,6 @@ stdView(toView)
   \code{stdView()}
 }
 \author{Jianhua Zhang}
-\note{These functions are part of the Bioconductor project at
-  Dana-Farber Cancer Institute to provide Bioinformatics functionalities
-  through R}
 
 \seealso{\code{\link{listSelect}}}
 

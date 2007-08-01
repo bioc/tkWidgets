@@ -61,8 +61,6 @@ procHTML(fileName)
 }
 \references{Documentation on R packages }
 \author{Jianhua Zhang}
-\note{The functions are part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinfomatics functionalities through R}
 
 \seealso{\code{\link{eExplorer}}}
 \examples{

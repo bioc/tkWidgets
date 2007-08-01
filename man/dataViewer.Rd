@@ -26,8 +26,6 @@ dataViewer(data, caption = "", save = TRUE)
 }
 \references{R tcltk}
 \author{Jianhua Zhang}
-\note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R}
 
 \seealso{\code{\link{importWizard}}}
 \examples{

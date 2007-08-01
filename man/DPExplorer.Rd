@@ -47,8 +47,6 @@ loadDataPkg(pkgName)
 }
 \references{Documents for a Bioconductor data package}
 \author{Jianhua Zhang}
-\note{The functions are part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R}
 
 \examples{
 if(interactive() && require("hgu95av2", character.only = TRUE)){

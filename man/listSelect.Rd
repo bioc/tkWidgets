@@ -44,9 +44,6 @@ writeLabel(baseW, typeFun, valueFun)
    (deselected).
 }
 \author{Jianhua Zhang}
-\note{The functions are part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioninformatics functionalities through \R.
-}
 \seealso{\code{\link{objViewer}}}
 
 \examples{

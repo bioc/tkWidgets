@@ -25,8 +25,6 @@ getLightTW(x, y, text)
   This function does not return any value
 }
 \author{Jianhua Zhang}
-\note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R}
 
 \examples{
 if(interactive()){

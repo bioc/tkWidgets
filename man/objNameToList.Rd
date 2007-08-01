@@ -25,8 +25,6 @@ objNameToList(objNames, env)
 }
 
 \author{Jianhua (John) Zhang}
-\note{This function is part of the Bioconducter project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionality through R.}
 
 \seealso{\code{\link{objectBrowser}}}
 

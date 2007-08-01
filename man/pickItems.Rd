@@ -29,8 +29,6 @@ pickItems(items, title1 = "Items to pick", title2 = "Picked items")
 }
 \references{R tcltk}
 \author{Jianhua Zhang}
-\note{This function is part of the Bioconductor project at Dana-Farber
-  Cancer Institute to provide Bioinformatics functionalities through R}
 
 \seealso{\code{\link{dataViewer}}}
 \examples{
