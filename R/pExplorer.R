@@ -63,7 +63,7 @@ pExplorer <- function (pkgName = "", pkgPath = "",
             pkgNames <<- getRPkgs(tclvalue(pkgPath))
             tclvalue(pkgName) <<- pkgNames[1]
             baseDir <<- file.path(tclvalue(pkgPath), tclvalue(pkgName))
-            subDir <<- NULL
+            subDirs <<- NULL
             writePkgDirs()
         }
     }

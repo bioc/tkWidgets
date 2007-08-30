@@ -82,20 +82,20 @@ fileWizard <- function(filename = "", fun = read.table, file = "file",
         end()
     }
     # Not for this release yet
-    showMore <- function(){
-        writeList(restList, rest)
-    }
+    #showMore <- function(){
+    #    writeList(restList, rest)
+    #}
     # Not for this release yet
-    update <- function(){
-        cat("workds")
-    }
+    #update <- function(){
+    #    cat("workds")
+    #}
     # Not for this release yet
-    argSelected <- function(){
-        selectedArg <<-
-            tclvalue(tkget(restList,(tkcurselection(restList))))
-        writeList(restEntry, args[[selectedArg]])
-        tkconfigure(restUp, state = "normal")
-    }
+    #argSelected <- function(){
+    #    selectedArg <<-
+    #        tclvalue(tkget(restList,(tkcurselection(restList))))
+    #    writeList(restEntry, args[[selectedArg]])
+    #    tkconfigure(restUp, state = "normal")
+    #}
     # Set up the interface
     top <- tktoplevel()
     tktitle(top) <- "BioC Data Import Wizard"

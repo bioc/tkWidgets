@@ -171,28 +171,29 @@ importPhenoData <- function(fileName = NULL, sampleNames = NULL, from = NULL){
 }
 
 # Read a data frame from a specified file
-getPDFromFile <- function(){
+#getPDFromFile <- function(){
 
-    pdata <- NULL
+#    pdata <- NULL
 
-    fileName <- getNameWidget("file")
-    if(is.null(fileName)){
-        return(NULL)
-    }
-    args <- guess.sep(fileName)
+#    fileName <- getNameWidget("file")
+#    if(is.null(fileName)){
+#        return(NULL)
+#    }
+#    args <- guess.sep(fileName)
     # Try read.table by figuring out the args
-    options(show.error.messages = FALSE)
-    tryMe <- try(read.table(file = fileName, sep = args[["separator"]],
-                            header = args[["header"]]))
-    options(show.error.messages = TRUE)
-    if(inherits(tryMe, "try-error")){
+
+#    options(show.error.messages = FALSE)
+#    tryMe <- try(read.table(file = fileName, sep = args[["separator"]],
+#                            header = args[["header"]]))
+#    options(show.error.messages = TRUE)
+#    if(inherits(tryMe, "try-error")){
         # If fail, try this
-        pdata <- readFileByUserArgs(fileName)
-    }else{
-        pdata <- tryMe
-    }
-    return(pdata)
-}
+#        pdata <- readFileByUserArgs(fileName)
+#    }else{
+#        pdata <- tryMe
+#    }
+#    return(pdata)
+#}
 
 # A widget to read in the name of an object
 getOBJWidget <- function(type = NULL){

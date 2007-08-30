@@ -5,7 +5,6 @@
 \alias{writePhenoTable}
 \alias{makePhenoData}
 \alias{convert2PData}
-\alias{getPDFromFile}
 \alias{getOBJWidget}
 \alias{objExists}
 \alias{getSNCNums}
@@ -23,7 +22,6 @@ writePDRowNames(pdata, sampleNames)
 writePhenoTable(base, textWidget, pdata)
 makePhenoData(pdata)
 convert2PData(phenoList)
-getPDFromFile()
 getOBJWidget(type = NULL)
 objExists(name, type = NULL)
 getSNCNums(sampleNames)

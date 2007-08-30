@@ -229,20 +229,20 @@ viewVignette <- function(title, packName, vigPath, font = "arial 11"){
     }
 
     # Not implemented now but will be later
-    back <- function(){
-        if(length(codeVersion) > 1){
-            codeVersion <<- codeVersion[[-length(codeVersion)]]
-        }
-        if(length(codeVersion) == 1){
-            tkconfigure(backButton, state = "disabled")
-        }
-        tempCode <- chunk(getChunk(codeVersion[[length(codeVersion)]]))
-        tkdelete(editViewer, "1.0", "end")
-        for(i in tempCode){
-            tkinsert(editViewer, "end", paste(i, "\n", sep = ""))
-        }
-        tkdelete(resultViewer, 0, "end")
-    }
+    #back <- function(){
+    #    if(length(codeVersion) > 1){
+    #        codeVersion <<- codeVersion[[-length(codeVersion)]]
+    #    }
+    #    if(length(codeVersion) == 1){
+    #        tkconfigure(backButton, state = "disabled")
+    #    }
+    #    tempCode <- chunk(getChunk(codeVersion[[length(codeVersion)]]))
+    #    tkdelete(editViewer, "1.0", "end")
+    #   for(i in tempCode){
+    #        tkinsert(editViewer, "end", paste(i, "\n", sep = ""))
+    #    }
+    #    tkdelete(resultViewer, 0, "end")
+    #}
 
     # Executed when a user clicks the view PDF button
     viewPDF <- function(){
@@ -250,7 +250,7 @@ viewVignette <- function(title, packName, vigPath, font = "arial 11"){
         temp <- try(vignette(gsub("\\..*", "", basename(vigPath))))
         options(show.error.message = TRUE)
         if(inherits(temp, "try-error")){
-            tkMessageBox(title = "PDF File Error",
+            tkmessageBox(title = "PDF File Error",
                          message = paste("No PDF files available for",
                                    basename(vigPath)),
                          icon = "",

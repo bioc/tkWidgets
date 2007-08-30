@@ -96,9 +96,9 @@ eExplorer <- function(pkgName, font = "arial 13", getFocus = TRUE){
     }
 
     # keeps track of code modification done
-    codeChanged <- function(){
-        newCode <<- TRUE
-    }
+    #codeChanged <- function(){
+    #    newCode <<- TRUE
+    #}
 
     # Cleans the boxes for code chunk and result of execution
     clear <- function(){
