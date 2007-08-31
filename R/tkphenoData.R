@@ -272,7 +272,9 @@ tkphenoData <- function(sampleNames){
       }}
     else{
       if(!is.na(match("cov.name.lst",ls(eerieEnv)))){
-        assign("cov.name.lst", cov.name.label,eerieEnv)}
+        # Changed by Jianhua Zhang from the line commented below
+        #assign("cov.name.lst", cov.name.label,eerieEnv)}
+        assign("cov.name.lst", get("cov.name.label", eerieEnv),eerieEnv)}
       else{
         for(i in 1:get("NumCovariates",eerieEnv)){
           assign("cov.name", tclVar(""),eerieEnv)
@@ -289,7 +291,9 @@ tkphenoData <- function(sampleNames){
     }
     else{
       if(!is.na(match("desc.lst",ls(eerieEnv)))){
-        assign("desc.lst",desc.lst,eerieEnv)}
+        #Changed by John from the line commented out 
+        #assign("desc.lst",desc.lst,eerieEnv)}
+        assign("desc.lst",get("desc.lst", eerieEnv),eerieEnv)}
       else{
         for(i in 1:get("NumCovariates",eerieEnv)){
           assign("descvar",tclVar(""),eerieEnv)
