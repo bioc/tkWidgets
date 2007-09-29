@@ -28,7 +28,7 @@ pickFiles(fileNames, fun = function(x) TRUE,
   is going to be checked when prefix is NULL.
 }
 \value{
-  Character vector of file names satisfying the conditions.}
+  Character vector of file names satisfying the conditions.
 }
 
 \author{Jianhua Zhang}

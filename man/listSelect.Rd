@@ -53,6 +53,6 @@ aList <- list(a = "AAA", b = c(123, 456, 789),
 # Since user interference is required, the example code does not run
 # automatically
 if(interactive())
-  listSelect(aList)}
+  listSelect(aList)
 }
 \keyword{interface}

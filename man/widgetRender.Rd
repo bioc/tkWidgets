@@ -42,7 +42,7 @@ widgetRender(iWidget, tkTitle)
 \value{
   A \code{\link{list}} of lists with the original values of the passed
   modified or unmodified depending on whether the cancel or end button
-  pressed.}
+  pressed.
 }
 \references{
   Peter Dalgaard (2001)

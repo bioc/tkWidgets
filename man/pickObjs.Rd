@@ -24,7 +24,7 @@ noAuto(x)
   Packages and environments are always displayed.
 }
 \value{
-  Character vector of object names that satisfy the requirements.}
+  Character vector of object names that satisfy the requirements.
 }
 
 \author{Jianhua (John) Zhang}

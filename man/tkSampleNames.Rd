@@ -1,13 +1,11 @@
 \name{tkSampleNames}
 \alias{tkSampleNames}
-%- Also NEED an `\alias' for EACH other topic documented here.
 \title{Simple interface to associate sample names with files}
 \description{
 This widget provides an interface to enter names to be associated with
 files containing array expression information related to a particular
 sample.}
 
-}
 \usage{
 tkSampleNames(..., filenames = character(0))
 }
