@@ -1,5 +1,5 @@
-# Functions that guide users through the steps of inporting a
-# phenoData object. Used by the affy package.
+# Functions that guide users through the steps of importing an
+# AnnotatedDataFrame object. Used by the affy package.
 
 importPhenoData <- function(fileName = NULL, sampleNames = NULL, from = NULL){
 
@@ -52,7 +52,7 @@ importPhenoData <- function(fileName = NULL, sampleNames = NULL, from = NULL){
             varList <- list()
             varList[colnames(pdata)] <- ""
         }else if (what == "pd"){
-            pdata <- getOBJWidget("phenoData")
+            pdata <- getOBJWidget("AnnotatedDataFrame")
             if(is.null(pdata)){
                 return(invisible())
             }
@@ -83,7 +83,7 @@ importPhenoData <- function(fileName = NULL, sampleNames = NULL, from = NULL){
             #if(!is.null(tempPheno)){
             #    newPhenoData <<- tempPheno
             newPhenoData <<- tempData
-            filename <- getName4Data("phenodata", objType = "phenoData")
+            filename <- getName4Data("phenodata", objType = "AnnotatedDataFrame")
             if(!is.null(filename)){
                 .GlobalEnv[[filename]] <- newPhenoData
             }
@@ -120,7 +120,7 @@ importPhenoData <- function(fileName = NULL, sampleNames = NULL, from = NULL){
                return(TRUE))
     }else{
         base <- tktoplevel()
-        tktitle(base) <- "BioC Read phenoData"
+        tktitle(base) <- "BioC Read AnnotatedDataFrame"
 
         tkpack(tklabel(base, text = paste("Please make a selection using",
                          "the buttons below:"),
@@ -131,7 +131,7 @@ importPhenoData <- function(fileName = NULL, sampleNames = NULL, from = NULL){
         fileFrame <- tkframe(base, borderwidth = 2, relief = "groove")
         tkpack(tkbutton(fileFrame, text = "Read From File", width = 18,
                         command = readFile), side = "left", expand = FALSE)
-        tkpack(tklabel(fileFrame, text = paste("Create a phenoData object",
+        tkpack(tklabel(fileFrame, text = paste("Create an AnnotatedDataFrame object",
                                   "using a specified file")),
                side = "left", expand = FALSE)
         tkpack(fileFrame, side = "top", anchor = "w", pady = 2, padx = 5)
@@ -139,24 +139,24 @@ importPhenoData <- function(fileName = NULL, sampleNames = NULL, from = NULL){
         dfFrame <- tkframe(base, borderwidth = 2, relief = "groove")
         tkpack(tkbutton(dfFrame, text = "Read From Object", width = 18,
                         command = readDF), side = "left", expand = FALSE)
-        tkpack(tklabel(dfFrame, text = paste("Create a phenoData object",
+        tkpack(tklabel(dfFrame, text = paste("Create an AnnotatedDataFrame object",
                                 "using an existing data frame")),
                side = "left", expand = FALSE)
         tkpack(dfFrame, side = "top", anchor = "w", pady = 2, padx = 5)
-        # Frame for editing phenoData
+        # Frame for editing AnnotatedDataFrame
         epFrame <- tkframe(base, borderwidth = 2, relief = "groove")
-        tkpack(tkbutton(epFrame, text = "Edit phenoData", width = 18,
+        tkpack(tkbutton(epFrame, text = "Edit AnnotatedDataFrame", width = 18,
                         command = readPheno), side = "left", expand = FALSE)
-        tkpack(tklabel(epFrame, text = paste("Editing an existing phenoData",
+        tkpack(tklabel(epFrame, text = paste("Editing an existing AnnotatedDataFrame",
                                 "object")),
                side = "left", expand = FALSE)
         tkpack(epFrame, side = "top", anchor = "w", pady = 2, padx = 5)
 
-        # Frame for creating new phenoData
+        # Frame for creating new AnnotatedDataFrame
         newFrame <- tkframe(base, borderwidth = 2, relief = "groove")
-        tkpack(tkbutton(newFrame, text = "Create New phenoData", width = 18,
+        tkpack(tkbutton(newFrame, text = "Create New AnnotatedDataFrame", width = 18,
                         command = createNew), side = "left", expand = FALSE)
-        tkpack(tklabel(newFrame, text = "Create a new phenoData object"),
+        tkpack(tklabel(newFrame, text = "Create a new AnnotateDataFrame object"),
                side = "left", expand = FALSE)
         tkpack(newFrame, side = "top", anchor = "w", pady = 2, padx = 5)
 
@@ -217,7 +217,7 @@ getOBJWidget <- function(type = NULL){
                     message = paste("I can't continue because:",
                     "\n 1. You may have entered an invalid name or",
                     "\n 2. the name of the object is not of",
-                    "class data.frame/phenoData.\nPlease try again."),
+                    "class data.frame/AnnotatedDataFrame.\nPlease try again."),
                           icon = "error",
                           type = "ok")
             }
@@ -370,7 +370,8 @@ writePDRowNames <- function(pdata, sampleNames){
 }
 
 # This widget is called by importPhenoData when uses decide to create
-# a phenoData object based on a file, a data frame, or phenoData object
+# an AnnotatedDataFrame object based on a file, a data frame, or
+# AnnotatedDataFrame object
 createPData <- function(pdata, varList){
     newPhenoData <- NULL
     phenoList <- NULL
@@ -381,19 +382,19 @@ createPData <- function(pdata, varList){
         tkdestroy(base)
     }
     on.exit(end())
-    # When the continus button is clicked, create a phenoData object
+    # When the continus button is clicked, create an AnnotatedDataFrame object
     cont <- function(){
         newPData <- convert2PData(phenoList)
         names(varList) <- colnames(newPData)
         phenoList <- getCovarDesc(varList)
         if(!is.null(phenoList)){
             options(show.error.messages = FALSE)
-            tryMe <- try(new("phenoData", pData=data.frame(newPData),
+            tryMe <- try(new("AnnotatedDataFrame", pData=data.frame(newPData),
                              varLabels=phenoList))
             options(show.error.messages = TRUE)
             if(inherits(tryMe, "try-error")){
                 tkmessageBox(title = paste("Data Error"),
-                       message = paste("I can't create a phenoData object.",
+                       message = paste("I can't create an AnnotatedDataFrame object.",
                        "Perhaps the numbers of covariates and their",
                        "descriptions do not match."),
                        icon = "error",
@@ -427,7 +428,7 @@ createPData <- function(pdata, varList){
                   side = "top", expand = FALSE, pady = 5)
     tkpack(noteFrame, side = "top", expand = FALSE, padx = 5, pady = 5)
 
-    # A text widget to keep phenoData entries
+    # A text widget to keep AnnotatedDataFrame entries
     dataFrame <- tkframe(base)
     dataText <- makeViewer(dataFrame, vWidth = 85, vHeight = 16,
                            hScroll = TRUE,
@@ -492,7 +493,7 @@ makePhenoData <- function(pdata){
     return(as.matrix(temp))
 }
 
-# Conver values in a matrix containing user input data to a phenoData
+# Conver values in a matrix containing user input data to an AnnotatedDataFrame
 # object
 convert2PData <- function(phenoList){
     pdata <- NULL
@@ -518,7 +519,7 @@ convert2PData <- function(phenoList){
     rownames(pdata) <- rnames
     colnames(pdata) <- cnames
     #names(varlist) <- as.character(1:length(varlist))
-#    return(new("phenoData", pData=data.frame(pdata), varLabels=varlist))
+#    return(new("AnnotatedDataFrame", pData=data.frame(pdata), varLabels=varlist))
     return(pdata)
 }
 

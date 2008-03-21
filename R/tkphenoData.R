@@ -142,9 +142,9 @@ tkphenoData <- function(sampleNames){
 #    tkgrid(space.label4,row=(get("NumSamples",eerieEnv)+4))
 #    tkgrid(space.label5,row=(get("NumSamples",eerieEnv)+5))
 
-    ###### JZ add this to save the phenoData object to .Global Env
+    ###### JZ add this to save the AnnotatedDataFrame object to .Global Env
     saveFrame <- tkframe(win.fr, background = "white")
-    tkpack(tklabel(saveFrame, text = "Save phenoData as", background = "white"),
+    tkpack(tklabel(saveFrame, text = "Save AnnotatedDataFrame as", background = "white"),
            side = "left", expand = FALSE)
     pdName <- tclVar("")
     pdNameEntry <- tkentry(saveFrame, width = 40, textvariable = pdName,

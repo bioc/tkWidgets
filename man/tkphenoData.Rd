@@ -1,9 +1,9 @@
 \name{tkphenoData}
 \alias{tkphenoData}
-\title{Simple interface to enter phenoData}
+\title{Simple interface to enter AnnotatedDataFrame}
 \description{
 This widget provides an interface to create
-\code{\link[Biobase]{phenoData-class}} instances.
+\code{\link[Biobase]{AnnotatedDataFrame-class}} instances.
 }
 \usage{
 tkphenoData(sampleNames)
@@ -14,14 +14,13 @@ tkphenoData(sampleNames)
 \details{
   The function returns a list of character matrices intended to be used
   as the \code{pData} and \code{varLabels} slots of an instance of
-  \code{\link[Biobase]{phenoData-class}}.
+  \code{\link[Biobase]{AnnotatedDataFrame-class}}.
 }
 \value{
   A list of two matrices
   \item{pData}{a character matrix containing phenotypic data.}
-  \item{varLabels }{a character vector with covariate description}
+  \item{varLabels }{a character vector with covariate description.}
 }
 \author{Majnu John} 
-
-\seealso{\code{\link[Biobase]{phenoData-class}}}
+\seealso{\code{\link[Biobase]{AnnotatedDataFrame-class}}}
 \keyword{interface}

@@ -17,7 +17,7 @@ WbuttonFun <- function(x) x$buttonFun
 #get and set the widget list
 ##FIXME: shouldn't these be getWidgetList and setWidgetList?
 WwList <- function(x) x$wList
-"WwList<-" <- function(x, value) {x$wList <- value; x}
+"WwList<-" <- function(x, value) {x$wList[names(value)] <- value; x}
 
 ##what about getIndexValuepWidget and setIndexValuepWidget
 #get and set index' pWidgets value

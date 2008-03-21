@@ -1,6 +1,5 @@
 \name{tkMIAME}
 \alias{tkMIAME}
-%- Also NEED an `\alias' for EACH other topic documented here.
 \title{Simple Interface to enter experimental design information}
 \description{This function provides a widget for users to enter
   experimental design MIAME information.
@@ -8,7 +7,6 @@
 \usage{
 tkMIAME()
 }
-
 \details{
 This widget provides an interface to enter experimental information following
 the MIAME (Minimum Information About a Microarray Experiment) standard.
@@ -24,7 +22,7 @@ We ask for the user to enter: experimenter name,
 laboratory, contact information, a single-sentence experiment title, an
 abstract describing the experiment, URLs. This slot could also include a
 formal statistical description of the experimental design (e.g. using
-factors). Some of this info is already stored in phenoData or elsewhere.
+factors). Some of this info is already stored in AnnotatedDataFrame or elsewhere.
 
 The function returns a list that is intended for the creation of an
 object of class \code{\link[Biobase]{MIAME}}. However, we return a list
@@ -32,7 +30,6 @@ so that the function can work independently of the Biobase package.
 }
 \value{
   A list containing entries:
-  
    \item{ExperimentName}{character string}
    \item{LabName}{character string}
    \item{ContactInfo}{character string}
@@ -46,6 +43,4 @@ so that the function can work independently of the Biobase package.
   \url{http://www.mged.org/Workgroups/MIAME/miame_1.1.html}} 
 \author{Majnu John}
 \seealso{\code{\link[Biobase]{MIAME}}}
-
-
-\keyword{interface}% __ONLY ONE__ keyword per line
+\keyword{interface}
