@@ -77,7 +77,7 @@ eExplorer <- function(pkgName, font = "arial 13", getFocus = TRUE){
         tkconfigure(resultViewer, state = "normal")
         tkdelete(resultViewer, "0.0", "end")
         options(show.error.messages = FALSE)
-        out <- try(capture.output(do.call("example", list(topic = expCode))))
+        out <- try(capture.output(do.call(example, list(topic = expCode))))
         options(show.error.messages = TRUE)
         if(inherits(out, "try-error")){
             cont <- paste("Execution fauled because of:", out)

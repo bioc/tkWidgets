@@ -223,7 +223,7 @@ getTopLevel <- function(title){
 
 ##fixme: surely this should do something smarter
 loadDataPkg <- function(pkgName){
-    where <- do.call("require", list(pkgName, quietly=TRUE))
+    where <- do.call(require, list(pkgName, quietly=TRUE))
     if(!where){
         tkmessageBox(title = "Invalid Package Name",
                          message = paste("Package", pkgName,

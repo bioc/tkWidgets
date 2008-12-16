@@ -324,7 +324,7 @@ finish <- function(env){
     if(inherits(conn, "connection")){
         args[["file"]] <- conn
         options(show.error.messages = FALSE)
-        dataFile <- try(do.call("read.table", args))
+        dataFile <- try(do.call(read.table, args))
         options(show.error.messages = TRUE)
         #close(args[["file"]])
         if(inherits(dataFile, "try-error")){
@@ -793,7 +793,7 @@ showData4State2 <- function(canvas, env, state = "state2"){
     if(inherits(conn, "connection")){
         temp[["file"]] <- conn
         options(show.error.messages = FALSE)
-        dataFile <- try(do.call("read.table", temp))
+        dataFile <- try(do.call(read.table, temp))
         options(show.error.messages = TRUE)
         if(inherits(dataFile, "try-error")){
             tkmessageBox(title = "Import Error",
@@ -881,7 +881,7 @@ setState3BFrame <- function(frame, env){
     if(inherits(conn, "connection")){
         argsList[["file"]] <- conn
         options(show.error.messages = FALSE)
-        dataFile <- try(do.call("read.table", argsList))
+        dataFile <- try(do.call(read.table, argsList))
         options(show.error.messages = TRUE)
         if(inherits(dataFile, "try-error")){
             tkmessageBox(title = "Import Error",
