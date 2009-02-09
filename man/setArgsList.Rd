@@ -93,7 +93,7 @@ getLineData(env)
   values for argument list and colInfo.
 
   \code{\link{whatDeli}} gets the word representation of delimiters
-  (e.g. tab for "\t").
+  (e.g. tab for "\\t").
 
   \code{\link{getMoreArgs}} generates a widget using widgetTools to
   collect some of the arguments for read.table.

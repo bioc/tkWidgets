@@ -27,7 +27,7 @@ getRowNames(file.name, sep, header, skip)
     of lines to be read from the file for making the determination}
   \item{seps}{\code{seps} a vector of characters of potential delimiters
     to be used to make the determination. Default delimiters include " ",
-    ",", ";", and "\t". Anything inaddition to the default will have to
+    ",", ";", and "\\t". Anything inaddition to the default will have to
     be included in seps}
   \item{twoLines}{\code{twoLines} a vector of character string including
     the first two lines of a file that will be used to determine whether
