@@ -127,7 +127,7 @@ getLineData(env)
   \code{\link{changeState}} changes the state and thus the interface of
   a widget.
 
-  \code{\ling{setNewState}} sets the state of a importing process.
+  \code{\link{setNewState}} sets the state of a importing process.
 
   \code{\link{addArgs}} adds a new state to the argument list for
   states.
