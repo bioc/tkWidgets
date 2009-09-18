@@ -22,25 +22,33 @@ We ask for the user to enter: experimenter name,
 laboratory, contact information, a single-sentence experiment title, an
 abstract describing the experiment, URLs. This slot could also include a
 formal statistical description of the experimental design (e.g. using
-factors). Some of this info is already stored in AnnotatedDataFrame or elsewhere.
+factors). Some of this info is already stored in
+\code{\link[Biobase:class.AnnotatedDataFrame]{AnnotatedDataFrame}} or
+elsewhere. 
 
 The function returns a list that is intended for the creation of an
-object of class \code{\link[Biobase]{MIAME}}. However, we return a list
-so that the function can work independently of the Biobase package.
+object of class \code{\link[Biobase:class.MIAME]{MIAME}}. However, we
+return a list so that the function can work independently of the Biobase
+package. 
 }
+
 \value{
   A list containing entries:
+
    \item{ExperimentName}{character string}
    \item{LabName}{character string}
    \item{ContactInfo}{character string}
    \item{ExperimentTitle}{character string}
    \item{Description}{character string}
    \item{URL}{character string}
+  
 }
 \references{``Minimum information about a microarray experiment
   (MIAME)-toward standards for microarray data'', A. Brazma, et al.,
   Nature Genetics, vol. 29 (December 2001), pp. 365-371,
-  \url{http://www.mged.org/Workgroups/MIAME/miame_1.1.html}} 
+  \url{http://www.mged.org/Workgroups/MIAME/miame_1.1.html}
+}
+
 \author{Majnu John}
-\seealso{\code{\link[Biobase]{MIAME}}}
+\seealso{\code{\link[Biobase:class.MIAME]{MIAME}}}
 \keyword{interface}

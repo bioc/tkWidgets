@@ -3,7 +3,8 @@
 \title{Simple interface to enter AnnotatedDataFrame}
 \description{
 This widget provides an interface to create
-\code{\link[Biobase]{AnnotatedDataFrame-class}} instances.
+\code{\link[Biobase:class.AnnotatedDataFrame]{AnnotatedDataFrame-class}}
+instances. 
 }
 \usage{
 tkphenoData(sampleNames)
@@ -14,7 +15,7 @@ tkphenoData(sampleNames)
 \details{
   The function returns a list of character matrices intended to be used
   as the \code{pData} and \code{varLabels} slots of an instance of
-  \code{\link[Biobase]{AnnotatedDataFrame-class}}.
+  \code{\link[Biobase:class.AnnotatedDataFrame]{AnnotatedDataFrame-class}}.
 }
 \value{
   A list of two matrices
@@ -22,5 +23,5 @@ tkphenoData(sampleNames)
   \item{varLabels }{a character vector with covariate description.}
 }
 \author{Majnu John} 
-\seealso{\code{\link[Biobase]{AnnotatedDataFrame-class}}}
+\seealso{\code{\link[Biobase:class.AnnotatedDataFrame]{AnnotatedDataFrame-class}}}
 \keyword{interface}

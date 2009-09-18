@@ -12,7 +12,8 @@
 \title{Functions to input data for an AnnotatedDataFrame object}
 \description{
   This functions allow users to read data from an existing file or an R
-  data.frame object and use the data frame to construct an AnnotatedDataFrame object.
+  data.frame object and use the data frame to construct an
+  AnnotatedDataFrame object. 
 }
 \usage{
 importPhenoData(fileName, sampleNames = NULL, from = NULL)
@@ -72,5 +73,5 @@ if(interactive()){
     importPhenoData()
 }
 }
-\seealso{\code{\link[Biobase]{AnnotatedDataFrame-class}}}
+\seealso{\code{\link[Biobase:class.AnnotatedDataFrame]{AnnotatedDataFrame-class}}} 
 \keyword{interface}
