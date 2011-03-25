@@ -10,14 +10,14 @@
 \alias{WbuttonFun}
 \alias{WwList}
 \alias{WwList<-}
-\alias{"WwList<-"}
+\alias{WwList<-}
 \alias{WLValue}
 \alias{WLValue<-}
 \alias{WRButtons}
 \alias{WpreFun}
 \alias{WpostFun}
 \alias{WEnd}
-\alias{"WValue<-"}
+\alias{WValue<-}
 \description{
   Currently primitive widget objects (\code{pwidget}s) are implemented
   as \code{\link{list}}s, but this will change.  Users should only rely
@@ -33,7 +33,7 @@ WcanEdit(x)
 WbuttonText(x)
 WbuttonFun(x)
 WwList(x)
-WwList <- value
+WwList(x) <- value
 WLValue(x, index)
 WLValue(x, index) <- value
 WRButtons(x)
