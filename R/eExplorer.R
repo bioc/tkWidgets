@@ -193,7 +193,7 @@ eExplorer <- function(pkgName, font = "arial 13", getFocus = TRUE){
 
 getExCode <- function(pkgName){
     options(show.error.messages = FALSE)
-    tryMe <- try(list.files(file.path(.path.package(pkgName), "R-ex")))
+    tryMe <- try(list.files(file.path(path.package(pkgName), "R-ex")))
     options(show.error.messages = TRUE)
 
     if(inherits(tryMe, "try-error")){
@@ -207,7 +207,7 @@ getExCode <- function(pkgName){
     codeChunks <- list()
     for(i in tryMe){
         codeChunks[[gsub("\\.R", "", i)]] <- readLines(
-                     file.path(.path.package(pkgName), "R-ex", i))
+                     file.path(path.package(pkgName), "R-ex", i))
     }
     return(codeChunks)
 }
@@ -222,7 +222,7 @@ getHelpFile <- function(pkgName, fileName){
                      "fileName is NULL or NA"))
     }
     options(show.error.message = FALSE)
-    tryMe <- try(readLines(file.path(.path.package(pkgName), "help",
+    tryMe <- try(readLines(file.path(path.package(pkgName), "help",
                                      fileName)))
     options(show.error.messages = TRUE)
     if(inherits(tryMe, "try-error")){

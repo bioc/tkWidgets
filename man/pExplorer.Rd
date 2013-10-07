@@ -66,8 +66,8 @@ procHTML(fileName)
 \examples{
     require("tkWidgets") || stop("tkWidgets not available")
     getPkgContents(.libPaths(), "tkWidgets")
-    getFileContents(file.path(.path.package("tkWidgets"), "help"),
-        list.files(file.path(.path.package("tkWidgets"), "help"))[1])
+    getFileContents(file.path(path.package("tkWidgets"), "help"),
+        list.files(file.path(path.package("tkWidgets"), "help"))[1])
     if(interactive()){
         pExplorer()
     }

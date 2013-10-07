@@ -188,7 +188,7 @@ vExplorer <- function (title = "BioC Vignettes Explorer",
     goodNames <- NULL
     for(i in packNames){
         eval(call(deparse(substitute(require)), i, TRUE))
-        path <- .path.package(i)
+        path <- path.package(i)
         options(warn = -1)
         tryMe <- getPkgVigList(path)
         options(warn = 1)

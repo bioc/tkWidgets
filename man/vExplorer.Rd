@@ -44,7 +44,7 @@ if(interactive()){
     require("tools", character.only = TRUE)
     require("widgetTools", character.only = TRUE)
     vExplorer()
-    path <- .path.package("widgetTools")
+    path <- path.package("widgetTools")
     vigList <- pkgVignettes("widgetTools")
     viewVignette("BioC VignetteBrowser", "widgetTools", vigList$docs)
 }
