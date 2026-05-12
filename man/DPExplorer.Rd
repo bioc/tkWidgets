@@ -49,9 +49,8 @@ loadDataPkg(pkgName)
 \author{Jianhua Zhang}
 
 \examples{
-if(interactive() && require("hgu95av2", character.only = TRUE)){
-    DPExplorer("hgu95av2")
-}
+if (interactive())
+    DPExplorer()
 }
 \keyword{interface}
 
